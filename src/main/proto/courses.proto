@@ -1,0 +1,13 @@
+enum Term {
+  SPRING = 0;
+  WINTER = 1;
+  FALL = 2;
+}
+
+message CourseInfo {
+  optional string name = 1;
+  optional string code = 2;
+  optional string description = 3;
+  optional string faculty = 4;
+  optional Term offeringTerm = 5;
+}
