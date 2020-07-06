@@ -15,6 +15,7 @@ import kotlin.DeprecationLevel
 import kotlin.Int
 import kotlin.Nothing
 import kotlin.String
+import kotlin.collections.List
 import kotlin.hashCode
 import kotlin.jvm.JvmField
 import okio.ByteString
@@ -42,9 +43,15 @@ class CourseInfo(
   val faculty: String? = null,
   @field:WireField(
     tag = 5,
-    adapter = "Term#ADAPTER"
+    adapter = "Term#ADAPTER",
+    label = WireField.Label.REPEATED
   )
-  val offeringTerm: Term? = null,
+  val offeringTerms: List<Term> = emptyList(),
+  @field:WireField(
+    tag = 6,
+    adapter = "com.squareup.wire.ProtoAdapter#INT32"
+  )
+  val id: Int? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<CourseInfo, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -61,7 +68,8 @@ class CourseInfo(
         && code == other.code
         && description == other.description
         && faculty == other.faculty
-        && offeringTerm == other.offeringTerm
+        && offeringTerms == other.offeringTerms
+        && id == other.id
   }
 
   override fun hashCode(): Int {
@@ -72,7 +80,8 @@ class CourseInfo(
       result = result * 37 + code.hashCode()
       result = result * 37 + description.hashCode()
       result = result * 37 + faculty.hashCode()
-      result = result * 37 + offeringTerm.hashCode()
+      result = result * 37 + offeringTerms.hashCode()
+      result = result * 37 + id.hashCode()
       super.hashCode = result
     }
     return result
@@ -84,7 +93,8 @@ class CourseInfo(
     if (code != null) result += """code=${sanitize(code)}"""
     if (description != null) result += """description=${sanitize(description)}"""
     if (faculty != null) result += """faculty=${sanitize(faculty)}"""
-    if (offeringTerm != null) result += """offeringTerm=$offeringTerm"""
+    if (offeringTerms.isNotEmpty()) result += """offeringTerms=$offeringTerms"""
+    if (id != null) result += """id=$id"""
     return result.joinToString(prefix = "CourseInfo{", separator = ", ", postfix = "}")
   }
 
@@ -93,9 +103,10 @@ class CourseInfo(
     code: String? = this.code,
     description: String? = this.description,
     faculty: String? = this.faculty,
-    offeringTerm: Term? = this.offeringTerm,
+    offeringTerms: List<Term> = this.offeringTerms,
+    id: Int? = this.id,
     unknownFields: ByteString = this.unknownFields
-  ): CourseInfo = CourseInfo(name, code, description, faculty, offeringTerm, unknownFields)
+  ): CourseInfo = CourseInfo(name, code, description, faculty, offeringTerms, id, unknownFields)
 
   companion object {
     @JvmField
@@ -109,7 +120,8 @@ class CourseInfo(
         ProtoAdapter.STRING.encodedSizeWithTag(2, value.code) +
         ProtoAdapter.STRING.encodedSizeWithTag(3, value.description) +
         ProtoAdapter.STRING.encodedSizeWithTag(4, value.faculty) +
-        Term.ADAPTER.encodedSizeWithTag(5, value.offeringTerm) +
+        Term.ADAPTER.asRepeated().encodedSizeWithTag(5, value.offeringTerms) +
+        ProtoAdapter.INT32.encodedSizeWithTag(6, value.id) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: CourseInfo) {
@@ -117,7 +129,8 @@ class CourseInfo(
         ProtoAdapter.STRING.encodeWithTag(writer, 2, value.code)
         ProtoAdapter.STRING.encodeWithTag(writer, 3, value.description)
         ProtoAdapter.STRING.encodeWithTag(writer, 4, value.faculty)
-        Term.ADAPTER.encodeWithTag(writer, 5, value.offeringTerm)
+        Term.ADAPTER.asRepeated().encodeWithTag(writer, 5, value.offeringTerms)
+        ProtoAdapter.INT32.encodeWithTag(writer, 6, value.id)
         writer.writeBytes(value.unknownFields)
       }
 
@@ -126,7 +139,8 @@ class CourseInfo(
         var code: String? = null
         var description: String? = null
         var faculty: String? = null
-        var offeringTerm: Term? = null
+        val offeringTerms = mutableListOf<Term>()
+        var id: Int? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> name = ProtoAdapter.STRING.decode(reader)
@@ -134,10 +148,11 @@ class CourseInfo(
             3 -> description = ProtoAdapter.STRING.decode(reader)
             4 -> faculty = ProtoAdapter.STRING.decode(reader)
             5 -> try {
-              offeringTerm = Term.ADAPTER.decode(reader)
+              offeringTerms.add(Term.ADAPTER.decode(reader))
             } catch (e: ProtoAdapter.EnumConstantNotFoundException) {
               reader.addUnknownField(tag, FieldEncoding.VARINT, e.value.toLong())
             }
+            6 -> id = ProtoAdapter.INT32.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
@@ -146,7 +161,8 @@ class CourseInfo(
           code = code,
           description = description,
           faculty = faculty,
-          offeringTerm = offeringTerm,
+          offeringTerms = offeringTerms,
+          id = id,
           unknownFields = unknownFields
         )
       }
