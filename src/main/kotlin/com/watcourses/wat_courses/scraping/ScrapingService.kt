@@ -1,5 +1,6 @@
 package com.watcourses.wat_courses.scraping
 
+import ReParseConditionsResponse
 import Term
 import com.watcourses.wat_courses.persistence.DbCourse
 import com.watcourses.wat_courses.persistence.DbCourseRepo
@@ -99,6 +100,21 @@ class ScrapingService {
                 courseId = basicInfo[1].let { it.substring(it.lastIndexOf(" ") + 1).trim() }
             )
         }
+    }
+
+    fun reParseConditions(): ReParseConditionsResponse {
+        val rulesToReparse = dbRuleRepo.findAllByCondIsNull()
+        var successCount = 0
+        for (rule in rulesToReparse) {
+            val newRule = DbRule.parse(rule.rawRule!!)
+            if (rule.parseFailureBecause != newRule.parseFailureBecause || rule.cond != newRule.cond) {
+                rule.parseFailureBecause = newRule.parseFailureBecause
+                rule.cond = newRule.cond
+                dbRuleRepo.save(rule)
+            }
+            if (rule.cond != null) successCount += 1
+        }
+        return ReParseConditionsResponse(total = rulesToReparse.size, success = successCount)
     }
 
     companion object {

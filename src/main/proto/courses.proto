@@ -12,3 +12,8 @@ message CourseInfo {
   repeated Term offeringTerms = 5;
   optional string id = 6;
 }
+
+message ReParseConditionsResponse {
+  optional int32 total = 1;
+  optional int32 success = 2;
+}

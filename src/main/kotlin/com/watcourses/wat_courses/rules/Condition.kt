@@ -28,17 +28,32 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
         /*
          * Example: CS 101, 123, CS 102/ECE 123, CS 233 => AND(CS101, CS123, OR(CS102, ECE123), CS233)
          */
+        private fun parseFromCourseRequirementText(text: String): Condition {
+            val processedText = text.substringAfter(":").trim()
+            val andParts = processedText.split(",").map { it.trim() }
+            return Condition(ConditionType.AND, andParts.mapIndexed { i, part ->
+                if (part.contains("/") || part.contains(" OR ", ignoreCase = true)) {
+                    val orParts = part.split("/", " OR ", ignoreCase = true)
+                    Condition(ConditionType.OR, orParts.mapIndexed { j, _ -> resolveCourse(orParts, j) })
+                } else
+                    resolveCourse(andParts, i)
+            })
+        }
+
+        private fun tryParseFacultyRequirements(text: String): Condition? {
+            return null
+        }
+
         fun parseFromText(text: String): Condition {
             try {
-                val processedText = text.substringAfter(":").trim()
-                val andParts = processedText.split(",").map { it.trim() }
-                return Condition(ConditionType.AND, andParts.mapIndexed { i, part ->
-                    if (part.contains("/") || part.contains("OR")) {
-                        val orParts = part.split("/", "OR")
-                        Condition(ConditionType.OR, orParts.mapIndexed { j, _ -> resolveCourse(orParts, j) })
-                    } else
-                        resolveCourse(andParts, i)
-                })
+                val conditions = mutableListOf<Condition>()
+                for (clause in text.split(";")) {
+                    val parsedCondition = tryParseFacultyRequirements(clause)
+                        ?: parseFromCourseRequirementText(text)
+                    conditions.add(parsedCondition)
+                }
+                if (conditions.size == 1) return conditions.single()
+                return Condition(ConditionType.AND, conditions)
             } catch (e: ParseFailure) {
                 e.str = text
                 throw e
