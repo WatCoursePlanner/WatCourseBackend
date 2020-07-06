@@ -101,6 +101,31 @@ class ScrapingService {
     }
 
     companion object {
-        val LIST_OF_COURSES_LIST = arrayOf("CS", "PMATH", "GEOE", "ACTSC", "ECE", "MTHEL", "SE")
+        val LIST_OF_COURSES_LIST = arrayOf(
+            "ACTSC", "AE", "AFM", "AHS", "AMATH",
+            "ANTH", "APPLS", "ARABIC", "ARBUS", "ARCH",
+            "ARTS", "ASL", "AVIA", "BASE", "BET", "BIOL",
+            "BME", "BUS", "CDNST", "CHE", "CHEM", "CHINA",
+            "CI", "CIVE", "CLAS", "CMW", "CO",
+            "COGSCI", "COMM", "COOP", "CROAT", "CS",
+            "DAC", "DUTCH", "EARTH", "EASIA", "ECE",
+            "ECON", "EMLS", "ENBUS", "ENGL", "ENVE",
+            "ENVS", "ERS", "FINE", "FR", "GBDA",
+            "GENE", "GEOE", "GEOG", "GER", "GERON",
+            "GRK", "GSJ", "HIST", "HLTH", "HRM",
+            "HRTS", "HUMSC", "INDEV", "INDG", "INTEG",
+            "INTST", "ITAL", "ITALST", "JAPAN", "JS",
+            "KIN", "KOREA", "LAT", "LS", "MATBUS",
+            "MATH", "ME", "MEDVL", "MENN", "MGMT",
+            "MNS", "MOHAWK", "MSCI", "MTE", "MTHEL",
+            "MUSIC", "NE", "OPTOM", "PACS", "PD",
+            "PDARCH", "PDPHRM", "PHARM", "PHIL", "PHYS",
+            "PLAN", "PMATH", "PORT", "PSCI", "PSYCH",
+            "REC", "REES", "RS", "RUSS", "SCBUS",
+            "SCI", "SDS", "SE", "SI", "SMF",
+            "SOC", "SOCWK", "SPAN", "SPCOM", "STAT",
+            "STV", "SVENT", "SWREN", "SYDE", "THPERF",
+            "UNIV", "VCULT", "WKRPT"
+        )
     }
 }
