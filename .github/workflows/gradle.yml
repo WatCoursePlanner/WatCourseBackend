@@ -13,10 +13,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK
-      uses: actions/setup-java@v1
-      with:
-        java-version: 11
-    - name: Build
-      run: chmod +x gradlew && ./gradlew build
+      - uses: actions/checkout@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: Start MySql Server
+        run: sudo systemctl start mysql.service
+      - name: Build
+        run: chmod +x gradlew && ./gradlew build
