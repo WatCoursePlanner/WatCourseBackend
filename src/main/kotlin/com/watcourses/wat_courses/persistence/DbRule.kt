@@ -10,7 +10,6 @@ import javax.persistence.*
 @TypeDef(name = "json", typeClass = JsonStringType::class)
 @Table(
     name = "rules", indexes = [
-        Index(name = "idx_raw_rule", columnList = "rawRule", unique = false),
         Index(name = "idx_manually_assigned", columnList = "manuallyAssigned", unique = false)
     ]
 )

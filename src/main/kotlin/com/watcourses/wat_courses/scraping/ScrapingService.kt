@@ -50,7 +50,7 @@ class ScrapingService {
 
     fun updateCourses() {
         for (courseList in LIST_OF_COURSES_LIST) {
-            logger.info("Scrapping $courseList")
+            logger.info("Scraping $courseList")
             val courses = fromUrl("http://www.ucalendar.uwaterloo.ca/2021/COURSE/course-$courseList.html")
                 ?.let { doc -> scrapeCoursePage(doc) }
             if (courses == null) {
@@ -60,6 +60,7 @@ class ScrapingService {
             logger.info("Done. ${courses.size} courses obtained.")
             for (course in courses) persistCourse(course)
             logger.info("Courses persisted.")
+            Thread.sleep(1000)
         }
     }
 

@@ -12,7 +12,7 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
 
         // resolve "123" in CS 101, 123 to course("CS 123")
         private fun resolveCourse(parts: List<String>, index: Int): Condition {
-            val part = parts[index]
+            val part = parts[index].trim()
             if (part.contains(" ")) { // e.g. CS 101. We have "CS" already so return directly
                 courseSanityCheck(part)
                 return course(part)
@@ -33,8 +33,8 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
                 val processedText = text.substringAfter(":").trim()
                 val andParts = processedText.split(",").map { it.trim() }
                 return Condition(ConditionType.AND, andParts.mapIndexed { i, part ->
-                    if (part.contains("/")) {
-                        val orParts = part.split("/")
+                    if (part.contains("/") || part.contains("OR")) {
+                        val orParts = part.split("/", "OR")
                         Condition(ConditionType.OR, orParts.mapIndexed { j, _ -> resolveCourse(orParts, j) })
                     } else
                         resolveCourse(andParts, i)
