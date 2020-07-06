@@ -49,9 +49,9 @@ class CourseInfo(
   val offeringTerms: List<Term> = emptyList(),
   @field:WireField(
     tag = 6,
-    adapter = "com.squareup.wire.ProtoAdapter#INT32"
+    adapter = "com.squareup.wire.ProtoAdapter#STRING"
   )
-  val id: Int? = null,
+  val id: String? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<CourseInfo, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -94,7 +94,7 @@ class CourseInfo(
     if (description != null) result += """description=${sanitize(description)}"""
     if (faculty != null) result += """faculty=${sanitize(faculty)}"""
     if (offeringTerms.isNotEmpty()) result += """offeringTerms=$offeringTerms"""
-    if (id != null) result += """id=$id"""
+    if (id != null) result += """id=${sanitize(id)}"""
     return result.joinToString(prefix = "CourseInfo{", separator = ", ", postfix = "}")
   }
 
@@ -104,7 +104,7 @@ class CourseInfo(
     description: String? = this.description,
     faculty: String? = this.faculty,
     offeringTerms: List<Term> = this.offeringTerms,
-    id: Int? = this.id,
+    id: String? = this.id,
     unknownFields: ByteString = this.unknownFields
   ): CourseInfo = CourseInfo(name, code, description, faculty, offeringTerms, id, unknownFields)
 
@@ -121,7 +121,7 @@ class CourseInfo(
         ProtoAdapter.STRING.encodedSizeWithTag(3, value.description) +
         ProtoAdapter.STRING.encodedSizeWithTag(4, value.faculty) +
         Term.ADAPTER.asRepeated().encodedSizeWithTag(5, value.offeringTerms) +
-        ProtoAdapter.INT32.encodedSizeWithTag(6, value.id) +
+        ProtoAdapter.STRING.encodedSizeWithTag(6, value.id) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: CourseInfo) {
@@ -130,7 +130,7 @@ class CourseInfo(
         ProtoAdapter.STRING.encodeWithTag(writer, 3, value.description)
         ProtoAdapter.STRING.encodeWithTag(writer, 4, value.faculty)
         Term.ADAPTER.asRepeated().encodeWithTag(writer, 5, value.offeringTerms)
-        ProtoAdapter.INT32.encodeWithTag(writer, 6, value.id)
+        ProtoAdapter.STRING.encodeWithTag(writer, 6, value.id)
         writer.writeBytes(value.unknownFields)
       }
 
@@ -140,7 +140,7 @@ class CourseInfo(
         var description: String? = null
         var faculty: String? = null
         val offeringTerms = mutableListOf<Term>()
-        var id: Int? = null
+        var id: String? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> name = ProtoAdapter.STRING.decode(reader)
@@ -152,7 +152,7 @@ class CourseInfo(
             } catch (e: ProtoAdapter.EnumConstantNotFoundException) {
               reader.addUnknownField(tag, FieldEncoding.VARINT, e.value.toLong())
             }
-            6 -> id = ProtoAdapter.INT32.decode(reader)
+            6 -> id = ProtoAdapter.STRING.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }

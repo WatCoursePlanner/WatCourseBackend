@@ -5,6 +5,7 @@ import com.watcourses.wat_courses.persistence.DbCourse
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.persistence.DbRule
 import com.watcourses.wat_courses.persistence.DbRuleRepo
+import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.slf4j.Logger
@@ -22,7 +23,14 @@ class ScrapingService {
 
     private val logger: Logger = LoggerFactory.getLogger(ScrapingService::class.java)
 
-    fun fromUrl(url: String) = Jsoup.connect(url).get()
+    fun fromUrl(url: String): Document? {
+        return try {
+            Jsoup.connect(url).get()
+        } catch (e: HttpStatusException) {
+            logger.warn("Failed to open $url: $e")
+            null
+        }
+    }
 
     private fun extractTermInfoFromDescription(desc: String): List<Term> {
         val beginningText = "[Offered: "
@@ -41,8 +49,9 @@ class ScrapingService {
     }
 
     fun updateCourses() {
-        val courses = LIST_OF_COURSES_LINKS.map { scrapeCoursePage(fromUrl(it)) }.flatten()
-        logger.info("Scrapping done. ${courses.size} courses obtained from ${LIST_OF_COURSES_LINKS.size} links.")
+        val courses = LIST_OF_COURSES.map { "http://www.ucalendar.uwaterloo.ca/2021/COURSE/course-$it.html" }
+            .mapNotNull { fromUrl(it)?.let { doc -> scrapeCoursePage(doc) } }.flatten()
+        logger.info("Scrapping done. ${courses.size} courses obtained from ${LIST_OF_COURSES.size} links.")
         for (course in courses) {
             persistCourse(course)
         }
@@ -84,8 +93,6 @@ class ScrapingService {
     }
 
     companion object {
-        val LIST_OF_COURSES_LINKS = arrayOf(
-            "http://www.ucalendar.uwaterloo.ca/2021/COURSE/course-CS.html"
-        )
+        val LIST_OF_COURSES = arrayOf("CS", "PMATH", "GEOE", "ACTSC", "ECE", "MTHEL", "SE")
     }
 }

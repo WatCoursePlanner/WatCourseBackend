@@ -10,5 +10,5 @@ message CourseInfo {
   optional string description = 3;
   optional string faculty = 4;
   repeated Term offeringTerms = 5;
-  optional int32 id = 6;
+  optional string id = 6;
 }

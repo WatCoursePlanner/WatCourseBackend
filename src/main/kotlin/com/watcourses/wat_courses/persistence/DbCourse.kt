@@ -1,5 +1,6 @@
 package com.watcourses.wat_courses.persistence
 
+import CourseInfo
 import Term
 import com.vladmihalcea.hibernate.type.json.JsonStringType
 import org.hibernate.annotations.Type
@@ -18,11 +19,11 @@ data class DbCourse(
     @Column(nullable = false)
     var name: String,
 
-    @Column(nullable = false, columnDefinition = "text")
-    var description: String,
-
     @Column(nullable = false)
     var code: String,
+
+    @Column(nullable = false, columnDefinition = "text")
+    var description: String,
 
     @Column(columnDefinition = "json") @Type(type = "json")
     var offeringTerms: List<Term>?,
@@ -41,4 +42,14 @@ data class DbCourse(
 
     @Id @GeneratedValue
     var id: Long? = null
-)
+) {
+    fun toProto(): CourseInfo {
+        return CourseInfo(
+            name = name,
+            code = code,
+            description = description,
+            offeringTerms = offeringTerms ?: listOf(),
+            id = courseId
+        )
+    }
+}
