@@ -2,4 +2,6 @@ package com.watcourses.wat_courses.persistence
 
 import org.springframework.data.repository.CrudRepository
 
-interface DbRuleRepo : CrudRepository<DbRule?, Long?>
+interface DbRuleRepo : CrudRepository<DbRule?, Long?> {
+    fun findFirstByRawRuleOrderById(rawRule: String): DbRule?
+}

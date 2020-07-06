@@ -49,13 +49,18 @@ class ScrapingService {
     }
 
     fun updateCourses() {
-        val courses = LIST_OF_COURSES.map { "http://www.ucalendar.uwaterloo.ca/2021/COURSE/course-$it.html" }
-            .mapNotNull { fromUrl(it)?.let { doc -> scrapeCoursePage(doc) } }.flatten()
-        logger.info("Scrapping done. ${courses.size} courses obtained from ${LIST_OF_COURSES.size} links.")
-        for (course in courses) {
-            persistCourse(course)
+        for (courseList in LIST_OF_COURSES_LIST) {
+            logger.info("Scrapping $courseList")
+            val courses = fromUrl("http://www.ucalendar.uwaterloo.ca/2021/COURSE/course-$courseList.html")
+                ?.let { doc -> scrapeCoursePage(doc) }
+            if (courses == null) {
+                logger.error("Failed to scrap $courseList")
+                continue
+            }
+            logger.info("Done. ${courses.size} courses obtained.")
+            for (course in courses) persistCourse(course)
+            logger.info("Courses persisted.")
         }
-        logger.info("Courses persisted.")
     }
 
     fun persistCourse(course: DbCourse) {
@@ -84,15 +89,18 @@ class ScrapingService {
                 code = codeAndCredit.subList(0, 2).joinToString(" "),
                 offeringTerms = extractTermInfoFromDescription(basicInfo[3]),
                 description = basicInfo[3],
-                antiRequisite = noteInfo.find { it.startsWith("Antireq:") }?.let { DbRule.parse(it) },
-                preRequisite = noteInfo.find { it.startsWith("Prereq:") }?.let { DbRule.parse(it) },
-                coRequisite = noteInfo.find { it.startsWith("Coreq:") }?.let { DbRule.parse(it) },
+                antiRequisite = noteInfo.find { it.startsWith("Antireq:") }
+                    ?.let { DbRule.findOrParse(it, dbRuleRepo) },
+                preRequisite = noteInfo.find { it.startsWith("Prereq:") }
+                    ?.let { DbRule.findOrParse(it, dbRuleRepo) },
+                coRequisite = noteInfo.find { it.startsWith("Coreq:") }
+                    ?.let { DbRule.findOrParse(it, dbRuleRepo) },
                 courseId = basicInfo[1].let { it.substring(it.lastIndexOf(" ") + 1).trim() }
             )
         }
     }
 
     companion object {
-        val LIST_OF_COURSES = arrayOf("CS", "PMATH", "GEOE", "ACTSC", "ECE", "MTHEL", "SE")
+        val LIST_OF_COURSES_LIST = arrayOf("CS", "PMATH", "GEOE", "ACTSC", "ECE", "MTHEL", "SE")
     }
 }
