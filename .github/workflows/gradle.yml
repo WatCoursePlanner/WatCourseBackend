@@ -18,7 +18,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Start MySql Server
-        run: sudo systemctl start mysql.service
+      - uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql version: '8.0'
+          mysql database: 'watcourses'
+          mysql root password: 'root'
       - name: Build
         run: chmod +x gradlew && ./gradlew build
