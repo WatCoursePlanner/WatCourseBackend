@@ -32,7 +32,10 @@ dependencies {
     implementation("org.springframework.session:spring-session-core")
     implementation("com.squareup.wire:wire-runtime:3.2.2")
     implementation("com.google.code.gson:gson:2.8.6")
+    implementation("org.jsoup:jsoup:1.13.1")
+    implementation("com.vladmihalcea:hibernate-types-52:2.9.12")
     runtimeOnly("com.h2database:h2")
+    runtimeOnly("mysql:mysql-connector-java")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
