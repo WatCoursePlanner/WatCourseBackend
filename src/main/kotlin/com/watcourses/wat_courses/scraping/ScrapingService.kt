@@ -102,19 +102,32 @@ class ScrapingService {
         }
     }
 
-    fun reParseConditions(): ReParseConditionsResponse {
+    fun reParseConditions(dryRun: Boolean): ReParseConditionsResponse {
         val rulesToReparse = dbRuleRepo.findAllByCondIsNull()
+        val succeedResults = mutableMapOf<String, String>()
+        val failedResults = mutableMapOf<String, String>()
         var successCount = 0
         for (rule in rulesToReparse) {
             val newRule = DbRule.parse(rule.rawRule!!)
             if (rule.parseFailureBecause != newRule.parseFailureBecause || rule.cond != newRule.cond) {
                 rule.parseFailureBecause = newRule.parseFailureBecause
                 rule.cond = newRule.cond
-                dbRuleRepo.save(rule)
+                if (!dryRun) dbRuleRepo.save(rule)
             }
-            if (rule.cond != null) successCount += 1
+            if (rule.cond != null) {
+                successCount += 1
+                succeedResults[rule.rawRule!!] = rule.cond.toString()
+            } else {
+                failedResults[rule.rawRule!!] = rule.parseFailureBecause.toString()
+            }
         }
-        return ReParseConditionsResponse(total = rulesToReparse.size, success = successCount)
+        return ReParseConditionsResponse(
+            total = rulesToReparse.size,
+            success = successCount,
+            succeedResults = succeedResults,
+            failedResults = failedResults,
+            dryRun = dryRun
+        )
     }
 
     companion object {

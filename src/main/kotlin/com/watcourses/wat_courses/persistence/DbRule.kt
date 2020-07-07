@@ -32,9 +32,9 @@ data class DbRule(
     companion object {
         fun parse(raw: String): DbRule {
             return try {
-                DbRule(rawRule = raw, cond = Condition.parseFromText(raw))
+                DbRule(rawRule = raw, cond = Condition.parse(raw))
             } catch (e: Condition.ParseFailure) {
-                DbRule(rawRule = raw, cond = null, parseFailureBecause = e.reason)
+                DbRule(rawRule = raw, cond = null, parseFailureBecause = e.message.toString())
             }
         }
 
