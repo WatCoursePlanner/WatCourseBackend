@@ -6,11 +6,15 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
     class ParseFailure(reason: String, val str: String? = null) : Exception(reason)
     companion object {
         private fun courseSanityCheck(course: String) {
-            if (course.split(" ").size != 2)
+            val courseParts = course.split(" ")
+            if (courseParts.size != 2
+                || courseParts[0].any { it !in 'A'..'Z' }
+                || courseParts[1].any { it !in '0'..'9' && it !in 'A'..'Z' }
+            )
                 throw ParseFailure("sanity check failed: $course does not look like a course")
         }
 
-        // resolve "123" in CS 101, 123 to course("CS 123")
+        // resolve "123" in "CS 101, 123" to course("CS 123")
         private fun resolveCourse(parts: List<String>, index: Int): Condition {
             val part = parts[index].trim()
             if (part.contains(" ")) { // e.g. CS 101. We have "CS" already so return directly
@@ -37,8 +41,6 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
             }
             return Condition(type, andParts.mapIndexed { i, part ->
                 if (part.contains("/") || part.contains(" OR ", ignoreCase = true)) {
-                    if (type == ConditionType.OR) throw ParseFailure("OR condition inside OR condition")
-
                     val orParts = part.split("/", " OR ", ignoreCase = true)
                     Condition(ConditionType.OR, orParts.mapIndexed { j, _ -> resolveCourse(orParts, j) })
                 } else
