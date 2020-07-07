@@ -16,4 +16,7 @@ message CourseInfo {
 message ReParseConditionsResponse {
   optional int32 total = 1;
   optional int32 success = 2;
+  map<string, string> succeedResults = 3;
+  map<string, string> failedResults = 4;
+  optional bool dryRun = 5;
 }

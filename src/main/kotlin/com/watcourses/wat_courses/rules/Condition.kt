@@ -1,9 +1,9 @@
 package com.watcourses.wat_courses.rules
 
-enum class ConditionType { TRUE, FALSE, AND, OR, NOT, HAS_COURSE }
+enum class ConditionType { TRUE, FALSE, AND, OR, NOT, HAS_COURSE, HAS_LABEL }
 
 data class Condition(val type: ConditionType, val operands: List<Condition>, val data: String? = null) {
-    class ParseFailure(val reason: String, var str: String? = null) : Exception("Failed to parse $str because $reason")
+    class ParseFailure(reason: String, val str: String? = null) : Exception(reason)
     companion object {
         private fun courseSanityCheck(course: String) {
             if (course.split(" ").size != 2)
@@ -19,7 +19,7 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
             }
             // look backwards for identifier
             val identifier = parts.subList(0, index).findLast { it.contains(" ") }?.substringBefore(" ")
-                ?: ParseFailure("Can't find a course identifier")
+                ?: throw ParseFailure("Can't find a course identifier")
             val completeCourseCode = "$identifier $part"
             courseSanityCheck(completeCourseCode)
             return course(completeCourseCode)
@@ -29,10 +29,16 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
          * Example: CS 101, 123, CS 102/ECE 123, CS 233 => AND(CS101, CS123, OR(CS102, ECE123), CS233)
          */
         private fun parseFromCourseRequirementText(text: String): Condition {
-            val processedText = text.substringAfter(":").trim()
-            val andParts = processedText.split(",").map { it.trim() }
-            return Condition(ConditionType.AND, andParts.mapIndexed { i, part ->
+            val andParts = text.split(",").map { it.trim() }.toMutableList()
+            var type = ConditionType.AND
+            if (andParts[0].startsWith("one of", ignoreCase = true)) {
+                andParts[0] = andParts[0].substring("one of".length).trim()
+                type = ConditionType.OR
+            }
+            return Condition(type, andParts.mapIndexed { i, part ->
                 if (part.contains("/") || part.contains(" OR ", ignoreCase = true)) {
+                    if (type == ConditionType.OR) throw ParseFailure("OR condition inside OR condition")
+
                     val orParts = part.split("/", " OR ", ignoreCase = true)
                     Condition(ConditionType.OR, orParts.mapIndexed { j, _ -> resolveCourse(orParts, j) })
                 } else
@@ -40,24 +46,109 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
             })
         }
 
-        private fun tryParseFacultyRequirements(text: String): Condition? {
-            return null
+        /*
+         * Parse major/level-related info. Examples:
+         * level at (at least) xx (1A)
+         * [not open to] xxx (major) students
+         * [not open to] students in [1A/SE/1st year]
+         * Fourth year Honours students in the Department of Recreation and Leisure Studies
+         * A, B and C majors (major name can include "and" too)
+         * Level at at least [1A] XXMajor
+         *
+         * Throws an exception when failed to parse
+         */
+        private fun tryParseLabelRequirements(text: String): Condition {
+            var infoNotExtracted = text
+            var cond = Condition(ConditionType.AND, listOf())
+            val additionalMap = mapOf(
+                "first year" to "1st year", "second year" to "2nd year",
+                "third year" to "3rd year", "fourth year" to "4th year",
+                "Year 1" to "1st year", "Year 2" to "2nd year",
+                "Year 3" to "3rd year", "Year 4" to "4th year"
+            )
+            val possibleList = setOf(
+                "1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B",
+                "1st year", "2nd year", "3rd year", "4th year"
+            ) + additionalMap.keys
+            val result = possibleList.find { text.contains(it, ignoreCase = true) }
+            if (result != null) {
+                cond = cond.addOperand(label(additionalMap[result] ?: result))
+                infoNotExtracted = infoNotExtracted.replace(result, "")
+            }
+
+            val abbrMap = mapOf(
+                "Eng" to "Engineering",
+                "Fin" to "Financial",
+                "Mgmt" to "Management",
+                "Acc'ting" to "Accounting",
+                "AHS" to "Applied Health Science",
+                "Math" to "Mathematics",
+                "&" to "and"
+            )
+
+            for (it in abbrMap) {
+                infoNotExtracted = infoNotExtracted.replace(it.key + ",", it.value + ",")
+                    .replace(it.key + " ", it.value + " ")
+            }
+
+            val foundList = mutableListOf<String>()
+
+            for (label in ALL_LABELS.sortedByDescending { it.length }) {
+                if (infoNotExtracted.contains(label, ignoreCase = true)) {
+                    foundList.add(label)
+                    infoNotExtracted = infoNotExtracted.replace(label, "", ignoreCase = true)
+                }
+            }
+
+            val wordsToIgnore = listOf(
+                ",", ".", "/", "and", "Bachelor of", "majors", "not open to",
+                "students", "in", "only", "level", "least", "at", "or", "of", "the"
+            )
+
+            for (ignoringWord in wordsToIgnore) {
+                infoNotExtracted = infoNotExtracted.replace(ignoringWord, "", ignoreCase = true).trim()
+            }
+
+            if (infoNotExtracted.isNotBlank()) {
+                throw ParseFailure("Has info not recognized: $infoNotExtracted")
+                //return null
+            }
+
+            cond = cond.addOperand(Condition(ConditionType.OR, foundList.map { label(it) }))
+
+            return when {
+                text.contains("not open to", ignoreCase = true) -> not(cond) // revert conditions
+                cond.operands.size == 1 -> cond.operands.single()
+                cond.operands.isNotEmpty() -> cond
+                else -> throw ParseFailure("Operands is empty. No info extracted") //null
+            }
         }
 
-        fun parseFromText(text: String): Condition {
-            try {
-                val conditions = mutableListOf<Condition>()
-                for (clause in text.split(";")) {
-                    val parsedCondition = tryParseFacultyRequirements(clause)
-                        ?: parseFromCourseRequirementText(text)
-                    conditions.add(parsedCondition)
-                }
-                if (conditions.size == 1) return conditions.single()
-                return Condition(ConditionType.AND, conditions)
+        private fun safeParseCall(
+            exceptionList: MutableList<Exception>,
+            str: String,
+            block: (String) -> Condition
+        ): Condition? {
+            return try {
+                block(str)
             } catch (e: ParseFailure) {
-                e.str = text
-                throw e
+                exceptionList.add(e)
+                null
             }
+        }
+
+        fun parse(text: String): Condition {
+            val processedText = text.substringAfter(":").trim()
+            val conditions = mutableListOf<Condition>()
+            for (clause in processedText.split(";")) {
+                val exceptions = mutableListOf<Exception>()
+                val parsedCondition = safeParseCall(exceptions, clause) { tryParseLabelRequirements(it) }
+                    ?: safeParseCall(exceptions, clause) { parseFromCourseRequirementText(it) }
+                    ?: throw ParseFailure(exceptions.joinToString("; ") { it.message.toString() }, text)
+                conditions.add(parsedCondition)
+            }
+            if (conditions.size == 1) return conditions.single()
+            return Condition(ConditionType.AND, conditions)
         }
 
         fun and(vararg conditions: Condition) = Condition(ConditionType.AND, conditions.toList())
@@ -66,16 +157,21 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
         fun alwaysTrue() = Condition(ConditionType.TRUE, listOf())
         fun alwaysFalse() = Condition(ConditionType.FALSE, listOf())
         fun course(code: String) = Condition(ConditionType.HAS_COURSE, listOf(), data = code)
+        fun label(label: String) = Condition(ConditionType.HAS_LABEL, listOf(), data = label)
     }
 
-    fun check(courseCodeSet: Set<String>): Boolean {
+    fun addOperand(operand: Condition) =
+        Condition(type = type, operands = operands + operand, data = data)
+
+    fun check(studentState: StudentState): Boolean {
         return when (type) {
             ConditionType.TRUE -> true
             ConditionType.FALSE -> false
-            ConditionType.AND -> operands.map { it.check(courseCodeSet) }.reduce { a, b -> a && b }
-            ConditionType.OR -> operands.map { it.check(courseCodeSet) }.reduce { a, b -> a || b }
-            ConditionType.NOT -> !operands.single().check(courseCodeSet)
-            ConditionType.HAS_COURSE -> courseCodeSet.contains(data)
+            ConditionType.AND -> operands.map { it.check(studentState) }.reduce { a, b -> a && b }
+            ConditionType.OR -> operands.map { it.check(studentState) }.reduce { a, b -> a || b }
+            ConditionType.NOT -> !operands.single().check(studentState)
+            ConditionType.HAS_COURSE -> studentState.courseTaken.contains(data)
+            ConditionType.HAS_LABEL -> studentState.labels.contains(data)
         }
     }
 
@@ -88,10 +184,12 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
             ConditionType.OR -> bracketIfComplex(operands.joinToString(" || ") { it.toStringInternal() })
             ConditionType.NOT -> "!${operands.single().toStringInternal()}"
             ConditionType.HAS_COURSE -> "$data"
+            ConditionType.HAS_LABEL -> "[$data]"
         }
     }
 
     override fun toString(): String {
-        return toStringInternal().trimStart('(').trimEnd(')')
+        val ret = toStringInternal()
+        return if (ret.first() == '(' && ret.last() == ')') ret.substring(1, ret.length - 1) else ret
     }
 }
