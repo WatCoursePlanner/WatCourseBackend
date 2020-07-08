@@ -11,6 +11,12 @@ message CourseInfo {
   optional string faculty = 4;
   repeated Term offeringTerms = 5;
   optional string id = 6;
+  optional string preRequisiteLogicStr = 7;
+  optional string coRequisiteLogicStr = 8;
+  optional string antiRequisiteLogicStr = 9;
+  optional string preRequisite = 10;
+  optional string coRequisite = 11;
+  optional string antiRequisite = 12;
 }
 
 message ReParseConditionsResponse {
@@ -19,4 +25,32 @@ message ReParseConditionsResponse {
   map<string, string> succeedResults = 3;
   map<string, string> failedResults = 4;
   optional bool dryRun = 5;
+}
+
+enum ConditionType {
+  TRUE = 0;
+  FALSE = 1;
+  AND = 2;
+  OR = 3;
+  NOT = 4;
+  HAS_COURSE = 5;
+  HAS_LABEL = 6;
+  SATISFIES_LIST = 7;
+}
+
+message Schedule {
+  message TermSchedule {
+    repeated string courseCodes = 1;
+    optional string termName = 2; // e.g. 1A, 2B
+  }
+  repeated TermSchedule terms = 1;
+}
+
+message StudentProfile {
+  optional Schedule schedule = 1;
+  repeated string labels = 2;
+}
+
+message CheckResults {
+  repeated string errors = 1;
 }
