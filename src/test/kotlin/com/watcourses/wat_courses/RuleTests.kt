@@ -1,5 +1,6 @@
 package com.watcourses.wat_courses
 
+import com.github.h0tk3y.betterParse.grammar.parseToEnd
 import com.watcourses.wat_courses.rules.Condition
 import com.watcourses.wat_courses.rules.Condition.Companion.alwaysFalse
 import com.watcourses.wat_courses.rules.Condition.Companion.alwaysTrue
@@ -7,6 +8,7 @@ import com.watcourses.wat_courses.rules.Condition.Companion.and
 import com.watcourses.wat_courses.rules.Condition.Companion.course
 import com.watcourses.wat_courses.rules.Condition.Companion.not
 import com.watcourses.wat_courses.rules.Condition.Companion.or
+import com.watcourses.wat_courses.rules.ConditionParser
 import com.watcourses.wat_courses.rules.StudentState
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -31,7 +33,7 @@ class RuleTests {
     }
 
     @Test
-    fun `parsing works`() {
+    fun `parsing raw requirements works`() {
         Condition.parse(
             "req: BME 121, CS 115, 135, 137, CHE 121, MTE 121/GENE 121, NE 111, MSCI 121"
         ).let {
@@ -88,5 +90,22 @@ class RuleTests {
 
         assertThat(Condition.parse("Level at least 4B Mechanical Engineering students only.").toString())
             .isEqualTo("[4B] && [Mechanical Engineering]")
+    }
+
+    @Test
+    fun `condition string parser works`() {
+        assertThat(
+            ConditionParser.parseToEnd("CS 123 && !(MATH 233 || [label2]) && [label] or CS 101 and [1A]").toString()
+        ).isEqualTo("((CS 123 && !(MATH 233 || [label2])) && [label]) || (CS 101 && [1A])")
+        assertThat(
+            ConditionParser.parseToEnd("!CS 123 && <list:2> || <ATE_CS:3>").toString()
+        ).isEqualTo("(!CS 123 && <list:2>) || <ATE_CS:3>")
+    }
+
+    @Test
+    fun `get related courses works`() {
+        val cond = ConditionParser.parseToEnd("!(MATH 233 || (<list1:1>&&true)) && <list2:2> or <list3:3>")
+        assertThat(cond.getRelatedCourses()).containsExactlyInAnyOrder("MATH 233")
+        assertThat(cond.getRelatedCourseLists()).containsExactlyInAnyOrder("list1", "list2", "list3")
     }
 }

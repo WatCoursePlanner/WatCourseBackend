@@ -21,6 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { setUrl("https://dl.bintray.com/hotkeytlt/maven") }
 }
 
 dependencies {
@@ -34,6 +35,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("org.jsoup:jsoup:1.13.1")
     implementation("com.vladmihalcea:hibernate-types-52:2.9.12")
+    implementation("com.github.h0tk3y.betterParse:better-parse:0.4.0")
+    implementation("org.tomlj:tomlj:1.0.0")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("mysql:mysql-connector-java")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -56,6 +59,6 @@ tasks.withType<KotlinCompile> {
 
 wire {
     kotlin {
-        out = "src/main/kotlin/proto"
+        out = "src/main/kotlin/com/watcourses/wat_courses/proto"
     }
 }

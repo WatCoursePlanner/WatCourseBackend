@@ -1,6 +1,6 @@
 package com.watcourses.wat_courses.rules
 
-enum class ConditionType { TRUE, FALSE, AND, OR, NOT, HAS_COURSE, HAS_LABEL }
+import ConditionType
 
 data class Condition(val type: ConditionType, val operands: List<Condition>, val data: String? = null) {
     class ParseFailure(reason: String, val str: String? = null) : Exception(reason)
@@ -68,10 +68,7 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
                 "Year 1" to "1st year", "Year 2" to "2nd year",
                 "Year 3" to "3rd year", "Year 4" to "4th year"
             )
-            val possibleList = setOf(
-                "1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B",
-                "1st year", "2nd year", "3rd year", "4th year"
-            ) + additionalMap.keys
+            val possibleList = TermResolver.ALL_TERMS_TO_VALUES_MAP.keys.toSet() + additionalMap.keys
             val result = possibleList.find { text.contains(it, ignoreCase = true) }
             if (result != null) {
                 cond = cond.addOperand(label(additionalMap[result] ?: result))
@@ -160,6 +157,25 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
         fun alwaysFalse() = Condition(ConditionType.FALSE, listOf())
         fun course(code: String) = Condition(ConditionType.HAS_COURSE, listOf(), data = code)
         fun label(label: String) = Condition(ConditionType.HAS_LABEL, listOf(), data = label)
+        fun courseList(label: String, minimalCount: Int) = Condition(
+            ConditionType.SATISFIES_LIST, listOf(), data = "$label:$minimalCount"
+        )
+    }
+
+    // Get the set of courses involved in the condition
+    fun getRelatedCourses(): Set<String> {
+        val courses = if (type == ConditionType.HAS_COURSE) setOf(data!!) else setOf()
+        return courses +
+                (operands.takeIf { it.isNotEmpty() }?.map { it.getRelatedCourses() }?.reduce { a, b -> a + b }
+                    ?: setOf())
+    }
+
+    // Get the set of course lists involved in the condition
+    fun getRelatedCourseLists(): Set<String> {
+        val courses = if (type == ConditionType.SATISFIES_LIST) setOf(data!!.split(":")[0]) else setOf()
+        return courses +
+                (operands.takeIf { it.isNotEmpty() }?.map { it.getRelatedCourseLists() }?.reduce { a, b -> a + b }
+                    ?: setOf())
     }
 
     fun addOperand(operand: Condition) =
@@ -172,8 +188,14 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
             ConditionType.AND -> operands.map { it.check(studentState) }.reduce { a, b -> a && b }
             ConditionType.OR -> operands.map { it.check(studentState) }.reduce { a, b -> a || b }
             ConditionType.NOT -> !operands.single().check(studentState)
-            ConditionType.HAS_COURSE -> studentState.courseTaken.contains(data)
+            ConditionType.HAS_COURSE -> studentState.coursesTaken.contains(data)
             ConditionType.HAS_LABEL -> studentState.labels.contains(data)
+            ConditionType.SATISFIES_LIST -> {
+                val (listName, countStr) = data!!.split(":")
+                studentState.coursesTaken.count {
+                    CourseListLoader().listContainsCourse(listName, it)
+                } >= countStr.toLong()
+            }
         }
     }
 
@@ -187,6 +209,7 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
             ConditionType.NOT -> "!${operands.single().toStringInternal()}"
             ConditionType.HAS_COURSE -> "$data"
             ConditionType.HAS_LABEL -> "[$data]"
+            ConditionType.SATISFIES_LIST -> "<$data>"
         }
     }
 
