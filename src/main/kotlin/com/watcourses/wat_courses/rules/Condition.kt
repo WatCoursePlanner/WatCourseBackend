@@ -162,6 +162,22 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
         )
     }
 
+    // Get the set of courses involved in the condition
+    fun getRelatedCourses(): Set<String> {
+        val courses = if (type == ConditionType.HAS_COURSE) setOf(data!!) else setOf()
+        return courses +
+                (operands.takeIf { it.isNotEmpty() }?.map { it.getRelatedCourses() }?.reduce { a, b -> a + b }
+                    ?: setOf())
+    }
+
+    // Get the set of course lists involved in the condition
+    fun getRelatedCourseLists(): Set<String> {
+        val courses = if (type == ConditionType.SATISFIES_LIST) setOf(data!!.split(":")[0]) else setOf()
+        return courses +
+                (operands.takeIf { it.isNotEmpty() }?.map { it.getRelatedCourseLists() }?.reduce { a, b -> a + b }
+                    ?: setOf())
+    }
+
     fun addOperand(operand: Condition) =
         Condition(type = type, operands = operands + operand, data = data)
 

@@ -101,4 +101,11 @@ class RuleTests {
             ConditionParser.parseToEnd("!CS 123 && <list:2> || <ATE_CS:3>").toString()
         ).isEqualTo("(!CS 123 && <list:2>) || <ATE_CS:3>")
     }
+
+    @Test
+    fun `get related courses works`() {
+        val cond = ConditionParser.parseToEnd("!(MATH 233 || (<list1:1>&&true)) && <list2:2> or <list3:3>")
+        assertThat(cond.getRelatedCourses()).containsExactlyInAnyOrder("MATH 233")
+        assertThat(cond.getRelatedCourseLists()).containsExactlyInAnyOrder("list1", "list2", "list3")
+    }
 }

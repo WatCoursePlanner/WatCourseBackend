@@ -12,7 +12,7 @@ class Checker {
     private lateinit var dbCourseRepo: DbCourseRepo
 
     fun check(profile: StudentProfile): CheckResults {
-        val results = mutableListOf<String>()
+        val issues = mutableListOf<CheckResults.Issue>()
         val coursesTaken = mutableSetOf<String>()
         for (term in profile.schedule!!.terms) {
             val effectiveLabels = profile.labels.toSet() + TermResolver.getApplicableLabels(term.termName!!)
@@ -22,17 +22,44 @@ class Checker {
                     StudentState(coursesTaken = coursesTaken + term.courseCodes, labels = effectiveLabels)
                 val dbCourse = dbCourseRepo.findByCode(course) ?: throw RuntimeException("Course $course not found")
                 if (dbCourse.preRequisite?.cond?.check(state) == false) {
-                    results.add("The pre-requisite of $course is not met.")
+                    issues.add(
+                        CheckResults.Issue(
+                            type = CheckResults.Issue.Type.PRE_REQUISITE_NOT_MET,
+                            subjectName = course,
+                            relatedCond = dbCourse.preRequisite!!.cond.toString(),
+                            relatedCondRaw = dbCourse.preRequisite!!.rawRule,
+                            relatedCourse = dbCourse.preRequisite!!.cond!!.getRelatedCourses().toList(),
+                            relatedCourseList = dbCourse.preRequisite!!.cond!!.getRelatedCourses().toList()
+                        )
+                    )
                 }
                 if (dbCourse.coRequisite?.cond?.check(stateIncludingThisTerm) == false) {
-                    results.add("The co-requisite of $course is not met.")
+                    issues.add(
+                        CheckResults.Issue(
+                            type = CheckResults.Issue.Type.CO_REQUISITE_NOT_MET,
+                            subjectName = course,
+                            relatedCond = dbCourse.coRequisite!!.cond.toString(),
+                            relatedCondRaw = dbCourse.coRequisite!!.rawRule,
+                            relatedCourse = dbCourse.coRequisite!!.cond!!.getRelatedCourses().toList(),
+                            relatedCourseList = dbCourse.coRequisite!!.cond!!.getRelatedCourses().toList()
+                        )
+                    )
                 }
                 if (dbCourse.antiRequisite?.cond?.check(stateIncludingThisTerm) == true) {
-                    results.add("The anti-requisite of $course is not met.")
+                    issues.add(
+                        CheckResults.Issue(
+                            type = CheckResults.Issue.Type.ANTI_REQUISITE_NOT_MET,
+                            subjectName = course,
+                            relatedCond = dbCourse.antiRequisite!!.cond.toString(),
+                            relatedCondRaw = dbCourse.antiRequisite!!.rawRule,
+                            relatedCourse = dbCourse.antiRequisite!!.cond!!.getRelatedCourses().toList(),
+                            relatedCourseList = dbCourse.antiRequisite!!.cond!!.getRelatedCourses().toList()
+                        )
+                    )
                 }
                 coursesTaken.addAll(term.courseCodes)
             }
         }
-        return CheckResults(errors = results)
+        return CheckResults(issues = issues)
     }
 }

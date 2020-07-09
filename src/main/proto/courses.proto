@@ -52,5 +52,19 @@ message StudentProfile {
 }
 
 message CheckResults {
-  repeated string errors = 1;
+  message Issue {
+    enum Type {
+      PRE_REQUISITE_NOT_MET = 1;
+      CO_REQUISITE_NOT_MET = 2;
+      ANTI_REQUISITE_NOT_MET = 3;
+      DEGREE_REQUIREMENTS_NOT_MET = 4;
+    }
+    optional Type type = 1;
+    optional string subjectName = 2; // Either the code of the course or the name of the cond
+    optional string relatedCond = 3; // Condition that failed in the check (string, logical expression).
+    optional string relatedCondRaw = 4; // The raw condition, if applicable
+    repeated string relatedCourse = 5; // courses in the cond.
+    repeated string relatedCourseList = 6; // course list in the cond.
+  }
+  repeated Issue issues = 1;
 }
