@@ -3,6 +3,7 @@ package com.watcourses.wat_courses.rules
 import CheckResults
 import StudentProfile
 import com.watcourses.wat_courses.persistence.DbCourseRepo
+import com.watcourses.wat_courses.persistence.DbRule
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -10,6 +11,17 @@ import org.springframework.stereotype.Service
 class Checker {
     @Autowired
     private lateinit var dbCourseRepo: DbCourseRepo
+
+    private fun generateIssue(course: String, rule: DbRule, type: CheckResults.Issue.Type): CheckResults.Issue {
+        return CheckResults.Issue(
+            type = type,
+            subjectName = course,
+            relatedCond = rule.cond.toString(),
+            relatedCondRaw = rule.rawRule,
+            relatedCourse = rule.cond!!.getRelatedCourses().toList(),
+            relatedCourseList = rule.cond!!.getRelatedCourses().toList()
+        )
+    }
 
     fun check(profile: StudentProfile): CheckResults {
         val issues = mutableListOf<CheckResults.Issue>()
@@ -23,38 +35,17 @@ class Checker {
                 val dbCourse = dbCourseRepo.findByCode(course) ?: throw RuntimeException("Course $course not found")
                 if (dbCourse.preRequisite?.cond?.check(state) == false) {
                     issues.add(
-                        CheckResults.Issue(
-                            type = CheckResults.Issue.Type.PRE_REQUISITE_NOT_MET,
-                            subjectName = course,
-                            relatedCond = dbCourse.preRequisite!!.cond.toString(),
-                            relatedCondRaw = dbCourse.preRequisite!!.rawRule,
-                            relatedCourse = dbCourse.preRequisite!!.cond!!.getRelatedCourses().toList(),
-                            relatedCourseList = dbCourse.preRequisite!!.cond!!.getRelatedCourses().toList()
-                        )
+                        generateIssue(course, dbCourse.preRequisite!!, CheckResults.Issue.Type.PRE_REQUISITE_NOT_MET)
                     )
                 }
                 if (dbCourse.coRequisite?.cond?.check(stateIncludingThisTerm) == false) {
                     issues.add(
-                        CheckResults.Issue(
-                            type = CheckResults.Issue.Type.CO_REQUISITE_NOT_MET,
-                            subjectName = course,
-                            relatedCond = dbCourse.coRequisite!!.cond.toString(),
-                            relatedCondRaw = dbCourse.coRequisite!!.rawRule,
-                            relatedCourse = dbCourse.coRequisite!!.cond!!.getRelatedCourses().toList(),
-                            relatedCourseList = dbCourse.coRequisite!!.cond!!.getRelatedCourses().toList()
-                        )
+                        generateIssue(course, dbCourse.coRequisite!!, CheckResults.Issue.Type.CO_REQUISITE_NOT_MET)
                     )
                 }
                 if (dbCourse.antiRequisite?.cond?.check(stateIncludingThisTerm) == true) {
                     issues.add(
-                        CheckResults.Issue(
-                            type = CheckResults.Issue.Type.ANTI_REQUISITE_NOT_MET,
-                            subjectName = course,
-                            relatedCond = dbCourse.antiRequisite!!.cond.toString(),
-                            relatedCondRaw = dbCourse.antiRequisite!!.rawRule,
-                            relatedCourse = dbCourse.antiRequisite!!.cond!!.getRelatedCourses().toList(),
-                            relatedCourseList = dbCourse.antiRequisite!!.cond!!.getRelatedCourses().toList()
-                        )
+                        generateIssue(course, dbCourse.antiRequisite!!, CheckResults.Issue.Type.ANTI_REQUISITE_NOT_MET)
                     )
                 }
                 coursesTaken.addAll(term.courseCodes)
