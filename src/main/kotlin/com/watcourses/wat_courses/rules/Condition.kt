@@ -181,12 +181,6 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
     fun addOperand(operand: Condition) =
         Condition(type = type, operands = operands + operand, data = data)
 
-    fun getCourseListNameAndCount(): Pair<String, Int> {
-        if (type != ConditionType.SATISFIES_LIST) throw RuntimeException("type is not SATISFIES_LIST: $type")
-        val (name, countStr) = data!!.split(":")
-        return Pair(name, countStr.toInt())
-    }
-
     fun check(studentState: StudentState): Boolean {
         return when (type) {
             ConditionType.TRUE -> true
@@ -197,10 +191,10 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
             ConditionType.HAS_COURSE -> studentState.coursesTaken.contains(data)
             ConditionType.HAS_LABEL -> studentState.labels.contains(data)
             ConditionType.SATISFIES_LIST -> {
-                val (listName, count) = getCourseListNameAndCount()
+                val (listName, countStr) = data!!.split(":")
                 studentState.coursesTaken.count {
                     CourseListLoader().listContainsCourse(listName, it)
-                } >= count
+                } >= countStr.toLong()
             }
         }
     }
