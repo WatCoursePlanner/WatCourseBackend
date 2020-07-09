@@ -1,7 +1,7 @@
-[degree]
 name = "Software Engineering"
 # parent = ""
 source = "https://ugradcalendar.uwaterloo.ca/page/ENG-Software-Engineering"
+labels = ["Software Engineering", "Engineering", "Faculty of Mathematics"]
 
 [[requirements]]
 name = "Three Advanced Technical Electives (ATE)"

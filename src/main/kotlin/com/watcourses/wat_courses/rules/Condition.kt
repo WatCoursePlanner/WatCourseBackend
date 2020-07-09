@@ -183,7 +183,7 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
             ConditionType.SATISFIES_LIST -> {
                 val (listName, count) = getCourseListNameAndCount()
                 studentState.coursesTaken.count {
-                    ListResolver().listContainsCourse(listName, it)
+                    CourseListLoader().listContainsCourse(listName, it)
                 } >= count
             }
         }

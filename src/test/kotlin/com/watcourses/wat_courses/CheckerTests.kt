@@ -1,10 +1,12 @@
 package com.watcourses.wat_courses
 
 import com.watcourses.wat_courses.rules.Checker
-import com.watcourses.wat_courses.rules.ListResolver
+import com.watcourses.wat_courses.rules.CourseListLoader
+import com.watcourses.wat_courses.rules.DegreeRequirementLoader
 import com.watcourses.wat_courses.rules.TermResolver
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 
@@ -14,11 +16,27 @@ class CheckerTests {
     private lateinit var checker: Checker
 
     @Autowired
-    private lateinit var listResolver: ListResolver
+    private lateinit var courseListLoader: CourseListLoader
+
+    @Autowired
+    private lateinit var degreeRequirementLoader: DegreeRequirementLoader
 
     @Test
-    fun `checker works`() {
-        listResolver.loadFiles()
+    fun `course list works`() {
+        assertThat(courseListLoader.listContainsCourse("ATE_CS", "CS 123")).isTrue()
+        assertThat(courseListLoader.listContainsCourse("ATE_CS", "DNE")).isFalse()
+        assertThat(courseListLoader.listContainsCourse("ATE", "CS 123")).isTrue()
+        assertThrows<Exception> { courseListLoader.listContainsCourse("DNE", "DNE") }
+    }
+
+    @Test
+    fun `degree requirements loader works`() {
+        val se = degreeRequirementLoader.getDegreeRequirement("Software Engineering")!!
+        assertThat(se.source).contains("ugradcalendar")
+        assertThat(se.labels).contains("Software Engineering", "Faculty of Mathematics")
+        assertThat(se.defaultSchedule!!.terms.single { it.termName == "1A" }.courseCodes).contains("SE 101")
+        assertThat(se.requirements.single { it.name == "Two Science Electives (SCE)" }.condition.toString())
+            .isEqualTo("<SCE:2>")
     }
 
     @Test
