@@ -3,19 +3,36 @@ package com.watcourses.wat_courses.rules
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.persistence.DbRule
 import com.watcourses.wat_courses.proto.CheckResults
+import com.watcourses.wat_courses.proto.ConditionType
 import com.watcourses.wat_courses.proto.StudentProfile
 import com.watcourses.wat_courses.utils.getDegreeLabels
 import com.watcourses.wat_courses.utils.getLabels
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class Checker {
-    @Autowired
-    private lateinit var dbCourseRepo: DbCourseRepo
-
-    @Autowired
-    private lateinit var degreeRequirementLoader: DegreeRequirementLoader
+class Checker(
+    private val dbCourseRepo: DbCourseRepo,
+    private val courseListLoader: CourseListLoader,
+    private val degreeRequirementLoader: DegreeRequirementLoader
+) {
+    fun checkCondition(condition: Condition, studentState: StudentState): Boolean {
+        return when (condition.type) {
+            ConditionType.TRUE -> true
+            ConditionType.FALSE -> false
+            ConditionType.AND -> condition.operands.map { checkCondition(it, studentState) }.reduce { a, b -> a && b }
+            ConditionType.OR -> condition.operands.map { checkCondition(it, studentState) }.reduce { a, b -> a || b }
+            ConditionType.NOT -> !checkCondition(condition.operands.single(), studentState)
+            ConditionType.HAS_COURSE -> studentState.coursesTaken.contains(condition.data)
+            ConditionType.HAS_LABEL -> studentState.labels.contains(condition.data)
+            ConditionType.SATISFIES_LIST -> {
+                val (listName, countStr) = condition.data!!.split(":")
+                studentState.coursesTaken.count {
+                    courseListLoader.listContainsCourse(listName, it)
+                } >= countStr.toLong()
+            }
+        }
+    }
+    fun Condition.check(state: StudentState) = checkCondition(this, state)
 
     private fun generateIssue(course: String, rule: DbRule, type: CheckResults.Issue.Type): CheckResults.Issue {
         return CheckResults.Issue(

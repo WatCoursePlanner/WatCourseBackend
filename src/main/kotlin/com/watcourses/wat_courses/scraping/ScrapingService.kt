@@ -1,27 +1,25 @@
 package com.watcourses.wat_courses.scraping
 
-import ReParseConditionsResponse
-import com.watcourses.wat_courses.proto.Term
 import com.watcourses.wat_courses.persistence.DbCourse
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.persistence.DbRule
 import com.watcourses.wat_courses.persistence.DbRuleRepo
+import com.watcourses.wat_courses.proto.ReParseConditionsResponse
+import com.watcourses.wat_courses.proto.Term
+import com.watcourses.wat_courses.rules.RawConditionParser
 import org.jsoup.HttpStatusException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-class ScrapingService {
-    @Autowired
-    private lateinit var dbCourseRepo: DbCourseRepo
-
-    @Autowired
-    private lateinit var dbRuleRepo: DbRuleRepo
-
+class ScrapingService(
+    private val dbCourseRepo: DbCourseRepo,
+    private val dbRuleRepo: DbRuleRepo,
+    private val rawConditionParser: RawConditionParser
+) {
     private val logger: Logger = LoggerFactory.getLogger(ScrapingService::class.java)
 
     fun fromUrl(url: String): Document? {
@@ -92,11 +90,11 @@ class ScrapingService {
                 offeringTerms = extractTermInfoFromDescription(basicInfo[3]),
                 description = basicInfo[3],
                 antiRequisite = noteInfo.find { it.startsWith("Antireq:") }
-                    ?.let { DbRule.findOrParse(it, dbRuleRepo) },
+                    ?.let { DbRule.findOrParse(it, dbRuleRepo) { rawConditionParser.parse(it) } },
                 preRequisite = noteInfo.find { it.startsWith("Prereq:") }
-                    ?.let { DbRule.findOrParse(it, dbRuleRepo) },
+                    ?.let { DbRule.findOrParse(it, dbRuleRepo) { rawConditionParser.parse(it) } },
                 coRequisite = noteInfo.find { it.startsWith("Coreq:") }
-                    ?.let { DbRule.findOrParse(it, dbRuleRepo) },
+                    ?.let { DbRule.findOrParse(it, dbRuleRepo) { rawConditionParser.parse(it) } },
                 courseId = basicInfo[1].let { it.substring(it.lastIndexOf(" ") + 1).trim() }
             )
         }
@@ -108,7 +106,7 @@ class ScrapingService {
         val failedResults = mutableMapOf<String, String>()
         var successCount = 0
         for (rule in rulesToReparse) {
-            val newRule = DbRule.parse(rule.rawRule!!)
+            val newRule = DbRule.parse(rule.rawRule!!) { rawConditionParser.parse(it) }
             if (rule.parseFailureBecause != newRule.parseFailureBecause || rule.cond != newRule.cond) {
                 rule.parseFailureBecause = newRule.parseFailureBecause
                 rule.cond = newRule.cond

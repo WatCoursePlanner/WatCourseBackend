@@ -26,10 +26,23 @@ class CheckerTests {
 
     @Test
     fun `course list works`() {
-        assertThat(courseListLoader.listContainsCourse("ATE_CS", "CS 123")).isTrue()
+        // Simple list tests
+        assertThat(courseListLoader.listContainsCourse("ATE_CS", "CS 442")).isTrue()
         assertThat(courseListLoader.listContainsCourse("ATE_CS", "DNE")).isFalse()
-        assertThat(courseListLoader.listContainsCourse("ATE", "CS 123")).isTrue()
+
+        // Test list with includes
+        assertThat(courseListLoader.listContainsCourse("ATE", "CS 442")).isTrue()
+
+        // Test non-existing list
         assertThrows<Exception> { courseListLoader.listContainsCourse("DNE", "DNE") }
+
+        // Test lists with wildcards & except & wildcard except
+        assertThat(courseListLoader.listContainsCourse("Humanities_and_Social_Sciences", "AE 101")).isTrue()
+        assertThat(courseListLoader.listContainsCourse("Humanities_and_Social_Sciences", "ANTH 100")).isTrue()
+        assertThat(courseListLoader.listContainsCourse("Humanities_and_Social_Sciences", "ECON 221")).isFalse()
+        assertThat(courseListLoader.listContainsCourse("Humanities_and_Social_Sciences", "ECON 101")).isTrue()
+        assertThat(courseListLoader.listContainsCourse("Humanities_and_Social_Sciences", "PSYCH 420")).isFalse()
+
     }
 
     @Test

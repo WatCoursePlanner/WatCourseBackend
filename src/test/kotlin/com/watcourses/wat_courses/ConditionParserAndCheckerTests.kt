@@ -1,19 +1,29 @@
 package com.watcourses.wat_courses
 
 import com.github.h0tk3y.betterParse.grammar.parseToEnd
-import com.watcourses.wat_courses.rules.Condition
-import com.watcourses.wat_courses.rules.Condition.Companion.alwaysFalse
-import com.watcourses.wat_courses.rules.Condition.Companion.alwaysTrue
-import com.watcourses.wat_courses.rules.Condition.Companion.and
-import com.watcourses.wat_courses.rules.Condition.Companion.course
-import com.watcourses.wat_courses.rules.Condition.Companion.not
-import com.watcourses.wat_courses.rules.Condition.Companion.or
-import com.watcourses.wat_courses.rules.ConditionParser
-import com.watcourses.wat_courses.rules.StudentState
+import com.watcourses.wat_courses.rules.*
+import com.watcourses.wat_courses.rules.RawConditionParser.Companion.alwaysFalse
+import com.watcourses.wat_courses.rules.RawConditionParser.Companion.alwaysTrue
+import com.watcourses.wat_courses.rules.RawConditionParser.Companion.and
+import com.watcourses.wat_courses.rules.RawConditionParser.Companion.course
+import com.watcourses.wat_courses.rules.RawConditionParser.Companion.not
+import com.watcourses.wat_courses.rules.RawConditionParser.Companion.or
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 
-class RuleTests {
+@SpringBootTest
+class ConditionParserAndCheckerTests {
+    @Autowired
+    private lateinit var checker: Checker
+
+    @Autowired
+    private lateinit var rawConditionParser: RawConditionParser
+
+    fun Condition.check(state: StudentState) = checker.checkCondition(this, state)
+    fun Condition.Companion.parse(text: String) = rawConditionParser.parse(text)
+
     @Test
     fun `checking works`() {
         val testState = StudentState(setOf("A", "B", "D"), emptySet())

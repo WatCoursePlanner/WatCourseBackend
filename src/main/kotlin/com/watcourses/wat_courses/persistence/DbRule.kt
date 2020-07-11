@@ -2,6 +2,7 @@ package com.watcourses.wat_courses.persistence
 
 import com.vladmihalcea.hibernate.type.json.JsonStringType
 import com.watcourses.wat_courses.rules.Condition
+import com.watcourses.wat_courses.rules.RawConditionParser
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
 import javax.persistence.*
@@ -30,14 +31,15 @@ data class DbRule(
     var id: Long? = null
 ) {
     companion object {
-        fun parse(raw: String): DbRule {
+        fun parse(raw: String, parser: (String) -> Condition): DbRule {
             return try {
-                DbRule(rawRule = raw, cond = Condition.parse(raw))
-            } catch (e: Condition.ParseFailure) {
+                DbRule(rawRule = raw, cond = parser(raw))
+            } catch (e: RawConditionParser.ParseFailure) {
                 DbRule(rawRule = raw, cond = null, parseFailureBecause = e.message.toString())
             }
         }
 
-        fun findOrParse(raw: String, dbRuleRepo: DbRuleRepo) = dbRuleRepo.findFirstByRawRuleOrderById(raw) ?: parse(raw)
+        fun findOrParse(raw: String, dbRuleRepo: DbRuleRepo, parser: (String) -> Condition)
+                = dbRuleRepo.findFirstByRawRuleOrderById(raw) ?: parse(raw, parser)
     }
 }

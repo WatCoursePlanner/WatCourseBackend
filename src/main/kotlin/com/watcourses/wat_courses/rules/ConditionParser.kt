@@ -32,22 +32,22 @@ object ConditionParser : Grammar<Condition>() {
 
     val ws by regexToken("\\s+", ignore = true)
 
-    val negation by -not and parser(this::term) map { Condition.not(it) }
+    val negation by -not and parser(this::term) map { RawConditionParser.not(it) }
     val labelExpression by -lLabel and id and -rLabel
     val listExpression by -lList and id and -listSeparator and positiveNumber and -rList
     val bracedExpression by -lpar and parser(this::orChain) and -rpar
 
     val term: Parser<Condition> by
-    (tru asJust Condition.alwaysTrue()) or
-            (fal asJust Condition.alwaysFalse()) or
-            (courseCode map { Condition.course(it.text) }) or
-            (labelExpression map { Condition.label(it.text) }) or
-            (listExpression map { Condition.courseList(it.t1.text, it.t2.text.toInt()) }) or
+    (tru asJust RawConditionParser.alwaysTrue()) or
+            (fal asJust RawConditionParser.alwaysFalse()) or
+            (courseCode map { RawConditionParser.course(it.text) }) or
+            (labelExpression map { RawConditionParser.label(it.text) }) or
+            (listExpression map { RawConditionParser.courseList(it.t1.text, it.t2.text.toInt()) }) or
             negation or
             bracedExpression
 
-    val andChain by leftAssociative(term, and) { a, _, b -> Condition.and(a, b) }
-    val orChain by leftAssociative(andChain, or) { a, _, b -> Condition.or(a, b) }
+    val andChain by leftAssociative(term, and) { a, _, b -> RawConditionParser.and(a, b) }
+    val orChain by leftAssociative(andChain, or) { a, _, b -> RawConditionParser.or(a, b) }
 
     override val rootParser by orChain
 }
