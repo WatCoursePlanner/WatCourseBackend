@@ -1,7 +1,7 @@
 package com.watcourses.wat_courses
 
-import Term
 import com.watcourses.wat_courses.persistence.DbCourseRepo
+import com.watcourses.wat_courses.proto.Term
 import com.watcourses.wat_courses.scraping.ScrapingService
 import org.assertj.core.api.Assertions.assertThat
 import org.jsoup.Jsoup
@@ -10,9 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.core.io.ClassPathResource
 import org.springframework.test.annotation.DirtiesContext
+import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
+@ActiveProfiles("test")
 class ScrapingTests {
     @Autowired
     private lateinit var scrapingService: ScrapingService

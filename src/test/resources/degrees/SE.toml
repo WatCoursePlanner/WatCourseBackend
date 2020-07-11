@@ -8,20 +8,8 @@ name = "Three Advanced Technical Electives (ATE)"
 cond = "<ATE_CS:1> and <ATE_ECE:1> and <ATE:3>"
 
 [[requirements]]
-name = "Two Science Electives (SCE)"
-cond = "<Science_Electives:2>"
-
-[[requirements]]
 name = "Three Linkage Electives (LE)"
-cond = "(CS 492 || <Societal_Issues:1>) && <Humanities_and_Social_Sciences:1> && <Communications:1>"
-
-[[requirements]]
-name = "Communication course is taken in 2A"
-cond = "![2A] || <Communications:1>"
-
-[[requirements]]
-name = "Five PD courses"
-cond = "<PD:5>"
+cond = "(CS 492) && <Humanities_and_Social_Sciences:1>
 
 [[requirements]]
 name = "All degree required courses are taken"

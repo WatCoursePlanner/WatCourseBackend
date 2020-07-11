@@ -1,0 +1,7 @@
+include = []
+courses = ["ANTH *","AE 101","ECON *"]
+except = ["ECON 211","ECON 221","PSYCH 4*"]
+notes = [
+ "GSJ 371 may be acceptable at the discretion of the associate chair when a course outline is shown",
+ "PSYCH 400-level courses need approval of the Department of Psychology"
+]

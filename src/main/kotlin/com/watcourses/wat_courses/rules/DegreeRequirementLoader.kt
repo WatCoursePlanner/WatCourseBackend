@@ -1,23 +1,31 @@
 package com.watcourses.wat_courses.rules
 
-import Schedule
 import com.github.h0tk3y.betterParse.grammar.parseToEnd
+import com.watcourses.wat_courses.proto.Schedule
 import com.watcourses.wat_courses.scraping.ScrapingService
+import com.watcourses.wat_courses.utils.ClassPathResourceReader
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Service
 import org.tomlj.Toml
 import org.tomlj.TomlArray
 import org.tomlj.TomlTable
 
 @Service
-class DegreeRequirementLoader {
+class DegreeRequirementLoader(private val resourceReader: ClassPathResourceReader) {
     private lateinit var degrees: Map<String, DegreeRequirement> // name -> DegreeRequirement
     private val logger: Logger = LoggerFactory.getLogger(ScrapingService::class.java)
 
     init {
-        val degreeList = ClassPathResource("degrees").file.listFiles()?.filterNotNull()?.map { file ->
+        try {
+            loadDegreeRequirements()
+        } catch (e: Exception) {
+            logger.warn("Failed to load lists because $e")
+        }
+    }
+
+    final fun loadDegreeRequirements() {
+        val degreeList = resourceReader.get("degrees").file.listFiles()?.filterNotNull()?.map { file ->
             val degreeFile = Toml.parse(file.inputStream())
             DegreeRequirement(
                 name = degreeFile["name"]?.toString() ?: file.nameWithoutExtension,
