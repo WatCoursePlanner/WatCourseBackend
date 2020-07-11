@@ -36,6 +36,7 @@ dependencies {
     implementation("org.jsoup:jsoup:1.13.1")
     implementation("com.vladmihalcea:hibernate-types-52:2.9.12")
     implementation("com.github.h0tk3y.betterParse:better-parse:0.4.0")
+    implementation("io.github.lognet:grpc-spring-boot-starter:3.5.5")
     implementation("org.tomlj:tomlj:1.0.0")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("mysql:mysql-connector-java")
@@ -59,6 +60,7 @@ tasks.withType<KotlinCompile> {
 
 wire {
     kotlin {
+        rpcRole = "server"
         out = "src/main/kotlin/"
     }
 }
