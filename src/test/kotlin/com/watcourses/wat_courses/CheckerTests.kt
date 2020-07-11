@@ -10,7 +10,6 @@ import com.watcourses.wat_courses.rules.DegreeRequirementLoader
 import com.watcourses.wat_courses.rules.TermResolver
 import com.watcourses.wat_courses.utils.ClassPathResourceReader
 import com.watcourses.wat_courses.utils.build
-import org.junit.jupiter.api.BeforeAll
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
