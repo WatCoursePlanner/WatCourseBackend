@@ -1,7 +1,7 @@
 package com.watcourses.wat_courses.persistence
 
-import CourseInfo
-import Term
+import com.watcourses.wat_courses.proto.CourseInfo
+import com.watcourses.wat_courses.proto.Term
 import com.vladmihalcea.hibernate.type.json.JsonStringType
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef

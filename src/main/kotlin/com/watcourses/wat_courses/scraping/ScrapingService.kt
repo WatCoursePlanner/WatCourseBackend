@@ -1,7 +1,7 @@
 package com.watcourses.wat_courses.scraping
 
 import ReParseConditionsResponse
-import Term
+import com.watcourses.wat_courses.proto.Term
 import com.watcourses.wat_courses.persistence.DbCourse
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.persistence.DbRule

@@ -1,4 +1,15 @@
 include = []
-courses = [
-    ""
-]
+courses = ["ECE 409",
+          "ECE 416",
+          "ECE 418",
+          "ECE 423",
+          "ECE 429",
+          "ECE 454",
+          "ECE 455",
+          "ECE 457A",
+          "ECE 457B",
+          "ECE 458",
+          "ECE 459",
+          "ECE 481",
+          "ECE 486",
+          "ECE 488"]

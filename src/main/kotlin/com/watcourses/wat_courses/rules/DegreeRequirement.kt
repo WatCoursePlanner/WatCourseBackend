@@ -1,6 +1,6 @@
 package com.watcourses.wat_courses.rules
 
-import Schedule
+import com.watcourses.wat_courses.proto.Schedule
 
 data class Requirement(
     val name: String,

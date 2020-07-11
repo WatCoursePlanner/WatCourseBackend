@@ -59,6 +59,6 @@ tasks.withType<KotlinCompile> {
 
 wire {
     kotlin {
-        out = "src/main/kotlin/com/watcourses/wat_courses/proto"
+        out = "src/main/kotlin/"
     }
 }

@@ -9,17 +9,58 @@ cond = "<ATE_CS:1> and <ATE_ECE:1> and <ATE:3>"
 
 [[requirements]]
 name = "Two Science Electives (SCE)"
-cond = "<SCE:2>"
+cond = "<Science_Electives:2>"
 
 [[requirements]]
 name = "Three Linkage Electives (LE)"
-cond = "<Societal_Issues:1> && <Humanities_and_Social_Sciences:1> && <Communications:1>"
+cond = "(CS 492 || <Societal_Issues:1>) && <Humanities_and_Social_Sciences:1> && <Communications:1>"
 
 [[requirements]]
 name = "Communication course is taken in 2A"
 cond = "![2A] || <Communications:1>"
-apply = "every_term"
+
+[[requirements]]
+name = "Five PD courses"
+cond = "<PD:5>"
+
+[[requirements]]
+name = "All degree required courses are taken"
+cond = """\
+CS 137 && ECE 105 && MATH 115 && MATH 117 && MATH 135 && SE 101 && SE 102 && CS 138 &&\
+ECE 106 && ECE 124 && ECE 140 && MATH 119 && SE 201 && (CHE 102 || CHE 120) && CS 241 && ECE 222 &&\
+SE 212 && (STAT 206 || (STAT 230 && STAT 231)) && SE 202 && CS 240 && CS 247 && CS 348 &&\
+ECE 192 && MATH 239 && WKRPT 200 && SE 301 && CS 341 && CS 349 && MATH 213 && SE 350 &&\
+SE 465 && SE 302 && CS 343 && ECE 358 && SE 380 && SE 390 && SE 464 && WKRPT 300 &&\
+SE 401 && SE 463 && SE 490 && WKRPT 400 && SE 402 && SE 491"""
 
 [[default_schedule.term]]
 name = "1A"
 courses = ["CS 137", "ECE 105", "MATH 115", "MATH 117", "MATH 135", "SE 101"]
+
+[[default_schedule.term]]
+name = "1B"
+courses = ["SE 102", "CS 138", "ECE 106", "ECE 124", "ECE 140", "MATH 119"]
+
+[[default_schedule.term]]
+name = "2A"
+courses = ["SE 201", "CHE 102", "CS 241", "ECE 222", "SE 212", "STAT 206"]
+
+[[default_schedule.term]]
+name = "2B"
+courses = ["SE 202", "CS 240", "CS 247", "CS 348", "ECE 192", "MATH 239", "WKRPT 200"]
+
+[[default_schedule.term]]
+name = "3A"
+courses = ["SE 301", "CS 341", "CS 349", "MATH 213", "SE 350", "SE 465"]
+
+[[default_schedule.term]]
+name = "3B"
+courses = ["SE 302", "CS 343", "ECE 358", "SE 380", "SE 390", "SE 464", "WKRPT 300"]
+
+[[default_schedule.term]]
+name = "4A"
+courses = ["SE 401", "SE 463", "SE 490", "WKRPT 400"]
+
+[[default_schedule.term]]
+name = "4B"
+courses = ["SE 402", "SE 491"]

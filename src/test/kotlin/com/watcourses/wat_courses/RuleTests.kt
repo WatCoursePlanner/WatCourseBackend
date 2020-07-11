@@ -96,7 +96,7 @@ class RuleTests {
     fun `condition string parser works`() {
         assertThat(
             ConditionParser.parseToEnd("CS 123 && !(MATH 233 || [label2]) && [label] or CS 101 and [1A]").toString()
-        ).isEqualTo("((CS 123 && !(MATH 233 || [label2])) && [label]) || (CS 101 && [1A])")
+        ).isEqualTo("(CS 123 && !(MATH 233 || [label2]) && [label]) || (CS 101 && [1A])")
         assertThat(
             ConditionParser.parseToEnd("!CS 123 && <list:2> || <ATE_CS:3>").toString()
         ).isEqualTo("(!CS 123 && <list:2>) || <ATE_CS:3>")

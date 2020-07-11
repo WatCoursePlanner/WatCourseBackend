@@ -1,6 +1,6 @@
 package com.watcourses.wat_courses.rules
 
-import Schedule
+import com.watcourses.wat_courses.proto.Schedule
 import com.github.h0tk3y.betterParse.grammar.parseToEnd
 import com.watcourses.wat_courses.scraping.ScrapingService
 import org.slf4j.Logger

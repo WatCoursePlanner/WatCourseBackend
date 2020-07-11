@@ -1,0 +1,2 @@
+include = []
+courses = ["ENGL 109", "ENGL 129R", "EMLS 129R", "EMLS 101R", "EMLS 102R", "SPCOM 100", "SPCOM 223"]

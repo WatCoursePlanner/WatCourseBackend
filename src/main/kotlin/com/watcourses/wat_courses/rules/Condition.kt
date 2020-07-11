@@ -1,6 +1,7 @@
 package com.watcourses.wat_courses.rules
 
-import ConditionType
+import com.watcourses.wat_courses.proto.ConditionType
+import com.watcourses.wat_courses.utils.unionFlatten
 
 data class Condition(val type: ConditionType, val operands: List<Condition>, val data: String? = null) {
     class ParseFailure(reason: String, val str: String? = null) : Exception(reason)
@@ -150,8 +151,20 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
             return Condition(ConditionType.AND, conditions)
         }
 
-        fun and(vararg conditions: Condition) = Condition(ConditionType.AND, conditions.toList())
-        fun or(vararg conditions: Condition) = Condition(ConditionType.OR, conditions.toList())
+        fun and(vararg conditions: Condition): Condition {
+            return if (conditions.size == 2 && conditions[0].type == ConditionType.AND)
+                conditions[0].addOperand(conditions[1]) // flatten if possible
+            else
+                Condition(ConditionType.AND, conditions.toList())
+        }
+
+        fun or(vararg conditions: Condition): Condition {
+            return if (conditions.size == 2 && conditions[0].type == ConditionType.OR)
+                conditions[0].addOperand(conditions[1]) // flatten if possible
+            else
+                Condition(ConditionType.OR, conditions.toList())
+        }
+
         fun not(condition: Condition) = Condition(ConditionType.NOT, listOf(condition))
         fun alwaysTrue() = Condition(ConditionType.TRUE, listOf())
         fun alwaysFalse() = Condition(ConditionType.FALSE, listOf())
@@ -162,20 +175,23 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
         )
     }
 
+
     // Get the set of courses involved in the condition
     fun getRelatedCourses(): Set<String> {
-        val courses = if (type == ConditionType.HAS_COURSE) setOf(data!!) else setOf()
-        return courses +
-                (operands.takeIf { it.isNotEmpty() }?.map { it.getRelatedCourses() }?.reduce { a, b -> a + b }
-                    ?: setOf())
+        return (if (type == ConditionType.HAS_COURSE) setOf(data!!) else setOf()) +
+                (operands.map { it.getRelatedCourses() }.unionFlatten())
     }
 
     // Get the set of course lists involved in the condition
     fun getRelatedCourseLists(): Set<String> {
         val courses = if (type == ConditionType.SATISFIES_LIST) setOf(data!!.split(":")[0]) else setOf()
-        return courses +
-                (operands.takeIf { it.isNotEmpty() }?.map { it.getRelatedCourseLists() }?.reduce { a, b -> a + b }
-                    ?: setOf())
+        return courses + (operands.map { it.getRelatedCourseLists() }.unionFlatten())
+    }
+
+    // Get the set of labels involved in the condition
+    fun getRelatedLabels(): Set<String> {
+        return (if (type == ConditionType.HAS_LABEL) setOf(data!!) else setOf()) +
+                (operands.map { it.getRelatedLabels() }.unionFlatten())
     }
 
     fun addOperand(operand: Condition) =

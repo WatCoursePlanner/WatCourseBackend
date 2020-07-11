@@ -1,9 +1,12 @@
 package com.watcourses.wat_courses
 
+import com.watcourses.wat_courses.proto.Schedule
+import com.watcourses.wat_courses.proto.StudentProfile
 import com.watcourses.wat_courses.rules.Checker
 import com.watcourses.wat_courses.rules.CourseListLoader
 import com.watcourses.wat_courses.rules.DegreeRequirementLoader
 import com.watcourses.wat_courses.rules.TermResolver
+import com.watcourses.wat_courses.utils.build
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -50,5 +53,16 @@ class CheckerTests {
                 "1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B",
                 "1st year", "2nd year", "3rd year", "4th year"
             )
+    }
+
+    @Test
+    fun `checker works`() {
+        val result = checker.check(
+            StudentProfile(
+                schedule = Schedule.build(mapOf("1A" to listOf("CS 480"))),
+                degrees = listOf("Software Engineering")
+            )
+        )
+        assertThat(result.issues).isNotEmpty()
     }
 }

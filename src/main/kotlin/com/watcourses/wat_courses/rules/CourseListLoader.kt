@@ -1,5 +1,6 @@
 package com.watcourses.wat_courses.rules
 
+import com.watcourses.wat_courses.proto.CourseList
 import com.watcourses.wat_courses.scraping.ScrapingService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -10,7 +11,7 @@ import org.tomlj.TomlArray
 
 @Service
 class CourseListLoader {
-    private val courseList = mutableMapOf<String, Set<String>>()
+    private val courseList = mutableMapOf<String, CourseList>()
     private val logger: Logger = LoggerFactory.getLogger(ScrapingService::class.java)
 
     init {
@@ -35,9 +36,10 @@ class CourseListLoader {
             var resolvedAtLeastOne = false
             for (list in unresolvedLists) {
                 if (list.includes.all { includeName -> unresolvedLists.find { it.name == includeName && it.added } != null }) {
-                    courseList[list.name] =
-                        list.courses + (list.includes.map { courseList[it]!! }.takeIf { it.isNotEmpty() }
-                            ?.reduce { a, b -> a + b } ?: emptySet())
+                    courseList[list.name] = CourseList(
+                        courses = (list.courses + (list.includes.map { courseList[it]!!.courses }).flatten().toSet()).toList(),
+                        name = list.name
+                    )
                     list.added = true
                     resolvedAtLeastOne = true
                 }
@@ -50,6 +52,9 @@ class CourseListLoader {
         logger.info("${courseList.keys.size} course lists loaded")
     }
 
+    fun getList(listName: String) =
+        (courseList[listName] ?: throw RuntimeException("List $listName does not exist"))
+
     fun listContainsCourse(listName: String, courseName: String) =
-        (courseList[listName] ?: throw RuntimeException("List $listName does not exist")).contains(courseName)
+        getList(listName).courses.contains(courseName)
 }

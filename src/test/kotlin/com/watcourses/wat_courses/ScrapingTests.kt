@@ -1,6 +1,6 @@
 package com.watcourses.wat_courses
 
-import Term
+import com.watcourses.wat_courses.proto.Term
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.scraping.ScrapingService
 import org.assertj.core.api.Assertions.assertThat
