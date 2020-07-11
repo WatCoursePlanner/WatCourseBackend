@@ -6,14 +6,20 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class ScrapingApi(private val scrapingService: ScrapingService) {
+class ScrapingApi(private val scrapingCourseService: ScrapingCourseService,
+                  private val scrapingScheduleService: ScrapingScheduleService) {
     @GetMapping("/scraping/start")
     fun startScraping() {
-        scrapingService.updateCourses()
+        scrapingCourseService.updateCourses()
+    }
+
+    @GetMapping("/scraping/start-schedule")
+    fun startScheduleScraping() {
+        scrapingScheduleService.run()
     }
 
     @GetMapping("/scraping/reparse")
     fun retryParse(@RequestParam("dry_run", defaultValue = "true") dryRun: Boolean): ReParseConditionsResponse {
-        return scrapingService.reParseConditions(dryRun)
+        return scrapingCourseService.reParseConditions(dryRun)
     }
 }

@@ -76,3 +76,21 @@ message CheckResults {
   }
   repeated Issue issues = 1;
 }
+
+message ReservedEnrolInfo{
+  optional string reserve = 1;
+  optional int32 cap = 2;
+  optional int32 total = 3;
+}
+
+message CourseSection{
+  optional string section = 1;
+  optional string location = 2;
+  optional int32 enrolCap = 3;
+  optional int32 enrolTotal = 4;
+  repeated string time = 5;
+  optional string room = 6;
+  optional string instructor = 7;
+  optional int32 sectionId = 8;
+  repeated ReservedEnrolInfo reservedEnrolInfo = 9;
+}
