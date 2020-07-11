@@ -1,19 +1,29 @@
 package com.watcourses.wat_courses
 
+import com.watcourses.wat_courses.persistence.DbCourse
+import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.Schedule
 import com.watcourses.wat_courses.proto.StudentProfile
 import com.watcourses.wat_courses.rules.Checker
 import com.watcourses.wat_courses.rules.CourseListLoader
 import com.watcourses.wat_courses.rules.DegreeRequirementLoader
 import com.watcourses.wat_courses.rules.TermResolver
+import com.watcourses.wat_courses.utils.ClassPathResourceReader
 import com.watcourses.wat_courses.utils.build
+import org.junit.jupiter.api.BeforeAll
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.core.io.ClassPathResource
+import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
+@ActiveProfiles("test")
 class CheckerTests {
     @Autowired
     private lateinit var checker: Checker
@@ -24,6 +34,24 @@ class CheckerTests {
     @Autowired
     private lateinit var degreeRequirementLoader: DegreeRequirementLoader
 
+    @Autowired
+    private lateinit var dbCourseRepo: DbCourseRepo
+
+    @MockBean
+    private lateinit var resourceReader: ClassPathResourceReader
+
+    @BeforeEach
+    fun setup() {
+        given(resourceReader.get("degrees")).willReturn(ClassPathResource("degrees"))
+        given(resourceReader.get("lists")).willReturn(ClassPathResource("lists"))
+
+        dbCourseRepo.deleteAll()
+        createCourse("CS 442", "AE 101", "ANTH 100", "ECON 221", "ECON 101", "PSYCH 420", "ECE 409")
+
+        courseListLoader.loadLists()
+        degreeRequirementLoader.loadDegreeRequirements()
+    }
+
     @Test
     fun `course list works`() {
         // Simple list tests
@@ -32,6 +60,7 @@ class CheckerTests {
 
         // Test list with includes
         assertThat(courseListLoader.listContainsCourse("ATE", "CS 442")).isTrue()
+        assertThat(courseListLoader.listContainsCourse("ATE", "ECE 409")).isTrue()
 
         // Test non-existing list
         assertThrows<Exception> { courseListLoader.listContainsCourse("DNE", "DNE") }
@@ -51,8 +80,8 @@ class CheckerTests {
         assertThat(se.source).contains("ugradcalendar")
         assertThat(se.labels).contains("Software Engineering", "Faculty of Mathematics")
         assertThat(se.defaultSchedule!!.terms.single { it.termName == "1A" }.courseCodes).contains("SE 101")
-        assertThat(se.requirements.single { it.name == "Two Science Electives (SCE)" }.condition.toString())
-            .isEqualTo("<SCE:2>")
+        assertThat(se.requirements.single { it.name == "Three Advanced Technical Electives (ATE)" }.condition.toString())
+            .isEqualTo("<ATE_CS:1> && <ATE_ECE:1> && <ATE:3>")
     }
 
     @Test
@@ -72,10 +101,26 @@ class CheckerTests {
     fun `checker works`() {
         val result = checker.check(
             StudentProfile(
-                schedule = Schedule.build(mapOf("1A" to listOf("CS 480"))),
+                schedule = Schedule.build(mapOf("1A" to listOf("CS 442"))),
                 degrees = listOf("Software Engineering")
             )
         )
         assertThat(result.issues).isNotEmpty()
     }
+
+    private fun createCourse(vararg code: String) =
+        code.forEach {
+            dbCourseRepo.save(
+                DbCourse(
+                    name = "$it name",
+                    code = it,
+                    antiRequisite = null,
+                    coRequisite = null,
+                    description = "",
+                    offeringTerms = null,
+                    preRequisite = null,
+                    courseId = it
+                )
+            )
+        }
 }

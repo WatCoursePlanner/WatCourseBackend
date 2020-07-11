@@ -3,20 +3,27 @@ package com.watcourses.wat_courses.rules
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.CourseList
 import com.watcourses.wat_courses.scraping.ScrapingService
+import com.watcourses.wat_courses.utils.ClassPathResourceReader
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.core.io.ClassPathResource
 import org.springframework.stereotype.Component
 import org.tomlj.Toml
 import org.tomlj.TomlArray
 
 @Component
-class CourseListLoader(private val dbCourseRepo: DbCourseRepo) {
+class CourseListLoader(private val dbCourseRepo: DbCourseRepo, private val resourceReader: ClassPathResourceReader) {
     private val courseList = mutableMapOf<String, CourseList>()
     private val logger: Logger = LoggerFactory.getLogger(ScrapingService::class.java)
 
     init {
+        try {
+            loadLists()
+        } catch (e: Exception) {
+            logger.warn("Failed to load lists because $e")
+        }
+    }
+
+    final fun loadLists() {
         data class UnresolvedList(
             val name: String,
             val courses: Set<String>,
@@ -25,7 +32,7 @@ class CourseListLoader(private val dbCourseRepo: DbCourseRepo) {
             var added: Boolean = false
         )
 
-        val unresolvedLists = ClassPathResource("lists").file.listFiles()?.filterNotNull()?.map { file ->
+        val unresolvedLists = resourceReader.get("lists").file.listFiles()?.filterNotNull()?.map { file ->
             val listFile = Toml.parse(file.inputStream())
             val courses = listFile["courses"] as TomlArray?
             val includes = listFile["include"] as TomlArray?
@@ -81,5 +88,7 @@ class CourseListLoader(private val dbCourseRepo: DbCourseRepo) {
             throw IllegalArgumentException("Currently only support code ends with a wildcard: $wildcardCourseCode")
         }
         return dbCourseRepo.findAllByCodeStartingWith(wildcardCourseCode.substringBefore("*")).map { it.code }
+            .takeIf { it.isNotEmpty() }
+            ?: throw IllegalArgumentException("Course $wildcardCourseCode does not match any results")
     }
 }
