@@ -2,7 +2,7 @@ package com.watcourses.wat_courses.rules
 
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.CourseList
-import com.watcourses.wat_courses.scraping.ScrapingService
+import com.watcourses.wat_courses.scraping.ScrapingCourseService
 import com.watcourses.wat_courses.utils.ClassPathResourceReader
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -13,7 +13,7 @@ import org.tomlj.TomlArray
 @Component
 class CourseListLoader(private val dbCourseRepo: DbCourseRepo, private val resourceReader: ClassPathResourceReader) {
     private val courseList = mutableMapOf<String, CourseList>()
-    private val logger: Logger = LoggerFactory.getLogger(ScrapingService::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(ScrapingCourseService::class.java)
 
     init {
         try {

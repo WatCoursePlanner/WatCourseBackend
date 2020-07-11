@@ -11,7 +11,7 @@ import javax.persistence.*
 @Table(
     name = "courses", indexes = [
         Index(name = "idx_code", columnList = "code", unique = true),
-        Index(name = "idx_course_id", columnList = "id", unique = true)
+        Index(name = "idx_course_id", columnList = "courseId", unique = true)
     ]
 )
 @TypeDef(name = "json", typeClass = JsonStringType::class)

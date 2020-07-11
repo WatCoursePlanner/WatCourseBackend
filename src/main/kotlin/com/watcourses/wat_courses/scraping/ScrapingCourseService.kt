@@ -7,29 +7,19 @@ import com.watcourses.wat_courses.persistence.DbRuleRepo
 import com.watcourses.wat_courses.proto.ReParseConditionsResponse
 import com.watcourses.wat_courses.proto.Term
 import com.watcourses.wat_courses.rules.RawConditionParser
-import org.jsoup.HttpStatusException
-import org.jsoup.Jsoup
+import com.watcourses.wat_courses.utils.JsoupSafeOpenUrl
 import org.jsoup.nodes.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 
 @Service
-class ScrapingService(
+class ScrapingCourseService(
     private val dbCourseRepo: DbCourseRepo,
     private val dbRuleRepo: DbRuleRepo,
     private val rawConditionParser: RawConditionParser
 ) {
-    private val logger: Logger = LoggerFactory.getLogger(ScrapingService::class.java)
-
-    fun fromUrl(url: String): Document? {
-        return try {
-            Jsoup.connect(url).get()
-        } catch (e: HttpStatusException) {
-            logger.warn("Failed to open $url: $e")
-            null
-        }
-    }
+    private val logger: Logger = LoggerFactory.getLogger(ScrapingCourseService::class.java)
 
     private fun extractTermInfoFromDescription(desc: String): List<Term> {
         val beginningText = "[Offered: "
@@ -50,7 +40,7 @@ class ScrapingService(
     fun updateCourses() {
         for (courseList in LIST_OF_COURSES_LIST) {
             logger.info("Scraping $courseList")
-            val courses = fromUrl("http://www.ucalendar.uwaterloo.ca/2021/COURSE/course-$courseList.html")
+            val courses = JsoupSafeOpenUrl("http://www.ucalendar.uwaterloo.ca/2021/COURSE/course-$courseList.html")
                 ?.let { doc -> scrapeCoursePage(doc) }
             if (courses == null) {
                 logger.error("Failed to scrap $courseList")

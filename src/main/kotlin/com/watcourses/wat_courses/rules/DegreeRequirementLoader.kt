@@ -2,7 +2,7 @@ package com.watcourses.wat_courses.rules
 
 import com.github.h0tk3y.betterParse.grammar.parseToEnd
 import com.watcourses.wat_courses.proto.Schedule
-import com.watcourses.wat_courses.scraping.ScrapingService
+import com.watcourses.wat_courses.scraping.ScrapingCourseService
 import com.watcourses.wat_courses.utils.ClassPathResourceReader
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,7 +14,7 @@ import org.tomlj.TomlTable
 @Service
 class DegreeRequirementLoader(private val resourceReader: ClassPathResourceReader) {
     private lateinit var degrees: Map<String, DegreeRequirement> // name -> DegreeRequirement
-    private val logger: Logger = LoggerFactory.getLogger(ScrapingService::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(ScrapingCourseService::class.java)
 
     init {
         try {
