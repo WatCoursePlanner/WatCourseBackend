@@ -2,7 +2,6 @@ package com.watcourses.wat_courses.rules
 
 import com.github.h0tk3y.betterParse.grammar.parseToEnd
 import com.watcourses.wat_courses.proto.Schedule
-import com.watcourses.wat_courses.scraping.ScrapingCourseService
 import com.watcourses.wat_courses.utils.ClassPathResourceReader
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -14,7 +13,7 @@ import org.tomlj.TomlTable
 @Service
 class DegreeRequirementLoader(private val resourceReader: ClassPathResourceReader) {
     private lateinit var degrees: Map<String, DegreeRequirement> // name -> DegreeRequirement
-    private val logger: Logger = LoggerFactory.getLogger(ScrapingCourseService::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(DegreeRequirementLoader::class.java)
 
     init {
         try {
@@ -25,10 +24,10 @@ class DegreeRequirementLoader(private val resourceReader: ClassPathResourceReade
     }
 
     final fun loadDegreeRequirements() {
-        val degreeList = resourceReader.get("degrees").file.listFiles()?.filterNotNull()?.map { file ->
-            val degreeFile = Toml.parse(file.inputStream())
+        val degreeList = resourceReader.getResources("degrees/*").map { res ->
+            val degreeFile = Toml.parse(res.inputStream)
             DegreeRequirement(
-                name = degreeFile["name"]?.toString() ?: file.nameWithoutExtension,
+                name = degreeFile["name"]?.toString() ?: res.filename!!.substringBefore('.'),
                 source = degreeFile["source"]?.toString() ?: "",
                 requirements = (degreeFile["requirements"] as TomlArray?)?.toList()?.map { it as TomlTable }
                     ?.map {
@@ -49,8 +48,8 @@ class DegreeRequirementLoader(private val resourceReader: ClassPathResourceReade
                         })
                     }
             )
-        }?.toList()
-        degrees = degreeList?.associateBy { it.name } ?: emptyMap()
+        }.toList()
+        degrees = degreeList.associateBy { it.name }
         logger.info("${degrees.keys.size} degree files loaded")
     }
 

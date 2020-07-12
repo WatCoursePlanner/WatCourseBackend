@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.core.io.ClassPathResource
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver
 import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
@@ -41,8 +42,12 @@ class CheckerTests {
 
     @BeforeEach
     fun setup() {
-        given(resourceReader.get("degrees")).willReturn(ClassPathResource("degrees"))
-        given(resourceReader.get("lists")).willReturn(ClassPathResource("lists"))
+        given(resourceReader.getResources("lists/*")).willReturn(
+            PathMatchingResourcePatternResolver(this.javaClass.classLoader).getResources("lists/*")
+        )
+        given(resourceReader.getResources("degrees/*")).willReturn(
+            PathMatchingResourcePatternResolver(this.javaClass.classLoader).getResources("degrees/*")
+        )
 
         dbCourseRepo.deleteAll()
         createCourse("CS 442", "AE 101", "ANTH 100", "ECON 221", "ECON 101", "PSYCH 420", "ECE 409")

@@ -13,7 +13,7 @@ import org.tomlj.TomlArray
 @Component
 class CourseListLoader(private val dbCourseRepo: DbCourseRepo, private val resourceReader: ClassPathResourceReader) {
     private val courseList = mutableMapOf<String, CourseList>()
-    private val logger: Logger = LoggerFactory.getLogger(ScrapingCourseService::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(CourseListLoader::class.java)
 
     init {
         try {
@@ -32,18 +32,19 @@ class CourseListLoader(private val dbCourseRepo: DbCourseRepo, private val resou
             var added: Boolean = false
         )
 
-        val unresolvedLists = resourceReader.get("lists").file.listFiles()?.filterNotNull()?.map { file ->
-            val listFile = Toml.parse(file.inputStream())
+        val unresolvedLists = resourceReader.getResources("lists/*").map { res ->
+            val listFile = Toml.parse(res.inputStream)
             val courses = listFile["courses"] as TomlArray?
             val includes = listFile["include"] as TomlArray?
             val except = listFile["except"] as TomlArray?
             UnresolvedList(
-                name = file.nameWithoutExtension,
+                name = res.filename!!.substringBefore('.'),
                 courses = courses?.toList()?.map { it as String }?.toSet() ?: setOf(),
                 includes = includes?.toList()?.map { it as String } ?: listOf(),
                 except = except?.toList()?.map { it as String }?.toSet() ?: setOf()
             )
-        }?.toMutableList() ?: mutableListOf()
+        }.toMutableList()
+
         while (unresolvedLists.any { !it.added }) {
             var resolvedAtLeastOne = false
             for (list in unresolvedLists) {
