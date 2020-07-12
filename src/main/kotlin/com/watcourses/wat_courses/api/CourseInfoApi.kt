@@ -1,9 +1,9 @@
 package com.watcourses.wat_courses.api
 
 import com.watcourses.wat_courses.persistence.DbCourseRepo
-import com.watcourses.wat_courses.proto.CourseInfo
-import com.watcourses.wat_courses.proto.CourseList
+import com.watcourses.wat_courses.proto.*
 import com.watcourses.wat_courses.rules.CourseListLoader
+import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,6 +16,24 @@ class CourseInfoApi(val dbCourseRepo: DbCourseRepo, val courseListLoader: Course
     fun getCourse(@PathVariable code: String): CourseInfo {
         return dbCourseRepo.findByCode(code)?.toProto() ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND, "Course with the code $code is not found"
+        )
+    }
+
+    @GetMapping("/course/search")
+    fun searchCourse(searchCourseRequest: SearchCourseRequest): SearchCourseResponse {
+        val result = dbCourseRepo.findAll(
+            PageRequest.of(
+                searchCourseRequest.pagination?.zeroBasedPage ?: 0,
+                searchCourseRequest.pagination?.limit ?: 30
+            )
+        )
+        return SearchCourseResponse(
+            pagination = PaginationInfoResponse(
+                totalPages = result.totalPages,
+                limit = result.size,
+                currentPage = result.number
+            ),
+            results = result.content.map { it.toProto() }
         )
     }
 
