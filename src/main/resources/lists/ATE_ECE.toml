@@ -1,7 +1,7 @@
 include = []
 courses = ["ECE 409",
           "ECE 416",
-          "ECE 418",
+          "ECE 417",
           "ECE 423",
           "ECE 429",
           "ECE 454",
