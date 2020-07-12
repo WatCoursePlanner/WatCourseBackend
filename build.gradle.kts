@@ -1,6 +1,9 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import com.google.protobuf.gradle.*
 
 plugins {
+    java
+    id("com.google.protobuf") version "0.8.8"
     id("org.springframework.boot") version "2.3.1.RELEASE"
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
     id("com.squareup.wire") version "3.2.2"
@@ -38,6 +41,11 @@ dependencies {
     implementation("com.github.h0tk3y.betterParse:better-parse:0.4.0")
     implementation("io.github.lognet:grpc-spring-boot-starter:3.5.5")
     implementation("org.tomlj:tomlj:1.0.0")
+    implementation("com.google.protobuf:protobuf-java:3.6.1")
+    implementation("io.grpc:grpc-stub:1.15.1")
+    implementation("io.grpc:grpc-protobuf:1.15.1")
+    implementation("javax.annotation:javax.annotation-api:1.3.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("mysql:mysql-connector-java")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
@@ -63,4 +71,39 @@ wire {
         rpcRole = "server"
         out = "src/main/kotlin/"
     }
+}
+
+sourceSets{
+    main {
+        proto {
+            srcDir("src/main/kotlin")
+        }
+    }
+}
+
+protobuf {
+    protoc {
+        artifact = "com.google.protobuf:protoc:3.6.1"
+    }
+    plugins {
+        id("grpc") {
+            artifact = "io.grpc:protoc-gen-grpc-java:1.15.1"
+        }
+        id("grpckotlin") {
+            artifact = "io.rouz:grpc-kotlin-gen:0.1.4"
+        }
+    }
+    generateProtoTasks {
+        ofSourceSet("main").forEach {
+            it.plugins {
+                id("grpc") {
+                    outputSubDir = "kotlin"
+                }
+                id("grpckotlin") {
+                    outputSubDir = "kotlin"
+                }
+            }
+        }
+    }
+    generatedFilesBaseDir = "$projectDir/src/"
 }

@@ -1,7 +1,7 @@
 package com.watcourses.wat_courses.persistence
 
-import com.watcourses.wat_courses.proto.CourseInfo
-import com.watcourses.wat_courses.proto.Term
+import com.watcourses.wat_courses.proto.Courses.CourseInfo
+import com.watcourses.wat_courses.proto.Courses.Term
 import com.vladmihalcea.hibernate.type.json.JsonStringType
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
@@ -44,18 +44,37 @@ data class DbCourse(
     var id: Long? = null
 ) {
     fun toProto(): CourseInfo {
-        return CourseInfo(
-            name = name,
-            code = code,
-            description = description,
-            offeringTerms = offeringTerms ?: listOf(),
-            id = courseId,
-            preRequisite = preRequisite?.rawRule,
-            coRequisite = coRequisite?.rawRule,
-            antiRequisite = antiRequisite?.rawRule,
-            preRequisiteLogicStr = preRequisite?.cond?.toString(),
-            coRequisiteLogicStr = coRequisite?.cond?.toString(),
-            antiRequisiteLogicStr = antiRequisite?.cond?.toString()
-        )
+        val builder = CourseInfo.newBuilder()
+                .setName(name)
+                .setCode(code)
+                .setDescription(description)
+                .setId(courseId)
+                .setPreRequisite(preRequisite?.rawRule)
+                .setCoRequisite(coRequisite?.rawRule)
+                .setAntiRequisite(antiRequisite?.rawRule)
+                .setPreRequisiteLogicStr(preRequisite?.cond?.toString())
+                .setCoRequisiteLogicStr(coRequisite?.cond?.toString())
+                .setAntiRequisiteLogicStr(antiRequisite?.cond?.toString())
+
+        if (offeringTerms != null) {
+            for ((index, term) in offeringTerms!!.withIndex()) {
+                builder.setOfferingTerms(index, term)
+            }
+        }
+
+        return builder.build()
+//        return CourseInfo(
+//            name = name,
+//            code = code,
+//            description = description,
+//            offeringTerms = offeringTerms ?: listOf(),
+//            id = courseId,
+//            preRequisite = preRequisite?.rawRule,
+//            coRequisite = coRequisite?.rawRule,
+//            antiRequisite = antiRequisite?.rawRule,
+//            preRequisiteLogicStr = preRequisite?.cond?.toString(),
+//            coRequisiteLogicStr = coRequisite?.cond?.toString(),
+//            antiRequisiteLogicStr = antiRequisite?.cond?.toString()
+//        )
     }
 }
