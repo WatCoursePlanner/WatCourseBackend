@@ -28,13 +28,13 @@ abstract class CourseServiceImplBase(
     
     
     
-    open suspend fun getCourseInfo(request: com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest): com.watcourses.wat_courses.proto.Courses.CourseInfo {
+    open suspend fun getCourseInfo(request: com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest): com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse {
         throw unimplemented(getGetCourseInfoMethod()).asRuntimeException()
     }
 
     internal fun getCourseInfoInternal(
         request: com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest,
-        responseObserver: StreamObserver<com.watcourses.wat_courses.proto.Courses.CourseInfo>
+        responseObserver: StreamObserver<com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse>
     ) {
         launch {
             tryCatchingStatus(responseObserver) {
@@ -104,7 +104,7 @@ abstract class CourseServiceImplBase(
                 METHODID_GET_COURSE_INFO ->
                     this@CourseServiceImplBase.getCourseInfoInternal(
                         request as com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest,
-                        responseObserver as StreamObserver<com.watcourses.wat_courses.proto.Courses.CourseInfo>
+                        responseObserver as StreamObserver<com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse>
                     )
                 else -> throw AssertionError()
             }

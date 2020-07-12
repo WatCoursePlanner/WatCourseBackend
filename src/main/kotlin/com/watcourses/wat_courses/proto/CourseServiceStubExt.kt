@@ -19,7 +19,7 @@ import io.grpc.stub.MetadataUtils
 
 
 
-suspend inline fun CourseServiceStub.getCourseInfo(request: com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest): com.watcourses.wat_courses.proto.Courses.CourseInfo {
+suspend inline fun CourseServiceStub.getCourseInfo(request: com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest): com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse {
     return suspendCoroutine {
         getCourseInfo(request, ContinuationStreamObserver(it))
     }

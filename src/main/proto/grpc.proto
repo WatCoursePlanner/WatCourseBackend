@@ -2,12 +2,14 @@ syntax = "proto2";
 
 package com.watcourses.wat_courses.proto;
 
-import "courses.proto";
-
 message CourseInfoRequest {
   required string code = 1;
 }
 
+message CourseInfoResponse {
+  required string code = 1;
+}
+
 service CourseService {
-  rpc getCourseInfo (CourseInfoRequest) returns (CourseInfo);
+  rpc getCourseInfo (CourseInfoRequest) returns (CourseInfoResponse);
 }

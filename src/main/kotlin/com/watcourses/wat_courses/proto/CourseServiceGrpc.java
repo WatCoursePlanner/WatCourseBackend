@@ -28,21 +28,21 @@ public final class CourseServiceGrpc {
 
   // Static method descriptors that strictly reflect the proto.
   private static volatile io.grpc.MethodDescriptor<com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest,
-      com.watcourses.wat_courses.proto.Courses.CourseInfo> getGetCourseInfoMethod;
+      com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse> getGetCourseInfoMethod;
 
   @io.grpc.stub.annotations.RpcMethod(
       fullMethodName = SERVICE_NAME + '/' + "getCourseInfo",
       requestType = com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest.class,
-      responseType = com.watcourses.wat_courses.proto.Courses.CourseInfo.class,
+      responseType = com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse.class,
       methodType = io.grpc.MethodDescriptor.MethodType.UNARY)
   public static io.grpc.MethodDescriptor<com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest,
-      com.watcourses.wat_courses.proto.Courses.CourseInfo> getGetCourseInfoMethod() {
-    io.grpc.MethodDescriptor<com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest, com.watcourses.wat_courses.proto.Courses.CourseInfo> getGetCourseInfoMethod;
+      com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse> getGetCourseInfoMethod() {
+    io.grpc.MethodDescriptor<com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest, com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse> getGetCourseInfoMethod;
     if ((getGetCourseInfoMethod = CourseServiceGrpc.getGetCourseInfoMethod) == null) {
       synchronized (CourseServiceGrpc.class) {
         if ((getGetCourseInfoMethod = CourseServiceGrpc.getGetCourseInfoMethod) == null) {
           CourseServiceGrpc.getGetCourseInfoMethod = getGetCourseInfoMethod = 
-              io.grpc.MethodDescriptor.<com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest, com.watcourses.wat_courses.proto.Courses.CourseInfo>newBuilder()
+              io.grpc.MethodDescriptor.<com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest, com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse>newBuilder()
               .setType(io.grpc.MethodDescriptor.MethodType.UNARY)
               .setFullMethodName(generateFullMethodName(
                   "com.watcourses.wat_courses.proto.CourseService", "getCourseInfo"))
@@ -50,7 +50,7 @@ public final class CourseServiceGrpc {
               .setRequestMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
                   com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest.getDefaultInstance()))
               .setResponseMarshaller(io.grpc.protobuf.ProtoUtils.marshaller(
-                  com.watcourses.wat_courses.proto.Courses.CourseInfo.getDefaultInstance()))
+                  com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse.getDefaultInstance()))
                   .setSchemaDescriptor(new CourseServiceMethodDescriptorSupplier("getCourseInfo"))
                   .build();
           }
@@ -89,7 +89,7 @@ public final class CourseServiceGrpc {
     /**
      */
     public void getCourseInfo(com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest request,
-        io.grpc.stub.StreamObserver<com.watcourses.wat_courses.proto.Courses.CourseInfo> responseObserver) {
+        io.grpc.stub.StreamObserver<com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse> responseObserver) {
       asyncUnimplementedUnaryCall(getGetCourseInfoMethod(), responseObserver);
     }
 
@@ -100,7 +100,7 @@ public final class CourseServiceGrpc {
             asyncUnaryCall(
               new MethodHandlers<
                 com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest,
-                com.watcourses.wat_courses.proto.Courses.CourseInfo>(
+                com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse>(
                   this, METHODID_GET_COURSE_INFO)))
           .build();
     }
@@ -127,7 +127,7 @@ public final class CourseServiceGrpc {
     /**
      */
     public void getCourseInfo(com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest request,
-        io.grpc.stub.StreamObserver<com.watcourses.wat_courses.proto.Courses.CourseInfo> responseObserver) {
+        io.grpc.stub.StreamObserver<com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse> responseObserver) {
       asyncUnaryCall(
           getChannel().newCall(getGetCourseInfoMethod(), getCallOptions()), request, responseObserver);
     }
@@ -153,7 +153,7 @@ public final class CourseServiceGrpc {
 
     /**
      */
-    public com.watcourses.wat_courses.proto.Courses.CourseInfo getCourseInfo(com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest request) {
+    public com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse getCourseInfo(com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest request) {
       return blockingUnaryCall(
           getChannel(), getGetCourseInfoMethod(), getCallOptions(), request);
     }
@@ -179,7 +179,7 @@ public final class CourseServiceGrpc {
 
     /**
      */
-    public com.google.common.util.concurrent.ListenableFuture<com.watcourses.wat_courses.proto.Courses.CourseInfo> getCourseInfo(
+    public com.google.common.util.concurrent.ListenableFuture<com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse> getCourseInfo(
         com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest request) {
       return futureUnaryCall(
           getChannel().newCall(getGetCourseInfoMethod(), getCallOptions()), request);
@@ -207,7 +207,7 @@ public final class CourseServiceGrpc {
       switch (methodId) {
         case METHODID_GET_COURSE_INFO:
           serviceImpl.getCourseInfo((com.watcourses.wat_courses.proto.Grpc.CourseInfoRequest) request,
-              (io.grpc.stub.StreamObserver<com.watcourses.wat_courses.proto.Courses.CourseInfo>) responseObserver);
+              (io.grpc.stub.StreamObserver<com.watcourses.wat_courses.proto.Grpc.CourseInfoResponse>) responseObserver);
           break;
         default:
           throw new AssertionError();

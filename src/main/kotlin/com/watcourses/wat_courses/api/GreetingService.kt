@@ -3,6 +3,7 @@ package com.watcourses.wat_courses.api
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.CourseInfoRequest
 import com.watcourses.wat_courses.proto.CourseInfo
+import com.watcourses.wat_courses.proto.CourseInfoResponse
 import kotlinx.coroutines.*
 import org.lognet.springboot.grpc.GRpcService
 import org.springframework.beans.factory.annotation.Autowired
@@ -15,10 +16,11 @@ class CourseService : CourseServiceImplBase(
         coroutineContext = newFixedThreadPool(4).asCoroutineDispatcher()
 ) {
 
-    @Autowired
-    private lateinit var dbCourseRepo: DbCourseRepo
+//    @Autowired
+//    private lateinit var dbCourseRepo: DbCourseRepo
 
-    override suspend fun getCourseInfo(request: CourseInfoRequest): CourseInfo {
-        return dbCourseRepo.findByCode(request.code)!!.toProto()
+    override suspend fun getCourseInfo(request: CourseInfoRequest): CourseInfoResponse {
+//        return dbCourseRepo.findByCode(request.code)!!.toProto()
+        return CourseInfoResponse("123")
     }
 }

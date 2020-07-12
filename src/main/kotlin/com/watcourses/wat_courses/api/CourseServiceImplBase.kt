@@ -1,17 +1,25 @@
 package com.watcourses.wat_courses.api
 
-import com.watcourses.wat_courses.proto.CourseServiceGrpc
-import com.watcourses.wat_courses.proto.*
+import com.watcourses.wat_courses.proto.CourseInfoResponse
+import com.watcourses.wat_courses.proto.CourseServiceGrpc.*
+
+import io.*
 import io.grpc.*
 import io.grpc.stub.ServerCalls
 import io.grpc.stub.StreamObserver
+import io.rouz.*
 import io.rouz.grpc.ContextCoroutineContextElement
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
+import kotlin.coroutines.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.*
+
+
+
+@javax.annotation.Generated(
+        value = ["by gRPC Kotlin generator"],
+        comments = "Source: grpc.proto"
+)
 abstract class CourseServiceImplBase(
         coroutineContext: CoroutineContext = Dispatchers.Default
 ) : BindableService, CoroutineScope {
@@ -21,13 +29,16 @@ abstract class CourseServiceImplBase(
     override val coroutineContext: CoroutineContext
         get() = ContextCoroutineContextElement() + _coroutineContext
 
-    open suspend fun getCourseInfo(request: com.watcourses.wat_courses.proto.CourseInfoRequest): com.watcourses.wat_courses.proto.CourseInfo {
-        throw unimplemented(CourseServiceGrpc.getGetCourseInfoMethod()).asRuntimeException()
+
+
+
+    open suspend fun getCourseInfo(request: com.watcourses.wat_courses.proto.CourseInfoRequest): com.watcourses.wat_courses.proto.CourseInfoResponse {
+        throw unimplemented(getGetCourseInfoMethod()).asRuntimeException()
     }
 
     internal fun getCourseInfoInternal(
             request: com.watcourses.wat_courses.proto.CourseInfoRequest,
-            responseObserver: StreamObserver<CourseInfo>
+            responseObserver: StreamObserver<CourseInfoResponse>
     ) {
         launch {
             tryCatchingStatus(responseObserver) {
@@ -38,9 +49,9 @@ abstract class CourseServiceImplBase(
     }
 
     override fun bindService(): ServerServiceDefinition {
-        return ServerServiceDefinition.builder(CourseServiceGrpc.getServiceDescriptor())
+        return ServerServiceDefinition.builder(getServiceDescriptor())
                 .addMethod(
-                        CourseServiceGrpc.getGetCourseInfoMethod(),
+                        getGetCourseInfoMethod(),
                         ServerCalls.asyncUnaryCall(
                                 MethodHandlers(METHODID_GET_COURSE_INFO)
                         )
@@ -97,7 +108,7 @@ abstract class CourseServiceImplBase(
                 METHODID_GET_COURSE_INFO ->
                     this@CourseServiceImplBase.getCourseInfoInternal(
                             request as com.watcourses.wat_courses.proto.CourseInfoRequest,
-                            responseObserver as StreamObserver<CourseInfo>
+                            responseObserver as StreamObserver<com.watcourses.wat_courses.proto.CourseInfoResponse>
                     )
                 else -> throw AssertionError()
             }

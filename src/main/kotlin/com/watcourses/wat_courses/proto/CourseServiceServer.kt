@@ -9,7 +9,7 @@ interface CourseServiceServer : Service {
   @WireRpc(
     path = "/com.watcourses.wat_courses.proto.CourseService/getCourseInfo",
     requestAdapter = "com.watcourses.wat_courses.proto.CourseInfoRequest#ADAPTER",
-    responseAdapter = "com.watcourses.wat_courses.proto.CourseInfo#ADAPTER"
+    responseAdapter = "com.watcourses.wat_courses.proto.CourseInfoResponse#ADAPTER"
   )
-  suspend fun getCourseInfo(request: CourseInfoRequest): CourseInfo
+  suspend fun getCourseInfo(request: CourseInfoRequest): CourseInfoResponse
 }
