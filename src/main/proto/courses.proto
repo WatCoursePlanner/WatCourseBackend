@@ -26,6 +26,26 @@ message CourseList {
   repeated string courses = 2;
 }
 
+message PaginationInfoRequest {
+  optional int32 zeroBasedPage = 1;
+  optional int32 limit = 2;
+}
+
+message PaginationInfoResponse {
+  optional int32 totalPages = 1;
+  optional int32 currentPage = 2;
+  optional int32 limit = 3;
+}
+
+message SearchCourseRequest {
+  optional PaginationInfoRequest pagination = 1;
+}
+
+message SearchCourseResponse {
+  optional PaginationInfoResponse pagination = 1;
+  repeated CourseInfo results = 2;
+}
+
 message ReParseConditionsResponse {
   optional int32 total = 1;
   optional int32 success = 2;

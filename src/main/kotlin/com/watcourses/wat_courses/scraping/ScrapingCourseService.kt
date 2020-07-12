@@ -40,8 +40,13 @@ class ScrapingCourseService(
     fun updateCourses() {
         for (courseList in LIST_OF_COURSES_LIST) {
             logger.info("Scraping $courseList")
-            val courses = JsoupSafeOpenUrl("http://www.ucalendar.uwaterloo.ca/2021/COURSE/course-$courseList.html")
-                ?.let { doc -> scrapeCoursePage(doc) }
+            val courses = try {
+                JsoupSafeOpenUrl("http://www.ucalendar.uwaterloo.ca/2021/COURSE/course-$courseList.html")
+                    ?.let { doc -> scrapeCoursePage(doc) }
+            } catch (e: Exception) {
+                logger.error("Exception occurred while trying to scrap $courseList: $e")
+                null
+            }
             if (courses == null) {
                 logger.error("Failed to scrap $courseList")
                 continue
@@ -58,7 +63,7 @@ class ScrapingCourseService(
         course.coRequisite?.let { dbRuleRepo.save(it) }
         course.antiRequisite?.let { dbRuleRepo.save(it) }
 
-        val existing = dbCourseRepo.findByCode(course.code)
+        val existing = dbCourseRepo.findByCourseId(course.courseId) ?: dbCourseRepo.findByCode(course.code)
         if (existing != null) {
             dbCourseRepo.save(course.copy(id = existing.id))
         } else {
