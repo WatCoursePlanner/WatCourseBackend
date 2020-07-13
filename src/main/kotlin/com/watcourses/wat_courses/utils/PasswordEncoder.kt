@@ -12,12 +12,12 @@ private const val ITERATIONS = 3
 
 @Component
 class PasswordEncoder {
+    private val argon2 = Argon2PasswordEncoder(SALT_LEN, HASH_LEN, PARALLELISM, MEMORY, ITERATIONS)
     fun hash(password: String): String {
-        val argon2 = Argon2PasswordEncoder(SALT_LEN, HASH_LEN, PARALLELISM, MEMORY, ITERATIONS)
         return argon2.encode(password)
     }
 
     fun compare(hashedPassword: String, rawPassword: String): Boolean {
-        return hashedPassword == hash(rawPassword)
+        return argon2.matches(rawPassword, hashedPassword)
     }
 }

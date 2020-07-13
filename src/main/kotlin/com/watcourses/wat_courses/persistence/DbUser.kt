@@ -1,6 +1,9 @@
 package com.watcourses.wat_courses.persistence
 
+import com.watcourses.wat_courses.proto.StudentProfile
+import com.watcourses.wat_courses.proto.Term
 import com.watcourses.wat_courses.proto.UserInfo
+import org.hibernate.annotations.Type
 import javax.persistence.*
 
 @Entity(name = "user")

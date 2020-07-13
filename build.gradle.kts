@@ -39,6 +39,7 @@ dependencies {
     implementation("com.github.h0tk3y.betterParse:better-parse:0.4.0")
     implementation("org.tomlj:tomlj:1.0.0")
     implementation("com.google.apis:google-api-services-oauth2:v2-rev20200213-1.30.10")
+    implementation("org.bouncycastle:bcprov-jdk15on:1.66")
     runtimeOnly("com.h2database:h2")
     runtimeOnly("mysql:mysql-connector-java")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
