@@ -1,0 +1,33 @@
+package com.watcourses.wat_courses.proto;
+
+message UserInfo {
+  optional string firstName = 1;
+  optional string lastName = 2;
+  optional string email = 3;
+  optional string pictureUrl = 4;
+}
+
+message LoginOrRegisterResponse {
+  optional bool success = 1;
+  optional string reason = 2;
+  optional UserInfo userInfo = 3;
+}
+
+// For a new user who uses email+password login: RegisterRequest -> LoginOrRegisterResponse
+message RegisterRequest {
+  optional string firstName = 1;
+  optional string lastName = 2;
+  optional string email = 3;
+  optional string password = 4;
+}
+
+// For an existing user who uses email+password login: LoginRequest -> LoginOrRegisterResponse
+message LoginRequest {
+  optional string email = 1;
+  optional string password = 2;
+}
+
+// For a new/existing user who uses Google to login: GoogleLoginOrRegisterRequest -> LoginOrRegisterResponse
+message GoogleLoginOrRegisterRequest {
+  optional string token = 1;
+}
