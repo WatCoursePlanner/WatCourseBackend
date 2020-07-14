@@ -5,6 +5,7 @@ import com.watcourses.wat_courses.persistence.DbCourseScheduleRepo
 import com.watcourses.wat_courses.proto.Term
 import com.watcourses.wat_courses.scraping.ScrapingCourseService
 import com.watcourses.wat_courses.scraping.ScrapingScheduleService
+import com.watcourses.wat_courses.utils.getCode
 import org.assertj.core.api.Assertions.assertThat
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test
@@ -29,6 +30,15 @@ class ScrapingTests {
 
     @Autowired
     private lateinit var dbCourseScheduleRepo: DbCourseScheduleRepo
+
+    @Test
+    fun `term id is correct`(){
+        assertThat(Term.FALL.getCode(2019)).isEqualTo(1199)
+        assertThat(Term.SPRING.getCode(2020)).isEqualTo(1201)
+        assertThat(Term.WINTER.getCode(2020)).isEqualTo(1205)
+        assertThat(Term.FALL.getCode(2020)).isEqualTo(1209)
+        assertThat(Term.SPRING.getCode(2021)).isEqualTo(1211)
+    }
 
     @Test
     fun `scraping works`() {

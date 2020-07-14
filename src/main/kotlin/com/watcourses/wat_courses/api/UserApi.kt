@@ -13,6 +13,7 @@ import com.watcourses.wat_courses.proto.RegisterRequest
 import com.watcourses.wat_courses.utils.PasswordEncoder
 import com.watcourses.wat_courses.utils.SessionManager
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
 import javax.servlet.http.Cookie
@@ -29,7 +30,7 @@ class UserApi(
     private val jsonFactory = JacksonFactory()
 
     @PostMapping("/user/login")
-    fun login(loginRequest: LoginRequest, response: HttpServletResponse): LoginOrRegisterResponse {
+    fun login(@RequestBody loginRequest: LoginRequest, response: HttpServletResponse): LoginOrRegisterResponse {
         val email = loginRequest.email?.takeIf { it.isNotEmpty() }
             ?: return LoginOrRegisterResponse(success = false, reason = "Email not provided")
 
@@ -50,7 +51,10 @@ class UserApi(
     }
 
     @PostMapping("/user/register")
-    fun register(registerRequest: RegisterRequest, response: HttpServletResponse): LoginOrRegisterResponse {
+    fun register(
+        @RequestBody registerRequest: RegisterRequest,
+        response: HttpServletResponse
+    ): LoginOrRegisterResponse {
         val email = registerRequest.email?.takeIf { it.isNotEmpty() }
             ?: return LoginOrRegisterResponse(success = false, reason = "Email not provided")
 
@@ -82,8 +86,10 @@ class UserApi(
     }
 
     @PostMapping("/user/google")
-    fun googleLoginOrRegister(googleLoginOrRegisterRequest: GoogleLoginOrRegisterRequest, response: HttpServletResponse)
-            : LoginOrRegisterResponse {
+    fun googleLoginOrRegister(
+        @RequestBody googleLoginOrRegisterRequest: GoogleLoginOrRegisterRequest,
+        response: HttpServletResponse
+    ): LoginOrRegisterResponse {
         val token = googleLoginOrRegisterRequest.token?.takeIf { it.isNotEmpty() }
             ?: return LoginOrRegisterResponse(success = false, reason = "Token not provided")
 

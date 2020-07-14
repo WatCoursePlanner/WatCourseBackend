@@ -5,7 +5,9 @@ import com.watcourses.wat_courses.persistence.DbCourseSchedule
 import com.watcourses.wat_courses.persistence.DbCourseScheduleRepo
 import com.watcourses.wat_courses.proto.CourseSection
 import com.watcourses.wat_courses.proto.ReservedEnrolInfo
+import com.watcourses.wat_courses.proto.Term
 import com.watcourses.wat_courses.utils.JsoupSafeOpenUrl
+import com.watcourses.wat_courses.utils.getCode
 import org.jsoup.nodes.Document
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -24,10 +26,11 @@ class ScrapingScheduleService(
     @Scheduled(cron = "0 0 2 * * *")
     fun run() {
         logger.info("Start running ScrapingScheduleService")
-        dbCourseRepo.findAll().forEach { updateCourse(it!!.code, 1205) }
+        val results = dbCourseRepo.findAll().map { updateCourse(it!!.code, Term.WINTER.getCode(2020)) }
+        logger.info("Finished. ${results.count { !it }} failed out of ${results.size}")
     }
 
-    fun updateCourse(courseCode: String, sessionId: Int) {
+    fun updateCourse(courseCode: String, sessionId: Int): Boolean {
         val courseParts = courseCode.split(" ").takeUnless { it.size != 2 }
             ?: throw IllegalArgumentException("Course code $courseCode not valid")
 
@@ -36,7 +39,11 @@ class ScrapingScheduleService(
                 "http://www.adm.uwaterloo.ca/cgi-bin/cgiwrap/infocour/salook.pl?level=under" +
                         "&sess=$sessionId&subject=${courseParts[0]}&cournum=${courseParts[1]}"
             )?.let { doc -> scrapeSchedulePageSafe(courseCode, doc) }
-        if (schedule == null) logger.warn("Failed to scrap $courseCode")
+        if (schedule == null) {
+            logger.warn("Failed to scrap $courseCode")
+            return false
+        }
+        return true
     }
 
     fun scrapeSchedulePageSafe(courseCode: String, doc: Document): DbCourseSchedule? = try {
@@ -53,12 +60,12 @@ class ScrapingScheduleService(
         )
 
         val term = Regex("Term: (\\d+)").find(doc.text())!!.groupValues[1]
-        val rows = doc.select("td > table > tbody > tr").map { row ->
+        val rows = doc.select("td > table > tbody > tr").mapNotNull { row ->
             val rawRow = row.select("td").map { it.text() }
-            if (rawRow.isEmpty()) return@map null
             try {
                 @Suppress("IMPLICIT_CAST_TO_ANY")
                 when {
+                    rawRow.isEmpty() -> null
                     rawRow[0].toIntOrNull() != null -> CourseSection(
                         sectionId = rawRow[0].toInt(),
                         section = rawRow[1],
@@ -77,13 +84,14 @@ class ScrapingScheduleService(
                         enrolTotal = rawRow[2].toInt(),
                         time = rawRow[5]
                     )
-                    else -> Appendix(time = rawRow[10])
+                    rawRow.size >= 11 -> Appendix(time = rawRow[10])
+                    else -> null
                 }
             } catch (e: Exception) {
                 logger.warn("Exception occurred when scraping. code=$courseCode, term=$term, row=$rawRow, e=$e")
                 throw e
             }
-        }.filterNotNull()
+        }
         val sections = mutableListOf<CourseSection>()
         if (rows.isNotEmpty()) {
             var currentSection = rows[0] as CourseSection
