@@ -46,6 +46,13 @@ class ConditionParserAndCheckerTests {
 
     @Test
     fun `parsing raw requirements works`() {
+        assertThat(Condition.parse("Prereq: Level at least 3A; One of HUMSC 101, 102, 201, 301").toString())
+            .isEqualTo("[3A] && (HUMSC 101 || HUMSC 102 || HUMSC 201 || HUMSC 301)")
+        assertThat(Condition.parse("Prereq: One of GSJ 101, 102, WS 101, 102").toString())
+            .isEqualTo("GSJ 101 || GSJ 102 || WS 101 || WS 102")
+        assertThat(Condition.parse("req: One of SPAN 352W, 362W, 401/402").toString())
+            .isEqualTo("SPAN 352W || SPAN 362W || SPAN 401 || SPAN 402")
+
         Condition.parse(
             "req: BME 121, CS 115, 135, 137, CHE 121, MTE 121/GENE 121, NE 111, MSCI 121"
         ).let {
@@ -102,6 +109,9 @@ class ConditionParserAndCheckerTests {
 
         assertThat(Condition.parse("Level at least 4B Mechanical Engineering students only.").toString())
             .isEqualTo("[4B] && [Mechanical Engineering]")
+
+        assertThat(Condition.parse("Level at least 4B; MCS 138").toString())
+            .isEqualTo("[4B] && MCS 138")
     }
 
     @Test

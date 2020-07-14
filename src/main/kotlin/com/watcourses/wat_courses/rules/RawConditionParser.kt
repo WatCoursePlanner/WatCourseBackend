@@ -1,22 +1,25 @@
 package com.watcourses.wat_courses.rules
 
+import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.ConditionType
 import org.springframework.stereotype.Component
 
 @Component
-class RawConditionParser {
+class RawConditionParser(private val dbCourseRepo: DbCourseRepo) {
     class ParseFailure(reason: String, val str: String? = null) : Exception(reason)
 
     private fun courseSanityCheck(course: String) {
         val courseParts = course.split(" ")
         if (courseParts.size != 2
+            || courseParts[0].length > 6
             || courseParts[0].any { it !in 'A'..'Z' }
             || courseParts[1].any { it !in '0'..'9' && it !in 'A'..'Z' }
-        )
-            throw ParseFailure("sanity check failed: $course does not look like a course")
+            || courseParts[1].none { it in '0'..'9' } // must contain at least 1 number
+        ) throw ParseFailure("sanity check failed: $course does not look like a course")
     }
 
     // resolve "123" in "CS 101, 123" to course("CS 123")
+    // Make sure that each element of the parts is trimed
     private fun resolveCourse(parts: List<String>, index: Int): Condition {
         val part = parts[index].trim()
         if (part.contains(" ")) { // e.g. CS 101. We have "CS" already so return directly
@@ -26,22 +29,26 @@ class RawConditionParser {
         // look backwards for identifier
         val identifier = parts.subList(0, index).findLast { it.contains(" ") }?.substringBefore(" ")
             ?: throw ParseFailure("Can't find a course identifier")
-        val completeCourseCode = "$identifier $part"
+        val completeCourseCode = "$identifier $part".trim()
         courseSanityCheck(completeCourseCode)
         return course(completeCourseCode)
     }
 
     /*
      * Example: CS 101, 123, CS 102/ECE 123, CS 233 => AND(CS101, CS123, OR(CS102, ECE123), CS233)
+     * One of CS 101, 123, or 233
      */
     private fun parseFromCourseRequirementText(text: String): Condition {
-        val andParts = text.split(",").map { it.trim() }.toMutableList()
-        var type = ConditionType.AND
-        if (andParts[0].startsWith("one of", ignoreCase = true)) {
-            andParts[0] = andParts[0].substring("one of".length).trim()
-            type = ConditionType.OR
+        if (text.trim().startsWith("one of", ignoreCase = true)) {
+            val parts =
+                text.trim().substring("one of".length).split(",", " or ", "/", ignoreCase = true)
+                    .map { it.trim() }
+            return Condition(ConditionType.OR, parts.mapIndexed { i, _ ->
+                resolveCourse(parts, i)
+            })
         }
-        return Condition(type, andParts.mapIndexed { i, part ->
+        val andParts = text.split(",").map { it.trim() }.toMutableList()
+        return Condition(ConditionType.AND, andParts.mapIndexed { i, part ->
             if (part.contains("/") || part.contains(" OR ", ignoreCase = true)) {
                 val orParts = part.split("/", " OR ", ignoreCase = true)
                 Condition(ConditionType.OR, orParts.mapIndexed { j, _ -> resolveCourse(orParts, j) })
@@ -112,10 +119,9 @@ class RawConditionParser {
 
         if (infoNotExtracted.isNotBlank()) {
             throw ParseFailure("Has info not recognized: $infoNotExtracted")
-            //return null
         }
 
-        cond = cond.addOperand(Condition(ConditionType.OR, foundList.map { label(it) }))
+        if (foundList.isNotEmpty()) cond = cond.addOperand(Condition(ConditionType.OR, foundList.map { label(it) }))
 
         return when {
             text.contains("not open to", ignoreCase = true) -> not(cond) // revert conditions
@@ -141,7 +147,7 @@ class RawConditionParser {
     fun parse(text: String): Condition {
         val processedText = text.substringAfter(":").trim()
         val conditions = mutableListOf<Condition>()
-        for (clause in processedText.split(";")) {
+        for (clause in processedText.split(";").map { it.trim().trimEnd('.') }) {
             val exceptions = mutableListOf<Exception>()
             val parsedCondition = safeParseCall(exceptions, clause) { tryParseLabelRequirements(it) }
                 ?: safeParseCall(exceptions, clause) { parseFromCourseRequirementText(it) }

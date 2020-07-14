@@ -5,6 +5,7 @@ import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.persistence.DbRule
 import com.watcourses.wat_courses.persistence.DbRuleRepo
 import com.watcourses.wat_courses.proto.ReParseConditionsResponse
+import com.watcourses.wat_courses.proto.ReParseRegressionTestResponse
 import com.watcourses.wat_courses.proto.Term
 import com.watcourses.wat_courses.rules.RawConditionParser
 import com.watcourses.wat_courses.utils.JsoupSafeOpenUrl
@@ -95,8 +96,8 @@ class ScrapingCourseService(
         }
     }
 
-    fun reParseConditions(dryRun: Boolean): ReParseConditionsResponse {
-        val rulesToReparse = dbRuleRepo.findAllByCondIsNull()
+    fun reParseConditions(dryRun: Boolean, parseAll: Boolean = false): ReParseConditionsResponse {
+        val rulesToReparse = if (parseAll) dbRuleRepo.findAll().filterNotNull() else dbRuleRepo.findAllByCondIsNull()
         val succeedResults = mutableMapOf<String, String>()
         val failedResults = mutableMapOf<String, String>()
         var successCount = 0
@@ -120,6 +121,29 @@ class ScrapingCourseService(
             succeedResults = succeedResults,
             failedResults = failedResults,
             dryRun = dryRun
+        )
+    }
+
+    fun reParseRegressionTest(): ReParseRegressionTestResponse {
+        val rulesToReparse = dbRuleRepo.findAllByCondIsNotNull()
+        val failedResults = mutableListOf<ReParseRegressionTestResponse.Result>()
+        for (rule in rulesToReparse) {
+            val newRule = DbRule.parse(rule.rawRule!!) { rawConditionParser.parse(it) }
+            if (rule.cond != newRule.cond) {
+                failedResults.add(
+                    ReParseRegressionTestResponse.Result(
+                        rawRule = rule.rawRule!!,
+                        old = rule.cond?.toString(),
+                        new = newRule.cond?.toString(),
+                        error = newRule.parseFailureBecause
+                    )
+                )
+            }
+        }
+        return ReParseRegressionTestResponse(
+            total = rulesToReparse.size,
+            regressionNum = failedResults.size,
+            results = failedResults
         )
     }
 

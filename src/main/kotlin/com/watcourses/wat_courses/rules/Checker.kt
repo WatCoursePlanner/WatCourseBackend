@@ -19,8 +19,12 @@ class Checker(
         return when (condition.type) {
             ConditionType.TRUE -> true
             ConditionType.FALSE -> false
-            ConditionType.AND -> condition.operands.map { checkCondition(it, studentState) }.reduce { a, b -> a && b }
-            ConditionType.OR -> condition.operands.map { checkCondition(it, studentState) }.reduce { a, b -> a || b }
+            ConditionType.AND -> if (condition.operands.isEmpty()) true else condition.operands.map {
+                checkCondition(it, studentState)
+            }.reduce { a, b -> a && b }
+            ConditionType.OR -> if (condition.operands.isEmpty()) true else condition.operands.map {
+                checkCondition(it, studentState)
+            }.reduce { a, b -> a || b }
             ConditionType.NOT -> !checkCondition(condition.operands.single(), studentState)
             ConditionType.HAS_COURSE -> studentState.coursesTaken.contains(condition.data)
             ConditionType.HAS_LABEL -> studentState.labels.contains(condition.data)
@@ -32,6 +36,7 @@ class Checker(
             }
         }
     }
+
     fun Condition.check(state: StudentState) = checkCondition(this, state)
 
     private fun generateIssue(course: String, rule: DbRule, type: CheckResults.Issue.Type): CheckResults.Issue {

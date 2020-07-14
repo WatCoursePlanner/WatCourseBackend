@@ -46,14 +46,6 @@ message SearchCourseResponse {
   repeated CourseInfo results = 2;
 }
 
-message ReParseConditionsResponse {
-  optional int32 total = 1;
-  optional int32 success = 2;
-  map<string, string> succeedResults = 3;
-  map<string, string> failedResults = 4;
-  optional bool dryRun = 5;
-}
-
 enum ConditionType {
   TRUE = 0;
   FALSE = 1;
@@ -113,4 +105,13 @@ message CourseSection{
   optional string instructor = 7;
   optional int32 sectionId = 8;
   repeated ReservedEnrolInfo reservedEnrolInfo = 9;
+}
+
+message FindSlotRequest{
+  optional StudentProfile profile = 1;
+  optional string courseCode = 2;
+}
+
+message FindSlotResponse {
+  map<string, CheckResults> slot = 1; // The term name and check results of the corresponding slot
 }

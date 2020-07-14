@@ -1,0 +1,21 @@
+package com.watcourses.wat_courses.proto;
+
+message ReParseConditionsResponse {
+  optional int32 total = 1;
+  optional int32 success = 2;
+  map<string, string> succeedResults = 3;
+  map<string, string> failedResults = 4;
+  optional bool dryRun = 5;
+}
+
+message ReParseRegressionTestResponse {
+  message Result {
+    optional string rawRule = 1;
+    optional string old = 2;
+    optional string new = 3;
+    optional string error = 4;
+  }
+  optional int32 total = 1;
+  optional int32 regressionNum = 2;
+  repeated Result results = 3;
+}
