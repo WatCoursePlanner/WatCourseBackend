@@ -116,6 +116,22 @@ class Schedule(
       adapter = "com.squareup.wire.ProtoAdapter#STRING"
     )
     val termName: String? = null,
+    /**
+     * e.g. 2020
+     */
+    @field:WireField(
+      tag = 3,
+      adapter = "com.squareup.wire.ProtoAdapter#INT32"
+    )
+    val year: Int? = null,
+    /**
+     * e.g. Spring
+     */
+    @field:WireField(
+      tag = 4,
+      adapter = "com.watcourses.wat_courses.proto.Term#ADAPTER"
+    )
+    val term: Term? = null,
     unknownFields: ByteString = ByteString.EMPTY
   ) : Message<TermSchedule, Nothing>(ADAPTER, unknownFields) {
     @Deprecated(
@@ -130,6 +146,8 @@ class Schedule(
       return unknownFields == other.unknownFields
           && courseCodes == other.courseCodes
           && termName == other.termName
+          && year == other.year
+          && term == other.term
     }
 
     override fun hashCode(): Int {
@@ -138,6 +156,8 @@ class Schedule(
         result = unknownFields.hashCode()
         result = result * 37 + courseCodes.hashCode()
         result = result * 37 + termName.hashCode()
+        result = result * 37 + year.hashCode()
+        result = result * 37 + term.hashCode()
         super.hashCode = result
       }
       return result
@@ -147,14 +167,18 @@ class Schedule(
       val result = mutableListOf<String>()
       if (courseCodes.isNotEmpty()) result += """courseCodes=${sanitize(courseCodes)}"""
       if (termName != null) result += """termName=${sanitize(termName)}"""
+      if (year != null) result += """year=$year"""
+      if (term != null) result += """term=$term"""
       return result.joinToString(prefix = "TermSchedule{", separator = ", ", postfix = "}")
     }
 
     fun copy(
       courseCodes: List<String> = this.courseCodes,
       termName: String? = this.termName,
+      year: Int? = this.year,
+      term: Term? = this.term,
       unknownFields: ByteString = this.unknownFields
-    ): TermSchedule = TermSchedule(courseCodes, termName, unknownFields)
+    ): TermSchedule = TermSchedule(courseCodes, termName, year, term, unknownFields)
 
     companion object {
       @JvmField
@@ -166,27 +190,41 @@ class Schedule(
         override fun encodedSize(value: TermSchedule): Int = 
           ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(1, value.courseCodes) +
           ProtoAdapter.STRING.encodedSizeWithTag(2, value.termName) +
+          ProtoAdapter.INT32.encodedSizeWithTag(3, value.year) +
+          Term.ADAPTER.encodedSizeWithTag(4, value.term) +
           value.unknownFields.size
 
         override fun encode(writer: ProtoWriter, value: TermSchedule) {
           ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.courseCodes)
           ProtoAdapter.STRING.encodeWithTag(writer, 2, value.termName)
+          ProtoAdapter.INT32.encodeWithTag(writer, 3, value.year)
+          Term.ADAPTER.encodeWithTag(writer, 4, value.term)
           writer.writeBytes(value.unknownFields)
         }
 
         override fun decode(reader: ProtoReader): TermSchedule {
           val courseCodes = mutableListOf<String>()
           var termName: String? = null
+          var year: Int? = null
+          var term: Term? = null
           val unknownFields = reader.forEachTag { tag ->
             when (tag) {
               1 -> courseCodes.add(ProtoAdapter.STRING.decode(reader))
               2 -> termName = ProtoAdapter.STRING.decode(reader)
+              3 -> year = ProtoAdapter.INT32.decode(reader)
+              4 -> try {
+                term = Term.ADAPTER.decode(reader)
+              } catch (e: ProtoAdapter.EnumConstantNotFoundException) {
+                reader.addUnknownField(tag, FieldEncoding.VARINT, e.value.toLong())
+              }
               else -> reader.readUnknownField(tag)
             }
           }
           return TermSchedule(
             courseCodes = courseCodes,
             termName = termName,
+            year = year,
+            term = term,
             unknownFields = unknownFields
           )
         }

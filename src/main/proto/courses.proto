@@ -57,10 +57,18 @@ enum ConditionType {
   SATISFIES_LIST = 7;
 }
 
+enum CoopStream {
+  NO_COOP = 0;
+  STREAM_4 = 1;
+  STREAM_8 = 2;
+}
+
 message Schedule {
   message TermSchedule {
     repeated string courseCodes = 1;
     optional string termName = 2; // e.g. 1A, 2B
+    optional int32 year = 3; // e.g. 2020
+    optional Term term = 4; // e.g. Spring
   }
   repeated TermSchedule terms = 1;
 }
@@ -69,6 +77,12 @@ message StudentProfile {
   optional Schedule schedule = 1;
   repeated string labels = 2;
   repeated string degrees = 3;
+}
+
+message CreateStudentProfileRequest {
+  repeated string degrees = 1;
+  optional int32 startingYear = 2;
+  optional CoopStream coopStream = 3; // not used for now.
 }
 
 message CheckResults {
