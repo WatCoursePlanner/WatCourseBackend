@@ -1,11 +1,10 @@
 package com.watcourses.wat_courses.api
 
-import com.watcourses.wat_courses.proto.CheckResults
-import com.watcourses.wat_courses.proto.FindSlotRequest
-import com.watcourses.wat_courses.proto.FindSlotResponse
-import com.watcourses.wat_courses.proto.StudentProfile
+import com.watcourses.wat_courses.proto.*
 import com.watcourses.wat_courses.rules.Checker
 import com.watcourses.wat_courses.rules.DegreeRequirementLoader
+import com.watcourses.wat_courses.utils.create
+import com.watcourses.wat_courses.utils.unionFlatten
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -23,6 +22,21 @@ class StudentProfileApi(
             schedule = degreeRequirement.defaultSchedule,
             degrees = listOf(program),
             labels = degreeRequirement.labels.toList()
+        )
+    }
+
+    @PostMapping("/profile/create")
+    fun createStudentProfile(@RequestBody request: CreateStudentProfileRequest): StudentProfile {
+        val degrees = request.degrees
+        val degreeRequirements = degrees.map { degreeRequirementLoader.getDegreeRequirement(it)!! }
+        val startingYear = request.startingYear!!
+        val stream = request.coopStream!!
+        val defaultSchedule = degreeRequirements.single { it.defaultSchedule?.terms?.isNotEmpty() == true }
+            .defaultSchedule!!
+        return StudentProfile(
+            schedule = Schedule.create(defaultSchedule, startingYear, stream),
+            degrees = degrees,
+            labels = degreeRequirements.map { it.labels.toSet() }.unionFlatten().toList()
         )
     }
 

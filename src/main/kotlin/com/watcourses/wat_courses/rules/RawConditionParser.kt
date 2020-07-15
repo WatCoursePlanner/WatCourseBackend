@@ -5,8 +5,8 @@ import com.watcourses.wat_courses.proto.ConditionType
 import org.springframework.stereotype.Component
 
 @Component
-class RawConditionParser(private val dbCourseRepo: DbCourseRepo) {
-    class ParseFailure(reason: String, val str: String? = null) : Exception(reason)
+class RawConditionParser {
+    class ParseFailure(reason: String) : Exception(reason)
 
     private fun courseSanityCheck(course: String) {
         val courseParts = course.split(" ")
@@ -151,7 +151,7 @@ class RawConditionParser(private val dbCourseRepo: DbCourseRepo) {
             val exceptions = mutableListOf<Exception>()
             val parsedCondition = safeParseCall(exceptions, clause) { tryParseLabelRequirements(it) }
                 ?: safeParseCall(exceptions, clause) { parseFromCourseRequirementText(it) }
-                ?: throw ParseFailure(exceptions.joinToString("; ") { it.message.toString() }, text)
+                ?: throw ParseFailure(exceptions.joinToString("; ") { it.message.toString() })
             conditions.add(parsedCondition)
         }
         if (conditions.size == 1) return conditions.single()
