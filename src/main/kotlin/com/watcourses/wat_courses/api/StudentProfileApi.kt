@@ -33,8 +33,11 @@ class StudentProfileApi(
         val stream = request.coopStream!!
         val defaultSchedule = degreeRequirements.single { it.defaultSchedule?.terms?.isNotEmpty() == true }
             .defaultSchedule!!
+        val importedSchedule = request.schedule
+        val mergedSchedule = importedSchedule?.let { mergeSchedule(it, defaultSchedule) } ?: defaultSchedule
+
         return StudentProfile(
-            schedule = Schedule.create(defaultSchedule, startingYear, stream),
+            schedule = Schedule.create(mergedSchedule, startingYear, stream),
             degrees = degrees,
             labels = degreeRequirements.map { it.labels.toSet() }.unionFlatten().toList()
         )
@@ -70,6 +73,12 @@ class StudentProfileApi(
         return FindSlotResponse(slot = results.mapValues {
             // subtract commonResults
             CheckResults(issues = it.value.issues.filterNot { commonResults.contains(it) })
+        })
+    }
+
+    private fun mergeSchedule(imported: Schedule, template: Schedule): Schedule {
+        return Schedule(terms = template.terms.map { templateTerm ->
+            imported.terms.find { it.termName == templateTerm.termName } ?: templateTerm
         })
     }
 }
