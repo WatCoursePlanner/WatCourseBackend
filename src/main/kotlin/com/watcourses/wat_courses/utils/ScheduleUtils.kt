@@ -22,7 +22,7 @@ fun Schedule.Companion.create(
     @Suppress("UNUSED_PARAMETER") stream: CoopStream
 ): Schedule {
     var currentYear = startingYear
-    var currentTerm = listOf(Term.FALL, Term.SPRING, Term.WINTER).asSequence().repeat()
+    var currentTerm = listOf(Term.FALL, Term.WINTER, Term.SPRING).asSequence().repeat()
     return Schedule(terms = schedule.terms.map {
         val result = it.copy(
             year = currentYear,
