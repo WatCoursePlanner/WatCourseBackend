@@ -42,6 +42,11 @@ class CreateStudentProfileRequest(
     adapter = "com.watcourses.wat_courses.proto.CoopStream#ADAPTER"
   )
   val coopStream: CoopStream? = null,
+  @field:WireField(
+    tag = 4,
+    adapter = "com.watcourses.wat_courses.proto.Schedule#ADAPTER"
+  )
+  val schedule: Schedule? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<CreateStudentProfileRequest, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -57,6 +62,7 @@ class CreateStudentProfileRequest(
         && degrees == other.degrees
         && startingYear == other.startingYear
         && coopStream == other.coopStream
+        && schedule == other.schedule
   }
 
   override fun hashCode(): Int {
@@ -66,6 +72,7 @@ class CreateStudentProfileRequest(
       result = result * 37 + degrees.hashCode()
       result = result * 37 + startingYear.hashCode()
       result = result * 37 + coopStream.hashCode()
+      result = result * 37 + schedule.hashCode()
       super.hashCode = result
     }
     return result
@@ -76,6 +83,7 @@ class CreateStudentProfileRequest(
     if (degrees.isNotEmpty()) result += """degrees=${sanitize(degrees)}"""
     if (startingYear != null) result += """startingYear=$startingYear"""
     if (coopStream != null) result += """coopStream=$coopStream"""
+    if (schedule != null) result += """schedule=$schedule"""
     return result.joinToString(prefix = "CreateStudentProfileRequest{", separator = ", ", postfix =
         "}")
   }
@@ -84,9 +92,10 @@ class CreateStudentProfileRequest(
     degrees: List<String> = this.degrees,
     startingYear: Int? = this.startingYear,
     coopStream: CoopStream? = this.coopStream,
+    schedule: Schedule? = this.schedule,
     unknownFields: ByteString = this.unknownFields
   ): CreateStudentProfileRequest = CreateStudentProfileRequest(degrees, startingYear, coopStream,
-      unknownFields)
+      schedule, unknownFields)
 
   companion object {
     @JvmField
@@ -100,12 +109,14 @@ class CreateStudentProfileRequest(
         ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(1, value.degrees) +
         ProtoAdapter.INT32.encodedSizeWithTag(2, value.startingYear) +
         CoopStream.ADAPTER.encodedSizeWithTag(3, value.coopStream) +
+        Schedule.ADAPTER.encodedSizeWithTag(4, value.schedule) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: CreateStudentProfileRequest) {
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.degrees)
         ProtoAdapter.INT32.encodeWithTag(writer, 2, value.startingYear)
         CoopStream.ADAPTER.encodeWithTag(writer, 3, value.coopStream)
+        Schedule.ADAPTER.encodeWithTag(writer, 4, value.schedule)
         writer.writeBytes(value.unknownFields)
       }
 
@@ -113,6 +124,7 @@ class CreateStudentProfileRequest(
         val degrees = mutableListOf<String>()
         var startingYear: Int? = null
         var coopStream: CoopStream? = null
+        var schedule: Schedule? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> degrees.add(ProtoAdapter.STRING.decode(reader))
@@ -122,6 +134,7 @@ class CreateStudentProfileRequest(
             } catch (e: ProtoAdapter.EnumConstantNotFoundException) {
               reader.addUnknownField(tag, FieldEncoding.VARINT, e.value.toLong())
             }
+            4 -> schedule = Schedule.ADAPTER.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
@@ -129,12 +142,14 @@ class CreateStudentProfileRequest(
           degrees = degrees,
           startingYear = startingYear,
           coopStream = coopStream,
+          schedule = schedule,
           unknownFields = unknownFields
         )
       }
 
       override fun redact(value: CreateStudentProfileRequest): CreateStudentProfileRequest =
           value.copy(
+        schedule = value.schedule?.let(Schedule.ADAPTER::redact),
         unknownFields = ByteString.EMPTY
       )
     }
