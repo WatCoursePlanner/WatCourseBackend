@@ -29,7 +29,7 @@ fun Schedule.Companion.create(
             term = currentTerm.first()
         )
         currentTerm = currentTerm.drop(1)
-        if (currentTerm.first() == Term.SPRING) currentYear += 1
+        if (currentTerm.first() == Term.WINTER) currentYear += 1
         result
     })
 }
