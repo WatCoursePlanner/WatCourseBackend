@@ -6,6 +6,12 @@ enum Term {
   FALL = 2;
 }
 
+message RuleInfo {
+  optional string rawString = 1;
+  optional string logicString = 2;
+  optional bool fullyResolved = 3;
+}
+
 message CourseInfo {
   optional string name = 1;
   optional string code = 2;
@@ -13,12 +19,9 @@ message CourseInfo {
   optional string faculty = 4;
   repeated Term offeringTerms = 5;
   optional string id = 6;
-  optional string preRequisiteLogicStr = 7;
-  optional string coRequisiteLogicStr = 8;
-  optional string antiRequisiteLogicStr = 9;
-  optional string preRequisite = 10;
-  optional string coRequisite = 11;
-  optional string antiRequisite = 12;
+  optional RuleInfo preRequisite = 7;
+  optional RuleInfo coRequisite = 8;
+  optional RuleInfo antiRequisite = 9;
 }
 
 message CourseList {

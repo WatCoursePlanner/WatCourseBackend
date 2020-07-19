@@ -56,34 +56,19 @@ class CourseInfo(
   val id: String? = null,
   @field:WireField(
     tag = 7,
-    adapter = "com.squareup.wire.ProtoAdapter#STRING"
+    adapter = "com.watcourses.wat_courses.proto.RuleInfo#ADAPTER"
   )
-  val preRequisiteLogicStr: String? = null,
+  val preRequisite: RuleInfo? = null,
   @field:WireField(
     tag = 8,
-    adapter = "com.squareup.wire.ProtoAdapter#STRING"
+    adapter = "com.watcourses.wat_courses.proto.RuleInfo#ADAPTER"
   )
-  val coRequisiteLogicStr: String? = null,
+  val coRequisite: RuleInfo? = null,
   @field:WireField(
     tag = 9,
-    adapter = "com.squareup.wire.ProtoAdapter#STRING"
+    adapter = "com.watcourses.wat_courses.proto.RuleInfo#ADAPTER"
   )
-  val antiRequisiteLogicStr: String? = null,
-  @field:WireField(
-    tag = 10,
-    adapter = "com.squareup.wire.ProtoAdapter#STRING"
-  )
-  val preRequisite: String? = null,
-  @field:WireField(
-    tag = 11,
-    adapter = "com.squareup.wire.ProtoAdapter#STRING"
-  )
-  val coRequisite: String? = null,
-  @field:WireField(
-    tag = 12,
-    adapter = "com.squareup.wire.ProtoAdapter#STRING"
-  )
-  val antiRequisite: String? = null,
+  val antiRequisite: RuleInfo? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<CourseInfo, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -102,9 +87,6 @@ class CourseInfo(
         && faculty == other.faculty
         && offeringTerms == other.offeringTerms
         && id == other.id
-        && preRequisiteLogicStr == other.preRequisiteLogicStr
-        && coRequisiteLogicStr == other.coRequisiteLogicStr
-        && antiRequisiteLogicStr == other.antiRequisiteLogicStr
         && preRequisite == other.preRequisite
         && coRequisite == other.coRequisite
         && antiRequisite == other.antiRequisite
@@ -120,9 +102,6 @@ class CourseInfo(
       result = result * 37 + faculty.hashCode()
       result = result * 37 + offeringTerms.hashCode()
       result = result * 37 + id.hashCode()
-      result = result * 37 + preRequisiteLogicStr.hashCode()
-      result = result * 37 + coRequisiteLogicStr.hashCode()
-      result = result * 37 + antiRequisiteLogicStr.hashCode()
       result = result * 37 + preRequisite.hashCode()
       result = result * 37 + coRequisite.hashCode()
       result = result * 37 + antiRequisite.hashCode()
@@ -139,15 +118,9 @@ class CourseInfo(
     if (faculty != null) result += """faculty=${sanitize(faculty)}"""
     if (offeringTerms.isNotEmpty()) result += """offeringTerms=$offeringTerms"""
     if (id != null) result += """id=${sanitize(id)}"""
-    if (preRequisiteLogicStr != null) result +=
-        """preRequisiteLogicStr=${sanitize(preRequisiteLogicStr)}"""
-    if (coRequisiteLogicStr != null) result +=
-        """coRequisiteLogicStr=${sanitize(coRequisiteLogicStr)}"""
-    if (antiRequisiteLogicStr != null) result +=
-        """antiRequisiteLogicStr=${sanitize(antiRequisiteLogicStr)}"""
-    if (preRequisite != null) result += """preRequisite=${sanitize(preRequisite)}"""
-    if (coRequisite != null) result += """coRequisite=${sanitize(coRequisite)}"""
-    if (antiRequisite != null) result += """antiRequisite=${sanitize(antiRequisite)}"""
+    if (preRequisite != null) result += """preRequisite=$preRequisite"""
+    if (coRequisite != null) result += """coRequisite=$coRequisite"""
+    if (antiRequisite != null) result += """antiRequisite=$antiRequisite"""
     return result.joinToString(prefix = "CourseInfo{", separator = ", ", postfix = "}")
   }
 
@@ -158,16 +131,12 @@ class CourseInfo(
     faculty: String? = this.faculty,
     offeringTerms: List<Term> = this.offeringTerms,
     id: String? = this.id,
-    preRequisiteLogicStr: String? = this.preRequisiteLogicStr,
-    coRequisiteLogicStr: String? = this.coRequisiteLogicStr,
-    antiRequisiteLogicStr: String? = this.antiRequisiteLogicStr,
-    preRequisite: String? = this.preRequisite,
-    coRequisite: String? = this.coRequisite,
-    antiRequisite: String? = this.antiRequisite,
+    preRequisite: RuleInfo? = this.preRequisite,
+    coRequisite: RuleInfo? = this.coRequisite,
+    antiRequisite: RuleInfo? = this.antiRequisite,
     unknownFields: ByteString = this.unknownFields
-  ): CourseInfo = CourseInfo(name, code, description, faculty, offeringTerms, id,
-      preRequisiteLogicStr, coRequisiteLogicStr, antiRequisiteLogicStr, preRequisite, coRequisite,
-      antiRequisite, unknownFields)
+  ): CourseInfo = CourseInfo(name, code, description, faculty, offeringTerms, id, preRequisite,
+      coRequisite, antiRequisite, unknownFields)
 
   companion object {
     @JvmField
@@ -183,12 +152,9 @@ class CourseInfo(
         ProtoAdapter.STRING.encodedSizeWithTag(4, value.faculty) +
         Term.ADAPTER.asRepeated().encodedSizeWithTag(5, value.offeringTerms) +
         ProtoAdapter.STRING.encodedSizeWithTag(6, value.id) +
-        ProtoAdapter.STRING.encodedSizeWithTag(7, value.preRequisiteLogicStr) +
-        ProtoAdapter.STRING.encodedSizeWithTag(8, value.coRequisiteLogicStr) +
-        ProtoAdapter.STRING.encodedSizeWithTag(9, value.antiRequisiteLogicStr) +
-        ProtoAdapter.STRING.encodedSizeWithTag(10, value.preRequisite) +
-        ProtoAdapter.STRING.encodedSizeWithTag(11, value.coRequisite) +
-        ProtoAdapter.STRING.encodedSizeWithTag(12, value.antiRequisite) +
+        RuleInfo.ADAPTER.encodedSizeWithTag(7, value.preRequisite) +
+        RuleInfo.ADAPTER.encodedSizeWithTag(8, value.coRequisite) +
+        RuleInfo.ADAPTER.encodedSizeWithTag(9, value.antiRequisite) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: CourseInfo) {
@@ -198,12 +164,9 @@ class CourseInfo(
         ProtoAdapter.STRING.encodeWithTag(writer, 4, value.faculty)
         Term.ADAPTER.asRepeated().encodeWithTag(writer, 5, value.offeringTerms)
         ProtoAdapter.STRING.encodeWithTag(writer, 6, value.id)
-        ProtoAdapter.STRING.encodeWithTag(writer, 7, value.preRequisiteLogicStr)
-        ProtoAdapter.STRING.encodeWithTag(writer, 8, value.coRequisiteLogicStr)
-        ProtoAdapter.STRING.encodeWithTag(writer, 9, value.antiRequisiteLogicStr)
-        ProtoAdapter.STRING.encodeWithTag(writer, 10, value.preRequisite)
-        ProtoAdapter.STRING.encodeWithTag(writer, 11, value.coRequisite)
-        ProtoAdapter.STRING.encodeWithTag(writer, 12, value.antiRequisite)
+        RuleInfo.ADAPTER.encodeWithTag(writer, 7, value.preRequisite)
+        RuleInfo.ADAPTER.encodeWithTag(writer, 8, value.coRequisite)
+        RuleInfo.ADAPTER.encodeWithTag(writer, 9, value.antiRequisite)
         writer.writeBytes(value.unknownFields)
       }
 
@@ -214,12 +177,9 @@ class CourseInfo(
         var faculty: String? = null
         val offeringTerms = mutableListOf<Term>()
         var id: String? = null
-        var preRequisiteLogicStr: String? = null
-        var coRequisiteLogicStr: String? = null
-        var antiRequisiteLogicStr: String? = null
-        var preRequisite: String? = null
-        var coRequisite: String? = null
-        var antiRequisite: String? = null
+        var preRequisite: RuleInfo? = null
+        var coRequisite: RuleInfo? = null
+        var antiRequisite: RuleInfo? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> name = ProtoAdapter.STRING.decode(reader)
@@ -232,12 +192,9 @@ class CourseInfo(
               reader.addUnknownField(tag, FieldEncoding.VARINT, e.value.toLong())
             }
             6 -> id = ProtoAdapter.STRING.decode(reader)
-            7 -> preRequisiteLogicStr = ProtoAdapter.STRING.decode(reader)
-            8 -> coRequisiteLogicStr = ProtoAdapter.STRING.decode(reader)
-            9 -> antiRequisiteLogicStr = ProtoAdapter.STRING.decode(reader)
-            10 -> preRequisite = ProtoAdapter.STRING.decode(reader)
-            11 -> coRequisite = ProtoAdapter.STRING.decode(reader)
-            12 -> antiRequisite = ProtoAdapter.STRING.decode(reader)
+            7 -> preRequisite = RuleInfo.ADAPTER.decode(reader)
+            8 -> coRequisite = RuleInfo.ADAPTER.decode(reader)
+            9 -> antiRequisite = RuleInfo.ADAPTER.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
@@ -248,9 +205,6 @@ class CourseInfo(
           faculty = faculty,
           offeringTerms = offeringTerms,
           id = id,
-          preRequisiteLogicStr = preRequisiteLogicStr,
-          coRequisiteLogicStr = coRequisiteLogicStr,
-          antiRequisiteLogicStr = antiRequisiteLogicStr,
           preRequisite = preRequisite,
           coRequisite = coRequisite,
           antiRequisite = antiRequisite,
@@ -259,6 +213,9 @@ class CourseInfo(
       }
 
       override fun redact(value: CourseInfo): CourseInfo = value.copy(
+        preRequisite = value.preRequisite?.let(RuleInfo.ADAPTER::redact),
+        coRequisite = value.coRequisite?.let(RuleInfo.ADAPTER::redact),
+        antiRequisite = value.antiRequisite?.let(RuleInfo.ADAPTER::redact),
         unknownFields = ByteString.EMPTY
       )
     }
