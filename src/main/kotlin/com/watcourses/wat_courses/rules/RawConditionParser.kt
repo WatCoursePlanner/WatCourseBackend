@@ -19,7 +19,7 @@ class RawConditionParser(private val dbCourseRepo: DbCourseRepo) {
     }
 
     // resolve "123" in "CS 101, 123" to course("CS 123")
-    // Make sure that each element of the parts is trimed
+    // Make sure that each element of the parts is trimmed
     private fun resolveCourse(parts: List<String>, index: Int): Condition {
         val part = parts[index].trim()
         if (part.contains(" ")) { // e.g. CS 101. We have "CS" already so return directly
@@ -41,8 +41,8 @@ class RawConditionParser(private val dbCourseRepo: DbCourseRepo) {
     private fun parseFromCourseRequirementText(text: String): Condition {
         if (text.trim().startsWith("one of", ignoreCase = true)) {
             val parts =
-                text.trim().substring("one of".length).split(",", " or ", "/", ignoreCase = true)
-                    .map { it.trim() }
+                    text.trim().substring("one of".length).split(",", " or ", "/", ignoreCase = true)
+                            .map { it.trim() }
             return Condition(ConditionType.OR, parts.mapIndexed { i, _ ->
                 resolveCourse(parts, i)
             })
@@ -74,6 +74,8 @@ class RawConditionParser(private val dbCourseRepo: DbCourseRepo) {
         val additionalMap = mapOf(
             "first year" to "1st year", "second year" to "2nd year",
             "third year" to "3rd year", "fourth year" to "4th year",
+            "first-year" to "1st year", "second-year" to "2nd year",
+            "third-year" to "3rd year", "fourth-year" to "4th year",
             "Year 1" to "1st year", "Year 2" to "2nd year",
             "Year 3" to "3rd year", "Year 4" to "4th year"
         )
@@ -91,6 +93,8 @@ class RawConditionParser(private val dbCourseRepo: DbCourseRepo) {
             "Acc'ting" to "Accounting",
             "AHS" to "Applied Health Science",
             "Math" to "Mathematics",
+            "CPA" to "Mathematics/Chartered Professional Accountancy",
+            "DAC" to "Digital Arts Communication",
             "&" to "and"
         )
 
@@ -109,8 +113,8 @@ class RawConditionParser(private val dbCourseRepo: DbCourseRepo) {
         }
 
         val wordsToIgnore = listOf(
-            ",", ".", "/", "and", "Bachelor of", "majors", "not open to",
-            "students", "in", "only", "level", "least", "at", "or", "of", "the"
+            ",", ".", "/", "and", "Bachelor of", "majors", "not open to", "plan", "diploma",
+            "students", "in", "only", "level", "least", "at", "least", "or", "of", "the"
         )
 
         for (ignoringWord in wordsToIgnore) {
@@ -144,10 +148,25 @@ class RawConditionParser(private val dbCourseRepo: DbCourseRepo) {
         }
     }
 
+    private fun furtherTrim(text: String): String {  // test, temporary replacement for a self-check flag
+        var trimmedStr = text
+        val wordsToIgnore = listOf(  // strings that, when detected, raise flag
+                "with a grade of", "at least", "60%", "65%", "70%", "75%", "80%",
+                "1.0 unit", "0.50 unit", "0.5 unit", "(", ")", "taken", "prior to",
+                "Portfolio Review Milestone", "4U", "Topic", "LEC"
+        )
+        for (ignoringWord in wordsToIgnore) {
+            trimmedStr = trimmedStr.replace(ignoringWord, "", ignoreCase = true).trim()
+        }
+
+        return trimmedStr
+    }
+
     fun parse(text: String): Condition {
-        val processedText = text.substringAfter(":").trim()
+        var processedText = text.substringAfter(":").trim()
         val conditions = mutableListOf<Condition>()
-        for (clause in processedText.split(";").map { it.trim().trimEnd('.') }) {
+        for (partText in processedText.split(";").map { it.trim().trimEnd('.') }) {
+            val clause = furtherTrim(partText)
             val exceptions = mutableListOf<Exception>()
             val parsedCondition = safeParseCall(exceptions, clause) { tryParseLabelRequirements(it) }
                 ?: safeParseCall(exceptions, clause) { parseFromCourseRequirementText(it) }
