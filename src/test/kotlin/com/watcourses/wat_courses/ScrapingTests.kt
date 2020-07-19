@@ -62,8 +62,8 @@ class ScrapingTests {
 
     @Test
     fun `api schedule info extraction works`() {
-        apiScheduleService.scrapeSchedulePage("ECE 140", "1205", inputStreamFromRes("schedule_ece140.json"))
-        apiScheduleService.scrapeSchedulePage("ECE 140", "1201", inputStreamFromRes("schedule_ece140_1201.json"))
+        apiScheduleService.scrapeSchedulePage("ECE 140", "1205", inputStreamFromRes("schedule_ECE140.json"))
+        apiScheduleService.scrapeSchedulePage("ECE 140", "1201", inputStreamFromRes("schedule_ECE140_1201.json"))
 
         dbCourseScheduleRepo.findByCodeAndTermId("ECE 140", "1201")!!.let { res ->
             assertThat(res.termId).isEqualTo("1201")
