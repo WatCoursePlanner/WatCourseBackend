@@ -3,8 +3,8 @@ package com.watcourses.wat_courses
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.persistence.DbCourseScheduleRepo
 import com.watcourses.wat_courses.proto.Term
+import com.watcourses.wat_courses.scraping.ApiScheduleService
 import com.watcourses.wat_courses.scraping.ScrapingCourseService
-import com.watcourses.wat_courses.scraping.ScrapingScheduleService
 import com.watcourses.wat_courses.utils.getCode
 import org.assertj.core.api.Assertions.assertThat
 import org.jsoup.Jsoup
@@ -23,7 +23,7 @@ class ScrapingTests {
     private lateinit var scrapingCourseService: ScrapingCourseService
 
     @Autowired
-    private lateinit var scrapingScheduleService: ScrapingScheduleService
+    private lateinit var apiScheduleService: ApiScheduleService
 
     @Autowired
     private lateinit var dbCourseRepo: DbCourseRepo
@@ -32,7 +32,7 @@ class ScrapingTests {
     private lateinit var dbCourseScheduleRepo: DbCourseScheduleRepo
 
     @Test
-    fun `term id is correct`(){
+    fun `term id is correct`() {
         assertThat(Term.FALL.getCode(2019)).isEqualTo(1199)
         assertThat(Term.SPRING.getCode(2020)).isEqualTo(1201)
         assertThat(Term.WINTER.getCode(2020)).isEqualTo(1205)
@@ -58,29 +58,20 @@ class ScrapingTests {
         assertThat(dbCourseRepo.findByCode("CS 492")!!.name).isEqualTo("The Social Implications of Computing")
     }
 
+    private fun inputStreamFromRes(file: String) = ClassPathResource(file).inputStream
+
     @Test
-    fun `scraping schedule works`() {
-        scrapingScheduleService.scrapeSchedulePage(
-            "ECE 140", Jsoup.parse(ClassPathResource("schedule-ece140-1201.html").file, null)
-        )
-        scrapingScheduleService.scrapeSchedulePage(
-            "ECE 140", Jsoup.parse(ClassPathResource("schedule-ece140-1205.html").file, null)
-        )
-        scrapingScheduleService.scrapeSchedulePage(
-            "AE 221", Jsoup.parse(ClassPathResource("schedule-no-match.html").file, null)
-        )
+    fun `api schedule info extraction works`() {
+        apiScheduleService.scrapeSchedulePage("ECE 140", "1205", inputStreamFromRes("schedule_ece140.json"))
+        apiScheduleService.scrapeSchedulePage("ECE 140", "1201", inputStreamFromRes("schedule_ece140_1201.json"))
 
         dbCourseScheduleRepo.findByCodeAndTermId("ECE 140", "1201")!!.let { res ->
             assertThat(res.termId).isEqualTo("1201")
-            with(res.sections.single { it.sectionId == 5090 }) {
+            with(res.sections.single { it.classNumber == 5090 }) {
                 assertThat(section).isEqualTo("LEC 001")
-                assertThat(enrolCap).isEqualTo(140)
-                assertThat(enrolTotal).isEqualTo(156)
-                assertThat(time).contains("02:30-03:20MWF", "03:30-04:20Th 01/23-01/23")
-                assertThat(location).isEqualTo("UW U")
-                assertThat(room).isEqualTo("E7 5343")
-                assertThat(instructor).isEqualTo("Mohamed-Yahia Dabbagh")
-                assertThat(reservedEnrolInfo.single().total).isEqualTo(28)
+                assertThat(enrollmentCapacity).isEqualTo(140)
+                assertThat(enrollmentTotal).isEqualTo(156)
+                assertThat(reserves.single().enrollmentTotal).isEqualTo(28)
             }
             assertThat(res.enrolledCap).isEqualTo(281)
             assertThat(res.enrolledTotal).isEqualTo(283)
@@ -88,24 +79,14 @@ class ScrapingTests {
 
         dbCourseScheduleRepo.findByCodeAndTermId("ECE 140", "1205")!!.let { res ->
             assertThat(res.termId).isEqualTo("1205")
-            with(res.sections.single { it.sectionId == 3306 }) {
+            with(res.sections.single { it.classNumber == 3306 }) {
                 assertThat(section).isEqualTo("LEC 002")
-                assertThat(enrolCap).isEqualTo(150)
-                assertThat(enrolTotal).isEqualTo(143)
-                assertThat(time).containsExactly("TBA")
-                assertThat(location).isEqualTo("ONLN ONLINE")
-                assertThat(room).isEqualTo("")
-                assertThat(instructor).isEqualTo("John Saad")
-                assertThat(reservedEnrolInfo.single().total).isEqualTo(35)
+                assertThat(enrollmentCapacity).isEqualTo(150)
+                assertThat(enrollmentTotal).isEqualTo(143)
+                assertThat(reserves.single().enrollmentTotal).isEqualTo(35)
             }
             assertThat(res.enrolledCap).isEqualTo(300)
-            assertThat(res.enrolledTotal).isEqualTo(293)
-        }
-
-        dbCourseScheduleRepo.findByCodeAndTermId("AE 221", "1205")!!.let { res ->
-            assertThat(res.sections).isEmpty()
-            assertThat(res.enrolledCap).isEqualTo(0)
-            assertThat(res.enrolledTotal).isEqualTo(0)
+            assertThat(res.enrolledTotal).isEqualTo(295)
         }
     }
 }
