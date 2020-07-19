@@ -89,8 +89,7 @@ class RawConditionParser {
             "Mgmt" to "Management",
             "Acc'ting" to "Accounting",
             "AHS" to "Applied Health Science",
-            "Math" to "Mathematics",
-            "&" to "and"
+            "Math" to "Mathematics"
         )
 
         for (it in abbrMap) {
@@ -152,13 +151,39 @@ class RawConditionParser {
         }
     }
 
+    private fun furtherTrim(text: String): Pair<String, Boolean> {  // test, temporary replacement for a self-check flag
+        var trimmedText = text.substringAfter(":").trim()
+        var conditionFullyResolved = false
+        val wordsToFlag = listOf(  // strings that, when detected, raise flag
+                "with a grade of", "at least", "60%", "65%", "70%", "75%", "80%",
+                "1.0 unit", "0.50 unit", "0.5 unit", "(", ")", "taken", "prior to",
+                "Portfolio Review Milestone", "4U", "Topic", "LEC"
+        )
+        for (word in wordsToFlag) {
+            if (trimmedText.contains(word, ignoreCase = true)) {
+                conditionFullyResolved = true
+                trimmedText = trimmedText.replace(word, "", ignoreCase = true).trim()
+            }
+        }
+
+        val wordsToMap = mapOf(
+                "(" to "",
+                ")" to "",
+                "&" to "and",
+                "/" to "or"
+        )
+        for (word in wordsToMap) {
+            trimmedText = trimmedText.replace(word.key, word.value, ignoreCase = true).trim()
+        }
+
+        return Pair(trimmedText, conditionFullyResolved)
+    }
+
     // returns a condition and whether it is fully understood
     // ParseFailure is thrown if parse failed.
     fun parse(text: String): Pair<Condition, Boolean> {
-        var conditionFullyResolved = true
-        val processedText = text.substringAfter(":").trim()
+        var (processedText, conditionFullyResolved) = furtherTrim(text)
         val conditions = mutableListOf<Condition>()
-
         val clauses = processedText.split(";").map { it.trim().trimEnd('.') }.filterNot { it.isEmpty() }
 
         for (clause in clauses) {
