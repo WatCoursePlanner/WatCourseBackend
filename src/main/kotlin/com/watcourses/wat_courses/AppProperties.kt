@@ -7,4 +7,5 @@ import org.springframework.stereotype.Component
 @ConfigurationProperties("app")
 class AppProperties {
     lateinit var google_client_id: String
+    lateinit var uwaterloo_open_data_api_key: String // https://uwaterloo.ca/api/
 }

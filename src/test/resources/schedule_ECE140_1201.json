@@ -1,0 +1,1201 @@
+{
+  "meta": {
+    "requests": 14,
+    "timestamp": 1595176363,
+    "status": 200,
+    "message": "Request successful",
+    "method_id": 1171,
+    "method": {
+      "disclaimer": "Review the 'No Warranty' section of the University of Waterloo Open Data License before using this data. If building services upon this data, please inform your users of the inherent risks (as a best practice)",
+      "license": "https:\/\/uwaterloo.ca\/open-data\/university-waterloo-open-data-license-agreement-v1"
+    }
+  },
+  "data": [
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5090,
+      "section": "LEC 001",
+      "campus": "UW U",
+      "associated_class": 1,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 140,
+      "enrollment_total": 156,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [
+        {
+          "reserve_group": "COMPE or ELE Yr 1 students ",
+          "enrollment_capacity": 140,
+          "enrollment_total": 28
+        }
+      ],
+      "classes": [
+        {
+          "date": {
+            "start_time": "14:30",
+            "end_time": "15:20",
+            "weekdays": "MWF",
+            "start_date": null,
+            "end_date": null,
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E7",
+            "room": "5343"
+          },
+          "instructors": [
+            "Dabbagh,Mohamed-Yahia"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "15:30",
+            "end_time": "16:20",
+            "weekdays": "Th",
+            "start_date": "01\/23",
+            "end_date": "01\/23",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E7",
+            "room": "5343"
+          },
+          "instructors": [
+            "Dabbagh,Mohamed-Yahia"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "15:30",
+            "end_time": "16:20",
+            "weekdays": "Th",
+            "start_date": "02\/13",
+            "end_date": "02\/13",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E7",
+            "room": "5343"
+          },
+          "instructors": [
+            "Dabbagh,Mohamed-Yahia"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "15:30",
+            "end_time": "16:20",
+            "weekdays": "Th",
+            "start_date": "03\/19",
+            "end_date": "03\/19",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E7",
+            "room": "5343"
+          },
+          "instructors": [
+            "Dabbagh,Mohamed-Yahia"
+          ]
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5091,
+      "section": "LEC 002",
+      "campus": "UW U",
+      "associated_class": 2,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 141,
+      "enrollment_total": 127,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [
+        {
+          "reserve_group": "Software Eng Yr 1 students ",
+          "enrollment_capacity": 141,
+          "enrollment_total": 126
+        }
+      ],
+      "classes": [
+        {
+          "date": {
+            "start_time": "11:00",
+            "end_time": "12:20",
+            "weekdays": "TTh",
+            "start_date": null,
+            "end_date": null,
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "MC",
+            "room": "1085"
+          },
+          "instructors": [
+            "Dabbagh,Mohamed-Yahia"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "09:20",
+            "weekdays": "Th",
+            "start_date": "02\/13",
+            "end_date": "02\/13",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "MC",
+            "room": "1085"
+          },
+          "instructors": [
+            "Dabbagh,Mohamed-Yahia"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "09:20",
+            "weekdays": "Th",
+            "start_date": "03\/05",
+            "end_date": "03\/05",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "MC",
+            "room": "1085"
+          },
+          "instructors": [
+            "Dabbagh,Mohamed-Yahia"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "09:20",
+            "weekdays": "Th",
+            "start_date": "03\/19",
+            "end_date": "03\/19",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "MC",
+            "room": "1085"
+          },
+          "instructors": [
+            "Dabbagh,Mohamed-Yahia"
+          ]
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5092,
+      "section": "TUT 101",
+      "campus": "UW U",
+      "associated_class": 1,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 47,
+      "enrollment_total": 54,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "10:20",
+            "weekdays": "W",
+            "start_date": null,
+            "end_date": null,
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E5",
+            "room": "4106"
+          },
+          "instructors": []
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5093,
+      "section": "TUT 102",
+      "campus": "UW U",
+      "associated_class": 1,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 47,
+      "enrollment_total": 50,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "10:20",
+            "weekdays": "M",
+            "start_date": null,
+            "end_date": null,
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "MC",
+            "room": "4042"
+          },
+          "instructors": []
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5094,
+      "section": "TUT 103",
+      "campus": "UW U",
+      "associated_class": 1,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 46,
+      "enrollment_total": 52,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "10:20",
+            "weekdays": "F",
+            "start_date": null,
+            "end_date": null,
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "RCH",
+            "room": "204"
+          },
+          "instructors": []
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5095,
+      "section": "TUT 104",
+      "campus": "UW U",
+      "associated_class": 2,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 47,
+      "enrollment_total": 43,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "14:30",
+            "end_time": "16:20",
+            "weekdays": "T",
+            "start_date": null,
+            "end_date": null,
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "DWE",
+            "room": "3522A"
+          },
+          "instructors": []
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5143,
+      "section": "TUT 105",
+      "campus": "UW U",
+      "associated_class": 2,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 47,
+      "enrollment_total": 42,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "14:30",
+            "end_time": "16:20",
+            "weekdays": "W",
+            "start_date": null,
+            "end_date": null,
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "DWE",
+            "room": "3522A"
+          },
+          "instructors": []
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5144,
+      "section": "TUT 106",
+      "campus": "UW U",
+      "associated_class": 2,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 47,
+      "enrollment_total": 42,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "14:30",
+            "end_time": "16:20",
+            "weekdays": "Th",
+            "start_date": null,
+            "end_date": null,
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "DWE",
+            "room": "3522A"
+          },
+          "instructors": []
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5096,
+      "section": "LAB 201",
+      "campus": "UW U",
+      "associated_class": 1,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 47,
+      "enrollment_total": 54,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "Th",
+            "start_date": "01\/23",
+            "end_date": "01\/23",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "Th",
+            "start_date": "02\/06",
+            "end_date": "02\/06",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "Th",
+            "start_date": "03\/05",
+            "end_date": "03\/05",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "Th",
+            "start_date": "03\/19",
+            "end_date": "03\/19",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "Th",
+            "start_date": "04\/02",
+            "end_date": "04\/02",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5097,
+      "section": "LAB 202",
+      "campus": "UW U",
+      "associated_class": 1,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 47,
+      "enrollment_total": 51,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "T",
+            "start_date": "01\/21",
+            "end_date": "01\/21",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "T",
+            "start_date": "02\/04",
+            "end_date": "02\/04",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "T",
+            "start_date": "03\/03",
+            "end_date": "03\/03",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "T",
+            "start_date": "03\/17",
+            "end_date": "03\/17",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "T",
+            "start_date": "03\/31",
+            "end_date": "03\/31",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5098,
+      "section": "LAB 203",
+      "campus": "UW U",
+      "associated_class": 1,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 46,
+      "enrollment_total": 51,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "W",
+            "start_date": "01\/22",
+            "end_date": "01\/22",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "W",
+            "start_date": "02\/05",
+            "end_date": "02\/05",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "W",
+            "start_date": "03\/04",
+            "end_date": "03\/04",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "W",
+            "start_date": "03\/18",
+            "end_date": "03\/18",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "08:30",
+            "end_time": "11:20",
+            "weekdays": "W",
+            "start_date": "04\/01",
+            "end_date": "04\/01",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5138,
+      "section": "LAB 204",
+      "campus": "UW U",
+      "associated_class": 2,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 47,
+      "enrollment_total": 42,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "W",
+            "start_date": "01\/22",
+            "end_date": "01\/22",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "W",
+            "start_date": "02\/05",
+            "end_date": "02\/05",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "W",
+            "start_date": "03\/04",
+            "end_date": "03\/04",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "W",
+            "start_date": "03\/18",
+            "end_date": "03\/18",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "W",
+            "start_date": "04\/01",
+            "end_date": "04\/01",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5139,
+      "section": "LAB 205",
+      "campus": "UW U",
+      "associated_class": 2,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 47,
+      "enrollment_total": 43,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "Th",
+            "start_date": "01\/23",
+            "end_date": "01\/23",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "Th",
+            "start_date": "02\/06",
+            "end_date": "02\/06",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "Th",
+            "start_date": "03\/05",
+            "end_date": "03\/05",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "Th",
+            "start_date": "03\/19",
+            "end_date": "03\/19",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "Th",
+            "start_date": "04\/02",
+            "end_date": "04\/02",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    },
+    {
+      "subject": "ECE",
+      "catalog_number": "140",
+      "units": 0.5,
+      "title": "Linear Circuits",
+      "note": "Choose TUT and LAB sections with same Associated Class number as primary meet.",
+      "class_number": 5140,
+      "section": "LAB 206",
+      "campus": "UW U",
+      "associated_class": 2,
+      "related_component_1": null,
+      "related_component_2": null,
+      "enrollment_capacity": 47,
+      "enrollment_total": 42,
+      "waiting_capacity": 0,
+      "waiting_total": 0,
+      "topic": null,
+      "reserves": [],
+      "classes": [
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "T",
+            "start_date": "02\/04",
+            "end_date": "02\/04",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "T",
+            "start_date": "01\/21",
+            "end_date": "01\/21",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "T",
+            "start_date": "03\/03",
+            "end_date": "03\/03",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "T",
+            "start_date": "03\/17",
+            "end_date": "03\/17",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        },
+        {
+          "date": {
+            "start_time": "13:30",
+            "end_time": "16:20",
+            "weekdays": "T",
+            "start_date": "03\/31",
+            "end_date": "03\/31",
+            "is_tba": false,
+            "is_cancelled": false,
+            "is_closed": false
+          },
+          "location": {
+            "building": "E2",
+            "room": "3344"
+          },
+          "instructors": [
+            "Bell,David"
+          ]
+        }
+      ],
+      "held_with": [],
+      "term": 1201,
+      "academic_level": "undergraduate",
+      "last_updated": "2020-04-30T23:04:01-04:00"
+    }
+  ]
+}
