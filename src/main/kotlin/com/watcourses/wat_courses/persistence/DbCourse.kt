@@ -50,12 +50,9 @@ data class DbCourse(
             description = description,
             offeringTerms = offeringTerms ?: listOf(),
             id = courseId,
-            preRequisite = preRequisite?.rawRule,
-            coRequisite = coRequisite?.rawRule,
-            antiRequisite = antiRequisite?.rawRule,
-            preRequisiteLogicStr = preRequisite?.cond?.toString(),
-            coRequisiteLogicStr = coRequisite?.cond?.toString(),
-            antiRequisiteLogicStr = antiRequisite?.cond?.toString()
+            preRequisite = preRequisite?.toProto(),
+            coRequisite = coRequisite?.toProto(),
+            antiRequisite = antiRequisite?.toProto()
         )
     }
 }
