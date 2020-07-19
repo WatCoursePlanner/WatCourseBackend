@@ -1,0 +1,58 @@
+package com.watcourses.wat_courses.proto;
+
+message Reserve {
+  optional string reserveGroup = 1; // Name of the reserved group
+  optional int32 enrollmentCapacity = 2; // Total enrollment capacity of the group
+  optional int32 enrollmentTotal = 3; // Total reserve enrollment
+}
+
+message ClassDate {
+  optional string startTime = 1; // 24 hour class starting time
+  optional string endTime = 2; // 24 hour class ending time
+  optional string weekdays = 3; // Weekdays the course is offered
+  optional string startDate = 4; // Additional starting date for course
+  optional string endDate = 5; // Additional ending date for course
+  optional bool isTba = 6; // If the course schedule is TBA
+  optional bool isCancelled = 7; // If the course is cancelled for the term
+  optional bool isClosed = 8; // If the course is closed for the term
+}
+
+message ClassLocation {
+  optional string building = 1; // Name of the building
+  optional string room = 2; // Room number from the building
+}
+
+message Class {
+  optional ClassDate date = 1; // Date object for course schedule
+  optional ClassLocation location = 2; // Class location details
+  repeated string instructors = 3; // Names of instructors teaching the course
+}
+
+message CourseSchedule {
+  optional string subject = 1; // Requested subject acronym
+  optional string catalogNumber = 2; // Registrar assigned class number
+  optional float units = 3; // Credit count for the mentioned course
+  optional string title = 4; // Class name and title
+  optional string note = 5; // Additional notes regarding enrollment for the given term
+  optional int32 classNumber = 6; // Associated term specific class enrollment number
+  optional string section = 7; // Class instruction and number
+  optional string campus = 8; // Name of the campus the course is being offered
+  optional int32 associatedClass = 9; // Associated class id
+  optional string relatedComponent1 = 10; // Name of the related course component
+  optional string relatedComponent2 = 11; // Name of the second related course component
+  optional int32 enrollmentCapacity = 12; // Class enrollment capacity
+  optional int32 enrollmentTotal = 13; // Total current class enrollment
+  optional int32 waitingCapacity = 14; // Class waiting capacity
+  optional int32 waitingTotal = 15; // Total current waiting students
+  optional string topic = 16; // Class discussion topic
+  repeated Reserve reserves = 17; // Course specific enrollment reservation data
+  repeated Class classes = 18; // Schedule data
+  repeated string heldWith = 19; // A list of classes the course is held with
+  optional int32 term = 20; // 4 digit term representation
+  optional string academicLevel = 21; // Undergraduate or graduate course classification optional string lastUpdated = 22; // ISO8601 timestamp of when the data was last updated
+}
+
+// https://github.com/uWaterloo/api-documentation/blob/master/v2/courses/subject_catalog_number_schedule.md
+message CourseScheduleResponse {
+  repeated CourseSchedule data = 1;
+}
