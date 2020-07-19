@@ -153,7 +153,7 @@ class RawConditionParser {
 
     private fun furtherTrim(text: String): Pair<String, Boolean> {  // test, temporary replacement for a self-check flag
         var trimmedText = text.substringAfter(":").trim()
-        var conditionFullyResolved = false
+        var conditionFullyResolved = true
         val wordsToFlag = listOf(  // strings that, when detected, raise flag
                 "with a grade of", "at least", "60%", "65%", "70%", "75%", "80%",
                 "1.0 unit", "0.50 unit", "0.5 unit", "(", ")", "taken", "prior to",
@@ -161,7 +161,7 @@ class RawConditionParser {
         )
         for (word in wordsToFlag) {
             if (trimmedText.contains(word, ignoreCase = true)) {
-                conditionFullyResolved = true
+                conditionFullyResolved = false
                 trimmedText = trimmedText.replace(word, "", ignoreCase = true).trim()
             }
         }
