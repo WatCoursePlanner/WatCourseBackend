@@ -5,9 +5,7 @@ import com.watcourses.wat_courses.proto.*
 import com.watcourses.wat_courses.rules.CourseListLoader
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
@@ -17,6 +15,11 @@ class CourseInfoApi(val dbCourseRepo: DbCourseRepo, val courseListLoader: Course
         return dbCourseRepo.findByCode(code)?.toProto() ?: throw ResponseStatusException(
             HttpStatus.NOT_FOUND, "Course with the code $code is not found"
         )
+    }
+
+    @PostMapping("/course/batch")
+    fun batchGetCourse(@RequestBody request: BatchGetCourseRequest): BatchGetCourseResponse {
+        return BatchGetCourseResponse(results = request.courseCodes.map { getCourse(it) })
     }
 
     @GetMapping("/course/search")
