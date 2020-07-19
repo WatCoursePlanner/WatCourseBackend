@@ -24,7 +24,7 @@ class ConditionParserAndCheckerTests {
     private lateinit var rawConditionParser: RawConditionParser
 
     fun Condition.check(state: StudentState) = checker.checkCondition(this, state)
-    fun Condition.Companion.parse(text: String) = rawConditionParser.parse(text)
+    fun Condition.Companion.parse(text: String) = rawConditionParser.parse(text).first
 
     @Test
     fun `checking works`() {

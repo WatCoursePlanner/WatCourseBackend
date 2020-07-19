@@ -1,6 +1,5 @@
 package com.watcourses.wat_courses.rules
 
-import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.ConditionType
 import org.springframework.stereotype.Component
 
@@ -38,23 +37,23 @@ class RawConditionParser {
      * Example: CS 101, 123, CS 102/ECE 123, CS 233 => AND(CS101, CS123, OR(CS102, ECE123), CS233)
      * One of CS 101, 123, or 233
      */
-    private fun parseFromCourseRequirementText(text: String): Condition {
+    private fun parseFromCourseRequirementText(text: String): Pair<Condition, Boolean> {
         if (text.trim().startsWith("one of", ignoreCase = true)) {
             val parts =
                 text.trim().substring("one of".length).split(",", " or ", "/", ignoreCase = true)
                     .map { it.trim() }
-            return Condition(ConditionType.OR, parts.mapIndexed { i, _ ->
+            return Pair(Condition(ConditionType.OR, parts.mapIndexed { i, _ ->
                 resolveCourse(parts, i)
-            })
+            }), true)
         }
         val andParts = text.split(",").map { it.trim() }.toMutableList()
-        return Condition(ConditionType.AND, andParts.mapIndexed { i, part ->
+        return Pair(Condition(ConditionType.AND, andParts.mapIndexed { i, part ->
             if (part.contains("/") || part.contains(" OR ", ignoreCase = true)) {
                 val orParts = part.split("/", " OR ", ignoreCase = true)
                 Condition(ConditionType.OR, orParts.mapIndexed { j, _ -> resolveCourse(orParts, j) })
             } else
                 resolveCourse(andParts, i)
-        })
+        }), true)
     }
 
     /*
@@ -68,7 +67,7 @@ class RawConditionParser {
      *
      * Throws an exception when failed to parse
      */
-    private fun tryParseLabelRequirements(text: String): Condition {
+    private fun tryParseLabelRequirements(text: String): Pair<Condition, Boolean> {
         var infoNotExtracted = text
         var cond = Condition(ConditionType.AND, listOf())
         val additionalMap = mapOf(
@@ -123,19 +122,28 @@ class RawConditionParser {
 
         if (foundList.isNotEmpty()) cond = cond.addOperand(Condition(ConditionType.OR, foundList.map { label(it) }))
 
-        return when {
+        val retCondition = when {
             text.contains("not open to", ignoreCase = true) -> not(cond) // revert conditions
             cond.operands.size == 1 -> cond.operands.single()
             cond.operands.isNotEmpty() -> cond
-            else -> throw ParseFailure("Operands is empty. No info extracted") //null
+            else -> alwaysTrue()
         }
+
+        return Pair(retCondition, true)
     }
 
+    /* Parser functions should return Pair<Condition, Boolean>,
+     * in which Condition is the condition parsed,
+     * and Boolean indicates if the condition is fully resolved
+     * In case the parser does not understand the rule, it should
+     * throw an exception, which will be converted to null in this
+     * funciton.
+    */
     private fun safeParseCall(
         exceptionList: MutableList<Exception>,
         str: String,
-        block: (String) -> Condition
-    ): Condition? {
+        block: (String) -> Pair<Condition, Boolean>
+    ): Pair<Condition, Boolean>? {
         return try {
             block(str)
         } catch (e: ParseFailure) {
@@ -144,18 +152,29 @@ class RawConditionParser {
         }
     }
 
-    fun parse(text: String): Condition {
+    // returns a condition and whether it is fully understood
+    // ParseFailure is thrown if parse failed.
+    fun parse(text: String): Pair<Condition, Boolean> {
+        var conditionFullyResolved = true
         val processedText = text.substringAfter(":").trim()
         val conditions = mutableListOf<Condition>()
-        for (clause in processedText.split(";").map { it.trim().trimEnd('.') }) {
+
+        val clauses = processedText.split(";").map { it.trim().trimEnd('.') }.filterNot { it.isEmpty() }
+
+        for (clause in clauses) {
             val exceptions = mutableListOf<Exception>()
-            val parsedCondition = safeParseCall(exceptions, clause) { tryParseLabelRequirements(it) }
+
+            val (parsedCondition, fullyResolved) = safeParseCall(exceptions, clause) { tryParseLabelRequirements(it) }
                 ?: safeParseCall(exceptions, clause) { parseFromCourseRequirementText(it) }
                 ?: throw ParseFailure(exceptions.joinToString("; ") { it.message.toString() })
+
+            conditionFullyResolved = conditionFullyResolved && fullyResolved
             conditions.add(parsedCondition)
         }
-        if (conditions.size == 1) return conditions.single()
-        return Condition(ConditionType.AND, conditions)
+
+        if (conditions.size == 1) return Pair(conditions.single(), conditionFullyResolved)
+
+        return Pair(Condition(ConditionType.AND, conditions), conditionFullyResolved)
     }
 
     companion object {
