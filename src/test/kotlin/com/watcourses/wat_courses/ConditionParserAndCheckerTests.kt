@@ -46,6 +46,13 @@ class ConditionParserAndCheckerTests {
 
     @Test
     fun `parsing raw requirements works`() {
+        assertThat(Condition.parse("Prereq: (MATH 225 or 235 or 245) and (STAT 221 or 231 or 241).").toString())
+            .isEqualTo("((MATH 225 || MATH 235 || MATH 245)) && ((STAT 221 || STAT 231 || STAT 241))")
+        assertThat(
+            Condition.parse(
+                "Prereq: (CS 245 or SE 212), (one of CS 241, 246, 247), (one of STAT 206, 230, 240);"
+            ).toString()
+        ).isEqualTo("((CS 245 || SE 212)) && (CS 241 || CS 246 || CS 247) && (STAT 206 || STAT 230 || STAT 240)")
         assertThat(Condition.parse("Prereq: Level at least 3A; One of HUMSC 101, 102, 201, 301").toString())
             .isEqualTo("[3A] && (HUMSC 101 || HUMSC 102 || HUMSC 201 || HUMSC 301)")
         assertThat(Condition.parse("Prereq: One of GSJ 101, 102, WS 101, 102").toString())
