@@ -13,7 +13,9 @@ class WatCoursesApplication {
     fun corsConfigurer(): WebMvcConfigurer? {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**").allowedOrigins("http://localhost:3000").allowedMethods("*")
+                registry.addMapping("/**")
+                    .allowedOrigins("http://localhost:3000", "https://watcourses.com")
+                    .allowedMethods("*")
             }
         }
     }
