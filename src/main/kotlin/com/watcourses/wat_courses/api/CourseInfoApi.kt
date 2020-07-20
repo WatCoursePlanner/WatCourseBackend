@@ -19,7 +19,7 @@ class CourseInfoApi(val dbCourseRepo: DbCourseRepo, val courseListLoader: Course
 
     @PostMapping("/course/batch")
     fun batchGetCourse(@RequestBody request: BatchGetCourseRequest): BatchGetCourseResponse {
-        return BatchGetCourseResponse(results = request.courseCodes.map { getCourse(it) })
+        return BatchGetCourseResponse(results = request.courseCodes.filter { it.isNotEmpty() }.map { getCourse(it) })
     }
 
     @GetMapping("/course/search")
