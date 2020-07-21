@@ -51,7 +51,7 @@ courses = ["SE 201", "CHE 102", "CS 241", "ECE 222", "SE 212", "STAT 206"]
 
 [[default_schedule.term]]
 name = "WT2"
-courses = [""]
+courses = []
 
 [[default_schedule.term]]
 name = "2B"
@@ -59,7 +59,7 @@ courses = ["SE 202", "CS 240", "CS 247", "CS 348", "ECE 192", "MATH 239", "WKRPT
 
 [[default_schedule.term]]
 name = "WT3"
-courses = [""]
+courses = []
 
 [[default_schedule.term]]
 name = "3A"
@@ -67,7 +67,7 @@ courses = ["SE 301", "CS 341", "CS 349", "MATH 213", "SE 350", "SE 465"]
 
 [[default_schedule.term]]
 name = "WT4"
-courses = [""]
+courses = []
 
 [[default_schedule.term]]
 name = "3B"
@@ -75,7 +75,7 @@ courses = ["SE 302", "CS 343", "ECE 358", "SE 380", "SE 390", "SE 464", "WKRPT 3
 
 [[default_schedule.term]]
 name = "WT5"
-courses = [""]
+courses = []
 
 [[default_schedule.term]]
 name = "4A"
@@ -83,7 +83,7 @@ courses = ["SE 401", "SE 463", "SE 490", "WKRPT 400"]
 
 [[default_schedule.term]]
 name = "WT6"
-courses = [""]
+courses = []
 
 [[default_schedule.term]]
 name = "4B"

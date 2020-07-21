@@ -33,26 +33,73 @@ class RawConditionParser {
         return course(completeCourseCode)
     }
 
+    // Find intervals (represented by offsets) that are inside brackets. (nested brackets not supported)
+    private fun findBracketIntervals(text: String): List<Pair<Int, Int>> {
+        val ret = mutableListOf<Pair<Int, Int>>()
+        var startOffset = -1
+        for ((ind, c) in text.withIndex()) {
+            if (c == '(') {
+                if (startOffset != -1) throw ParseFailure("Nested brackets not supported.")
+                startOffset = ind
+            } else if (c == ')') {
+                if (startOffset == -1) throw ParseFailure("Brackets do not match")
+                ret.add(Pair(startOffset, ind))
+                startOffset = -1
+            }
+        }
+        if (startOffset != -1) throw ParseFailure("Brackets do not match")
+        return ret
+    }
+
+    private fun replaceInInterval(text: String, from: Int, to: Int, src: String, dest: String): String {
+        return text.replaceRange(from, to, text.substring(from, to).replace(src, dest))
+    }
+
+    private fun resolvePart(parts: List<String>, index: Int): Condition {
+        val part = parts[index].trim()
+        if (part.contains("(")) {
+            if (part.first() != '(' || part.last() != ')') throw ParseFailure("Brackets in unexpected positions")
+            val ret = parseFromCourseRequirementText(part.substring(1, part.lastIndex))
+            if (!ret.second) throw ParseFailure("resolvePart: Only support fully resolved condition")
+            return ret.first
+        }
+        return resolveCourse(parts, index)
+    }
+
     /*
      * Example: CS 101, 123, CS 102/ECE 123, CS 233 => AND(CS101, CS123, OR(CS102, ECE123), CS233)
      * One of CS 101, 123, or 233
      */
     private fun parseFromCourseRequirementText(text: String): Pair<Condition, Boolean> {
-        if (text.trim().startsWith("one of", ignoreCase = true)) {
+        var replacedText = text.replace(" OR ", "/", ignoreCase = true)
+            .replace(" AND ", ",", ignoreCase = true)
+            .replace("@", ",")
+            .replace("#", "/")
+
+        val bracketIntervals = findBracketIntervals(replacedText)
+
+        for (interval in bracketIntervals) {
+            // replace , to @ and / to # so they don't get split.
+            // Do not change the length of the string. Otherwise the intervals would change.
+            replacedText = replaceInInterval(replacedText, interval.first, interval.second, ",", "@")
+            replacedText = replaceInInterval(replacedText, interval.first, interval.second, "/", "#")
+        }
+
+        if (replacedText.trim().startsWith("one of", ignoreCase = true)) {
             val parts =
-                text.trim().substring("one of".length).split(",", " or ", "/", ignoreCase = true)
+                replacedText.trim().substring("one of".length).split(",", "/")
                     .map { it.trim() }
             return Pair(Condition(ConditionType.OR, parts.mapIndexed { i, _ ->
-                resolveCourse(parts, i)
+                resolvePart(parts, i)
             }), true)
         }
-        val andParts = text.split(",").map { it.trim() }.toMutableList()
+        val andParts = replacedText.split(",").map { it.trim() }.toMutableList()
         return Pair(Condition(ConditionType.AND, andParts.mapIndexed { i, part ->
-            if (part.contains("/") || part.contains(" OR ", ignoreCase = true)) {
-                val orParts = part.split("/", " OR ", ignoreCase = true)
-                Condition(ConditionType.OR, orParts.mapIndexed { j, _ -> resolveCourse(orParts, j) })
+            if (part.contains("/")) {
+                val orParts = part.split("/")
+                Condition(ConditionType.OR, orParts.mapIndexed { j, _ -> resolvePart(orParts, j) })
             } else
-                resolveCourse(andParts, i)
+                resolvePart(andParts, i)
         }), true)
     }
 

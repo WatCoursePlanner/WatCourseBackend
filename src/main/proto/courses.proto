@@ -115,3 +115,12 @@ message FindSlotRequest{
 message FindSlotResponse {
   map<string, CheckResults> slot = 1; // The term name and check results of the corresponding slot
 }
+
+message BatchGetCourseRequest {
+  repeated string courseCodes = 1;
+}
+
+message BatchGetCourseResponse {
+  repeated CourseInfo results = 1;
+}
+

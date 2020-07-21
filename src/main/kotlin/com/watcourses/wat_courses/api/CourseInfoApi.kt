@@ -5,9 +5,7 @@ import com.watcourses.wat_courses.proto.*
 import com.watcourses.wat_courses.rules.CourseListLoader
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
@@ -19,8 +17,13 @@ class CourseInfoApi(val dbCourseRepo: DbCourseRepo, val courseListLoader: Course
         )
     }
 
-    @GetMapping("/course/search")
-    fun searchCourse(searchCourseRequest: SearchCourseRequest): SearchCourseResponse {
+    @PostMapping("/course/batch")
+    fun batchGetCourse(@RequestBody request: BatchGetCourseRequest): BatchGetCourseResponse {
+        return BatchGetCourseResponse(results = request.courseCodes.filter { it.isNotEmpty() }.map { getCourse(it) })
+    }
+
+    @PostMapping("/course/search")
+    fun searchCourse(@RequestBody searchCourseRequest: SearchCourseRequest): SearchCourseResponse {
         val result = dbCourseRepo.findAll(
             PageRequest.of(
                 searchCourseRequest.pagination?.zeroBasedPage ?: 0,
