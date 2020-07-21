@@ -22,8 +22,8 @@ class CourseInfoApi(val dbCourseRepo: DbCourseRepo, val courseListLoader: Course
         return BatchGetCourseResponse(results = request.courseCodes.filter { it.isNotEmpty() }.map { getCourse(it) })
     }
 
-    @GetMapping("/course/search")
-    fun searchCourse(searchCourseRequest: SearchCourseRequest): SearchCourseResponse {
+    @PostMapping("/course/search")
+    fun searchCourse(@RequestBody searchCourseRequest: SearchCourseRequest): SearchCourseResponse {
         val result = dbCourseRepo.findAll(
             PageRequest.of(
                 searchCourseRequest.pagination?.zeroBasedPage ?: 0,
