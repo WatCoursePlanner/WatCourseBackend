@@ -1,8 +1,8 @@
 package com.watcourses.wat_courses.persistence
 
+import com.vladmihalcea.hibernate.type.json.JsonStringType
 import com.watcourses.wat_courses.proto.CourseInfo
 import com.watcourses.wat_courses.proto.Term
-import com.vladmihalcea.hibernate.type.json.JsonStringType
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
 import javax.persistence.*
@@ -11,7 +11,7 @@ import javax.persistence.*
 @Table(
     name = "courses", indexes = [
         Index(name = "idx_code", columnList = "code", unique = true),
-        Index(name = "idx_course_id", columnList = "courseId", unique = true)
+        Index(name = "idx_course_id", columnList = "courseId", unique = false)
     ]
 )
 @TypeDef(name = "json", typeClass = JsonStringType::class)

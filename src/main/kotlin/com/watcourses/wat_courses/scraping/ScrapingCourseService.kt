@@ -38,8 +38,8 @@ class ScrapingCourseService(
         }
     }
 
-    fun updateCourses() {
-        for (courseList in LIST_OF_COURSES_LIST) {
+    fun updateCourses(listOfCourseList: Array<String> = LIST_OF_COURSES_LIST) {
+        for (courseList in listOfCourseList) {
             logger.info("Scraping $courseList")
             val courses = try {
                 JsoupSafeOpenUrl("http://www.ucalendar.uwaterloo.ca/2021/COURSE/course-$courseList.html")
@@ -64,7 +64,7 @@ class ScrapingCourseService(
         course.coRequisite?.let { dbRuleRepo.save(it) }
         course.antiRequisite?.let { dbRuleRepo.save(it) }
 
-        val existing = dbCourseRepo.findByCourseId(course.courseId) ?: dbCourseRepo.findByCode(course.code)
+        val existing = dbCourseRepo.findByCode(course.code)
         if (existing != null) {
             dbCourseRepo.save(course.copy(id = existing.id))
         } else {
