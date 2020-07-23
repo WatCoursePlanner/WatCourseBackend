@@ -22,6 +22,11 @@ message CourseInfo {
   optional RuleInfo preRequisite = 7;
   optional RuleInfo coRequisite = 8;
   optional RuleInfo antiRequisite = 9;
+  optional double liked = 10;
+  optional double useful = 11;
+  optional double easy = 12;
+  optional int32 commentsCount = 13;
+  optional int32 ratingsCount = 14;
 }
 
 message CourseList {

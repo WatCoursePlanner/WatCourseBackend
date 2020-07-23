@@ -5,8 +5,10 @@ import com.watcourses.wat_courses.persistence.DbCourseScheduleRepo
 import com.watcourses.wat_courses.proto.Term
 import com.watcourses.wat_courses.scraping.ApiScheduleService
 import com.watcourses.wat_courses.scraping.ScrapingCourseService
+import com.watcourses.wat_courses.scraping.UwFlowScrapingService
 import com.watcourses.wat_courses.utils.getCode
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.jsoup.Jsoup
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,10 +28,16 @@ class ScrapingTests {
     private lateinit var apiScheduleService: ApiScheduleService
 
     @Autowired
+    private lateinit var uwFlowScrapingService: UwFlowScrapingService
+
+    @Autowired
     private lateinit var dbCourseRepo: DbCourseRepo
 
     @Autowired
     private lateinit var dbCourseScheduleRepo: DbCourseScheduleRepo
+
+    @Autowired
+    private lateinit var utils: Utils
 
     @Test
     fun `term id is correct`() {
@@ -87,6 +95,30 @@ class ScrapingTests {
             }
             assertThat(res.enrolledCap).isEqualTo(300)
             assertThat(res.enrolledTotal).isEqualTo(295)
+        }
+    }
+
+    @Test
+    fun `uwflow scraping works`() {
+        utils.createCourse("ECE 140", "ACTSC 391")
+        val data = uwFlowScrapingService.parseData(inputStreamFromRes("uwflow.json"))
+        assertThat(data).isNotNull
+        val results = data.map { uwFlowScrapingService.persist(it) }
+        assertThat(results.count { it }).isEqualTo(2)
+        assertThat(results).hasSize(3)
+        with(dbCourseRepo.findByCode("ECE 140")!!) {
+            assertThat(liked).isCloseTo(0.80697, within(0.001))
+            assertThat(easy).isCloseTo(0.61974, within(0.001))
+            assertThat(useful).isCloseTo(0.84466, within(0.001))
+            assertThat(filledCount).isEqualTo(373)
+            assertThat(commentCount).isEqualTo(58)
+        }
+        with(dbCourseRepo.findByCode("ACTSC 391")!!) {
+            assertThat(liked).isNull()
+            assertThat(easy).isNull()
+            assertThat(useful).isNull()
+            assertThat(filledCount).isEqualTo(0)
+            assertThat(commentCount).isEqualTo(0)
         }
     }
 }

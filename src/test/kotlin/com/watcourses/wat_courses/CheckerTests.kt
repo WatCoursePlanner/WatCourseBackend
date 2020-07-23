@@ -1,6 +1,5 @@
 package com.watcourses.wat_courses
 
-import com.watcourses.wat_courses.persistence.DbCourse
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.Schedule
 import com.watcourses.wat_courses.proto.StudentProfile
@@ -18,7 +17,6 @@ import org.mockito.BDDMockito.given
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.core.io.ClassPathResource
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver
 import org.springframework.test.context.ActiveProfiles
 
@@ -37,6 +35,9 @@ class CheckerTests {
     @Autowired
     private lateinit var dbCourseRepo: DbCourseRepo
 
+    @Autowired
+    private lateinit var utils: Utils
+
     @MockBean
     private lateinit var resourceReader: ClassPathResourceReader
 
@@ -50,7 +51,7 @@ class CheckerTests {
         )
 
         dbCourseRepo.deleteAll()
-        createCourse("CS 442", "AE 101", "ANTH 100", "ECON 221", "ECON 101", "PSYCH 420", "ECE 409")
+        utils.createCourse("CS 442", "AE 101", "ANTH 100", "ECON 221", "ECON 101", "PSYCH 420", "ECE 409")
 
         courseListLoader.loadLists()
         degreeRequirementLoader.loadDegreeRequirements()
@@ -111,20 +112,4 @@ class CheckerTests {
         )
         assertThat(result.issues).isNotEmpty()
     }
-
-    private fun createCourse(vararg code: String) =
-        code.forEach {
-            dbCourseRepo.save(
-                DbCourse(
-                    name = "$it name",
-                    code = it,
-                    antiRequisite = null,
-                    coRequisite = null,
-                    description = "",
-                    offeringTerms = null,
-                    preRequisite = null,
-                    courseId = it
-                )
-            )
-        }
 }

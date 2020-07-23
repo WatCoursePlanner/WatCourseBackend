@@ -1,0 +1,42 @@
+{
+  "data": {
+    "course": [
+      {
+        "id": 1887,
+        "name": "Linear Circuits",
+        "code": "ece140",
+        "rating": {
+          "liked": 0.806970509383378,
+          "easy": 0.6197411003236246,
+          "useful": 0.8446601941747572,
+          "filled_count": 373,
+          "comment_count": 58
+        }
+      },
+      {
+        "id": 56,
+        "name": "Corporate Finance 2",
+        "code": "actsc391",
+        "rating": {
+          "liked": null,
+          "easy": null,
+          "useful": null,
+          "filled_count": 0,
+          "comment_count": 0
+        }
+      },
+      {
+        "id": 233,
+        "name": "not found course",
+        "code": "some233",
+        "rating": {
+          "liked": null,
+          "easy": null,
+          "useful": null,
+          "filled_count": 0,
+          "comment_count": 0
+        }
+      }
+    ]
+  }
+}
