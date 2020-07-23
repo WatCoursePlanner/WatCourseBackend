@@ -40,6 +40,21 @@ data class DbCourse(
     @Column
     var courseId: String,
 
+    @Column
+    var liked: Double? = null,
+
+    @Column
+    var easy: Double? = null,
+
+    @Column
+    var useful: Double? = null,
+
+    @Column
+    var filledCount: Int? = null,
+
+    @Column
+    var commentCount: Int? = null,
+
     @Id @GeneratedValue
     var id: Long? = null
 ) {
@@ -52,7 +67,12 @@ data class DbCourse(
             id = courseId,
             preRequisite = preRequisite?.toProto(),
             coRequisite = coRequisite?.toProto(),
-            antiRequisite = antiRequisite?.toProto()
+            antiRequisite = antiRequisite?.toProto(),
+            liked = liked,
+            useful = useful,
+            easy = easy,
+            commentsCount = commentCount,
+            ratingsCount = filledCount
         )
     }
 }

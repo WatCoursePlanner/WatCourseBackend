@@ -1,0 +1,23 @@
+package com.watcourses.wat_courses.proto;
+
+message UwFlowCourseRating {
+  optional double liked = 1;
+  optional double easy = 2;
+  optional double useful = 3;
+  optional int32 filledCount = 4;
+  optional int32 commentCount = 5;
+}
+
+message UwFlowCourse {
+  optional int32 id = 1;
+  optional string code = 2;
+  optional UwFlowCourseRating rating = 3;
+}
+
+message CoursesResponseData {
+  repeated UwFlowCourse course = 1;
+}
+
+message CoursesResponse {
+  optional CoursesResponseData data = 1;
+}

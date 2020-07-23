@@ -4,6 +4,7 @@ import com.watcourses.wat_courses.proto.ReParseConditionsResponse
 import com.watcourses.wat_courses.proto.ReParseRegressionTestResponse
 import com.watcourses.wat_courses.scraping.ApiScheduleService
 import com.watcourses.wat_courses.scraping.ScrapingCourseService
+import com.watcourses.wat_courses.scraping.UwFlowScrapingService
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -11,7 +12,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class ScrapingApiAdmin(
     private val scrapingCourseService: ScrapingCourseService,
-    private val apiScheduleService: ApiScheduleService
+    private val apiScheduleService: ApiScheduleService,
+    private val uwFlowScrapingService: UwFlowScrapingService
 ) {
     @GetMapping("/admin/scraping/start-courses")
     fun startScraping() {
@@ -21,6 +23,11 @@ class ScrapingApiAdmin(
     @GetMapping("/admin/scraping/start-schedule")
     fun startScheduleScraping() {
         apiScheduleService.run()
+    }
+
+    @GetMapping("/admin/scraping/start-uwflow")
+    fun startUwFlowScraping() {
+        uwFlowScrapingService.run()
     }
 
     // Test and apply your new parser to existing rules in the database

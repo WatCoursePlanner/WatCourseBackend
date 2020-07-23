@@ -14,6 +14,7 @@ import kotlin.AssertionError
 import kotlin.Boolean
 import kotlin.Deprecated
 import kotlin.DeprecationLevel
+import kotlin.Double
 import kotlin.Int
 import kotlin.Nothing
 import kotlin.String
@@ -69,6 +70,31 @@ class CourseInfo(
     adapter = "com.watcourses.wat_courses.proto.RuleInfo#ADAPTER"
   )
   val antiRequisite: RuleInfo? = null,
+  @field:WireField(
+    tag = 10,
+    adapter = "com.squareup.wire.ProtoAdapter#DOUBLE"
+  )
+  val liked: Double? = null,
+  @field:WireField(
+    tag = 11,
+    adapter = "com.squareup.wire.ProtoAdapter#DOUBLE"
+  )
+  val useful: Double? = null,
+  @field:WireField(
+    tag = 12,
+    adapter = "com.squareup.wire.ProtoAdapter#DOUBLE"
+  )
+  val easy: Double? = null,
+  @field:WireField(
+    tag = 13,
+    adapter = "com.squareup.wire.ProtoAdapter#INT32"
+  )
+  val commentsCount: Int? = null,
+  @field:WireField(
+    tag = 14,
+    adapter = "com.squareup.wire.ProtoAdapter#INT32"
+  )
+  val ratingsCount: Int? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<CourseInfo, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -90,6 +116,11 @@ class CourseInfo(
         && preRequisite == other.preRequisite
         && coRequisite == other.coRequisite
         && antiRequisite == other.antiRequisite
+        && liked == other.liked
+        && useful == other.useful
+        && easy == other.easy
+        && commentsCount == other.commentsCount
+        && ratingsCount == other.ratingsCount
   }
 
   override fun hashCode(): Int {
@@ -105,6 +136,11 @@ class CourseInfo(
       result = result * 37 + preRequisite.hashCode()
       result = result * 37 + coRequisite.hashCode()
       result = result * 37 + antiRequisite.hashCode()
+      result = result * 37 + liked.hashCode()
+      result = result * 37 + useful.hashCode()
+      result = result * 37 + easy.hashCode()
+      result = result * 37 + commentsCount.hashCode()
+      result = result * 37 + ratingsCount.hashCode()
       super.hashCode = result
     }
     return result
@@ -121,6 +157,11 @@ class CourseInfo(
     if (preRequisite != null) result += """preRequisite=$preRequisite"""
     if (coRequisite != null) result += """coRequisite=$coRequisite"""
     if (antiRequisite != null) result += """antiRequisite=$antiRequisite"""
+    if (liked != null) result += """liked=$liked"""
+    if (useful != null) result += """useful=$useful"""
+    if (easy != null) result += """easy=$easy"""
+    if (commentsCount != null) result += """commentsCount=$commentsCount"""
+    if (ratingsCount != null) result += """ratingsCount=$ratingsCount"""
     return result.joinToString(prefix = "CourseInfo{", separator = ", ", postfix = "}")
   }
 
@@ -134,9 +175,14 @@ class CourseInfo(
     preRequisite: RuleInfo? = this.preRequisite,
     coRequisite: RuleInfo? = this.coRequisite,
     antiRequisite: RuleInfo? = this.antiRequisite,
+    liked: Double? = this.liked,
+    useful: Double? = this.useful,
+    easy: Double? = this.easy,
+    commentsCount: Int? = this.commentsCount,
+    ratingsCount: Int? = this.ratingsCount,
     unknownFields: ByteString = this.unknownFields
   ): CourseInfo = CourseInfo(name, code, description, faculty, offeringTerms, id, preRequisite,
-      coRequisite, antiRequisite, unknownFields)
+      coRequisite, antiRequisite, liked, useful, easy, commentsCount, ratingsCount, unknownFields)
 
   companion object {
     @JvmField
@@ -155,6 +201,11 @@ class CourseInfo(
         RuleInfo.ADAPTER.encodedSizeWithTag(7, value.preRequisite) +
         RuleInfo.ADAPTER.encodedSizeWithTag(8, value.coRequisite) +
         RuleInfo.ADAPTER.encodedSizeWithTag(9, value.antiRequisite) +
+        ProtoAdapter.DOUBLE.encodedSizeWithTag(10, value.liked) +
+        ProtoAdapter.DOUBLE.encodedSizeWithTag(11, value.useful) +
+        ProtoAdapter.DOUBLE.encodedSizeWithTag(12, value.easy) +
+        ProtoAdapter.INT32.encodedSizeWithTag(13, value.commentsCount) +
+        ProtoAdapter.INT32.encodedSizeWithTag(14, value.ratingsCount) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: CourseInfo) {
@@ -167,6 +218,11 @@ class CourseInfo(
         RuleInfo.ADAPTER.encodeWithTag(writer, 7, value.preRequisite)
         RuleInfo.ADAPTER.encodeWithTag(writer, 8, value.coRequisite)
         RuleInfo.ADAPTER.encodeWithTag(writer, 9, value.antiRequisite)
+        ProtoAdapter.DOUBLE.encodeWithTag(writer, 10, value.liked)
+        ProtoAdapter.DOUBLE.encodeWithTag(writer, 11, value.useful)
+        ProtoAdapter.DOUBLE.encodeWithTag(writer, 12, value.easy)
+        ProtoAdapter.INT32.encodeWithTag(writer, 13, value.commentsCount)
+        ProtoAdapter.INT32.encodeWithTag(writer, 14, value.ratingsCount)
         writer.writeBytes(value.unknownFields)
       }
 
@@ -180,6 +236,11 @@ class CourseInfo(
         var preRequisite: RuleInfo? = null
         var coRequisite: RuleInfo? = null
         var antiRequisite: RuleInfo? = null
+        var liked: Double? = null
+        var useful: Double? = null
+        var easy: Double? = null
+        var commentsCount: Int? = null
+        var ratingsCount: Int? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> name = ProtoAdapter.STRING.decode(reader)
@@ -195,6 +256,11 @@ class CourseInfo(
             7 -> preRequisite = RuleInfo.ADAPTER.decode(reader)
             8 -> coRequisite = RuleInfo.ADAPTER.decode(reader)
             9 -> antiRequisite = RuleInfo.ADAPTER.decode(reader)
+            10 -> liked = ProtoAdapter.DOUBLE.decode(reader)
+            11 -> useful = ProtoAdapter.DOUBLE.decode(reader)
+            12 -> easy = ProtoAdapter.DOUBLE.decode(reader)
+            13 -> commentsCount = ProtoAdapter.INT32.decode(reader)
+            14 -> ratingsCount = ProtoAdapter.INT32.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
@@ -208,6 +274,11 @@ class CourseInfo(
           preRequisite = preRequisite,
           coRequisite = coRequisite,
           antiRequisite = antiRequisite,
+          liked = liked,
+          useful = useful,
+          easy = easy,
+          commentsCount = commentsCount,
+          ratingsCount = ratingsCount,
           unknownFields = unknownFields
         )
       }
