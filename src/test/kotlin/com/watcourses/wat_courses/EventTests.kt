@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
 import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.servlet.MockMvc
 
 
 @SpringBootTest
@@ -30,9 +29,6 @@ class EventTests {
 
     @Autowired
     private lateinit var dbUserRepo: DbUserRepo
-
-    @Autowired
-    private lateinit var mockMvc: MockMvc
 
     private fun requestFromResponse(resp: MockHttpServletResponse): MockHttpServletRequest {
         val req = MockHttpServletRequest()
