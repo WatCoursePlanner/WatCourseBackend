@@ -203,7 +203,7 @@ class RawConditionParser {
         var conditionFullyResolved = true
         val wordsToFlag = listOf(  // strings that, when detected, raise flag
                 "with a grade of", "at least", "60%", "65%", "70%", "75%", "80%",
-                "1.0 unit", "0.50 unit", "0.5 unit", "(", ")", "taken", "prior to",
+                "1.0 unit", "0.50 unit", "0.5 unit", "taken", "prior to",
                 "Portfolio Review Milestone", "4U", "Topic", "LEC"
         )
         for (word in wordsToFlag) {
@@ -211,16 +211,6 @@ class RawConditionParser {
                 conditionFullyResolved = false
                 trimmedText = trimmedText.replace(word, "", ignoreCase = true).trim()
             }
-        }
-
-        val wordsToMap = mapOf(
-                "(" to "",
-                ")" to "",
-                "&" to "and",
-                "/" to "or"
-        )
-        for (word in wordsToMap) {
-            trimmedText = trimmedText.replace(word.key, word.value, ignoreCase = true).trim()
         }
 
         return Pair(trimmedText, conditionFullyResolved)
