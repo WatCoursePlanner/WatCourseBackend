@@ -19,3 +19,17 @@ message ReParseRegressionTestResponse {
   optional int32 regressionNum = 2;
   repeated Result results = 3;
 }
+
+message RuleImportItem {
+  optional string rawRule = 1;
+  optional string condition = 2;
+  optional bool completelyParsed = 3;
+}
+
+message RuleImportRequest {
+  repeated RuleImportItem items = 1;
+}
+
+message RuleImportResponse {
+  map<string, string> result = 1;
+}
