@@ -40,7 +40,7 @@ class UserApi(
         val dbUser = dbUserRepo.findByEmail(email)
 
         if (dbUser?.password != null && passwordEncoder.compare(dbUser.password!!, password)) {
-            generateAndSendSessionId(response, dbUser)
+            sessionManager.generateAndSendSessionId(response, dbUser)
             dbUserRepo.save(dbUser)
             return LoginOrRegisterResponse(success = true, userInfo = dbUser.toProto())
         }
@@ -79,7 +79,7 @@ class UserApi(
             sessionId = ""
         )
 
-        generateAndSendSessionId(response, dbUser)
+        sessionManager.generateAndSendSessionId(response, dbUser)
         dbUserRepo.save(dbUser)
 
         return LoginOrRegisterResponse(success = true, userInfo = dbUser.toProto())
@@ -122,18 +122,9 @@ class UserApi(
                 pictureUrl = payload["picture"] as String?
             )
         }
-        generateAndSendSessionId(response, dbUser)
+        sessionManager.generateAndSendSessionId(response, dbUser)
         dbUserRepo.save(dbUser)
 
         return LoginOrRegisterResponse(success = true, userInfo = dbUser.toProto())
-    }
-
-    fun generateAndSendSessionId(response: HttpServletResponse, dbUser: DbUser) {
-        dbUser.sessionId = sessionManager.generateSessionId()
-        val cookie = Cookie("session", dbUser.sessionId)
-        cookie.isHttpOnly = true
-        cookie.secure = true
-        cookie.maxAge = 60 * 60 * 24 * 30 // 30 days
-        response.addCookie(cookie)
     }
 }

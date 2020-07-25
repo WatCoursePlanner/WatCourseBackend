@@ -129,3 +129,8 @@ message BatchGetCourseResponse {
   repeated CourseInfo results = 1;
 }
 
+message EventRequest {
+  optional string type = 1;
+  optional string subject = 2;
+  optional string data = 3;
+}
