@@ -9,6 +9,7 @@ val ALL_LABELS = listOf(
     "Architecture",
     "Arts",
     "Aviation",
+    "Anthropology",
     "Bachelor of Social Work",
     "Biochemistry",
     "Biomedical Engineering",

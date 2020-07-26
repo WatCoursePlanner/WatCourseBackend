@@ -28,6 +28,14 @@ class RawConditionParser {
         // look backwards for identifier
         val identifier = parts.subList(0, index).findLast { it.contains(" ") }?.substringBefore(" ")
             ?: throw ParseFailure("Can't find a course identifier")
+        if (part.length == 1) { // e.g. ECE 123A/B
+            var prevPart = parts[index - 1]
+            if (!prevPart.last().isLetter()) throw ParseFailure("Expect $prevPart to have xxxA structure")
+            if (!prevPart.contains(identifier)) prevPart = identifier + " " + prevPart.trim()
+            prevPart = prevPart.trim().dropLast(1) + part
+            courseSanityCheck(prevPart)
+            return course(prevPart)
+        }
         val completeCourseCode = "$identifier $part".trim()
         courseSanityCheck(completeCourseCode)
         return course(completeCourseCode)
@@ -137,13 +145,22 @@ class RawConditionParser {
             "Acc'ting" to "Accounting",
             "AHS" to "Applied Health Science",
             "Math" to "Mathematics",
+            "Architectural" to "Architectural Engineering",
+            "Civil" to "Civil Engineering",
+            "Environmental," to "Environmental Engineering",
+            "Architectural" to "Architectural Engineering",
+            "Comp & Financial" to "Computing & Financial",
+            "Comp or Elect" to "Computer Engineering or Electric",
+            "Coop" to "Co-op",
             "&" to "and"
         )
 
         for (it in abbrMap) {
-            infoNotExtracted = infoNotExtracted.replace(it.key + ",", it.value + ",")
-                .replace(it.key + " ", it.value + " ")
+            infoNotExtracted = infoNotExtracted.replace(it.key + ",", it.value + ",", ignoreCase = true)
+                .replace(it.key + " ", it.value + " ", ignoreCase = true)
         }
+
+        infoNotExtracted = infoNotExtracted.replace("Engineering Engineering", "Engineering")
 
         val foundList = mutableListOf<String>()
 
@@ -156,7 +173,7 @@ class RawConditionParser {
 
         val wordsToIgnore = listOf(
             ",", ".", "/", "and", "Bachelor of", "majors", "not open to",
-            "students", "in", "only", "level", "least", "at", "or", "of", "the"
+            "students", "in", "only", "level", "least", "at", "or", "of", "the", "diploma"
         )
 
         for (ignoringWord in wordsToIgnore) {
@@ -199,11 +216,27 @@ class RawConditionParser {
         }
     }
 
+    // Remove stuff we can't recognize
+    fun preprocess(text: String): String {
+        val patterns = listOf(
+            "\\(LEC \\d+\\)", // section requirement
+            "(with a grade of|Cumulative overall average of)\\s??[Aa]t least \\d+%( in)?", // grade req
+            "(taken (in or before )?|prior to)(\\s?(or\\s?)?((spring|fall|winter) 20\\d\\d|[SWF]\\d\\d),?\\s?)+", // time req
+            "\\(\\s*\\)" // extra empty parenthesis
+        )
+        var str = text
+        patterns.forEach { str = str.replace(Regex(it), "") }
+        return str
+    }
+
     // returns a condition and whether it is fully understood
     // ParseFailure is thrown if parse failed.
     fun parse(text: String): Pair<Condition, Boolean> {
         var conditionFullyResolved = true
-        val processedText = text.substringAfter(":").trim()
+        val trimmedText = text.substringAfter(":").trim()
+        val processedText = preprocess(trimmedText)
+        if (trimmedText != processedText) conditionFullyResolved = false
+
         val conditions = mutableListOf<Condition>()
 
         val clauses = processedText.split(";").map { it.trim().trimEnd('.') }.filterNot { it.isEmpty() }
