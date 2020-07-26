@@ -25,6 +25,7 @@ class ConditionParserAndCheckerTests {
 
     fun Condition.check(state: StudentState) = checker.checkCondition(this, state)
     fun Condition.Companion.parse(text: String) = rawConditionParser.parse(text).first
+    fun Condition.Companion.parseFullInfo(text: String) = rawConditionParser.parse(text)
 
     @Test
     fun `checking works`() {
@@ -46,19 +47,63 @@ class ConditionParserAndCheckerTests {
 
     @Test
     fun `parsing raw requirements works`() {
-        assertThat(Condition.parse("Prereq: (MATH 225 or 235 or 245) and (STAT 221 or 231 or 241).").toString())
-            .isEqualTo("((MATH 225 || MATH 235 || MATH 245)) && ((STAT 221 || STAT 231 || STAT 241))")
-        assertThat(
-            Condition.parse(
-                "Prereq: (CS 245 or SE 212), (one of CS 241, 246, 247), (one of STAT 206, 230, 240);"
-            ).toString()
-        ).isEqualTo("((CS 245 || SE 212)) && (CS 241 || CS 246 || CS 247) && (STAT 206 || STAT 230 || STAT 240)")
-        assertThat(Condition.parse("Prereq: Level at least 3A; One of HUMSC 101, 102, 201, 301").toString())
-            .isEqualTo("[3A] && (HUMSC 101 || HUMSC 102 || HUMSC 201 || HUMSC 301)")
-        assertThat(Condition.parse("Prereq: One of GSJ 101, 102, WS 101, 102").toString())
-            .isEqualTo("GSJ 101 || GSJ 102 || WS 101 || WS 102")
-        assertThat(Condition.parse("req: One of SPAN 352W, 362W, 401/402").toString())
-            .isEqualTo("SPAN 352W || SPAN 362W || SPAN 401 || SPAN 402")
+        data class TestCase(
+            val rawRule: String,
+            val expectedCond: String,
+            val expectedConditionFullyResolved: Boolean = true
+        )
+
+        val testCases = listOf(
+            TestCase(
+                rawRule = "Prereq: Civil Engineering.",
+                expectedCond = "[Civil Engineering]"
+            ),
+            TestCase(
+                rawRule = "Antireq: AFM 415 (LEC 001) taken fall 2017, fall 2018",
+                expectedCond = "AFM 415",
+                expectedConditionFullyResolved = false
+            ),
+            TestCase(
+                rawRule = "AFM 417 taken S14, S15, S16, W16",
+                expectedCond = "AFM 417",
+                expectedConditionFullyResolved = false
+            ),
+            TestCase(
+                rawRule = "Prereq: (MATH 225 or 235 or 245) and (STAT 221 or 231 or 241).",
+                expectedCond = "((MATH 225 || MATH 235 || MATH 245)) && ((STAT 221 || STAT 231 || STAT 241))"
+            ),
+            TestCase(
+                rawRule = "Prereq: (CS 245 or SE 212), (one of CS 241, 246, 247), (one of STAT 206, 230, 240);",
+                expectedCond = "((CS 245 || SE 212)) && (CS 241 || CS 246 || CS 247) && (STAT 206 || STAT 230 || STAT 240)"
+            ),
+            TestCase(
+                rawRule = "Prereq: Level at least 3A; One of HUMSC 101, 102, 201, 301",
+                expectedCond = "[3A] && (HUMSC 101 || HUMSC 102 || HUMSC 201 || HUMSC 301)"
+            ),
+            TestCase(
+                rawRule = "Prereq: One of GSJ 101, 102, WS 101, 102",
+                expectedCond = "GSJ 101 || GSJ 102 || WS 101 || WS 102"
+            ),
+            TestCase(
+                rawRule = "req: One of SPAN 352W, 362W, 401/402",
+                expectedCond = "SPAN 352W || SPAN 362W || SPAN 401 || SPAN 402"
+            ),
+            TestCase(
+                rawRule = "Level at least 4B Mechanical Engineering students only.",
+                expectedCond = "[4B] && [Mechanical Engineering]"
+            ),
+            TestCase(
+                rawRule = "Level at least 4B; MCS 138",
+                expectedCond = "[4B] && MCS 138"
+            )
+        )
+
+        for (case in testCases) {
+            println("Testing $case")
+            assertThat(Condition.parseFullInfo(case.rawRule).toString()).isEqualTo(
+                Pair(case.expectedCond, case.expectedConditionFullyResolved).toString()
+            )
+        }
 
         Condition.parse(
             "req: BME 121, CS 115, 135, 137, CHE 121, MTE 121/GENE 121, NE 111, MSCI 121"
@@ -113,12 +158,6 @@ class ConditionParserAndCheckerTests {
             assertThat(it.check(StudentState(setOf("CS 123"), setOf("Software Engineering")))).isFalse()
             assertThat(it.check(StudentState(setOf("CS 116"), setOf("Computer Science")))).isFalse()
         }
-
-        assertThat(Condition.parse("Level at least 4B Mechanical Engineering students only.").toString())
-            .isEqualTo("[4B] && [Mechanical Engineering]")
-
-        assertThat(Condition.parse("Level at least 4B; MCS 138").toString())
-            .isEqualTo("[4B] && MCS 138")
     }
 
     @Test

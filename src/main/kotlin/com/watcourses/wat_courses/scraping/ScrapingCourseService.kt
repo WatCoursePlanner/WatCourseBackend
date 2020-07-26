@@ -128,13 +128,14 @@ class ScrapingCourseService(
         val rulesToReparse = dbRuleRepo.findAllByCondIsNotNull()
         val failedResults = mutableListOf<ReParseRegressionTestResponse.Result>()
         for (rule in rulesToReparse) {
+            if (rule.manuallyAssigned) continue
             val newRule = DbRule.parse(rule.rawRule!!) { rawConditionParser.parse(it) }
-            if (rule.cond != newRule.cond) {
+            if (rule.cond != newRule.cond || rule.fullyResolved != newRule.fullyResolved) {
                 failedResults.add(
                     ReParseRegressionTestResponse.Result(
                         rawRule = rule.rawRule!!,
-                        old = rule.cond?.toString(),
-                        new = newRule.cond?.toString(),
+                        old = "${rule.fullyResolved} ${rule.cond?.toString()}",
+                        new = "${newRule.fullyResolved} ${newRule.cond?.toString()}",
                         error = newRule.parseFailureBecause
                     )
                 )
