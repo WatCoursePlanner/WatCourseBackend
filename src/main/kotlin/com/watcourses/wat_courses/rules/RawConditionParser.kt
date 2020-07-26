@@ -28,6 +28,14 @@ class RawConditionParser {
         // look backwards for identifier
         val identifier = parts.subList(0, index).findLast { it.contains(" ") }?.substringBefore(" ")
             ?: throw ParseFailure("Can't find a course identifier")
+        if (part.length == 1) { // e.g. ECE 123A/B
+            var prevPart = parts[index - 1]
+            if (!prevPart.last().isLetter()) throw ParseFailure("Expect $prevPart to have xxxA structure")
+            if (!prevPart.contains(identifier)) prevPart = identifier + " " + prevPart.trim()
+            prevPart = prevPart.trim().dropLast(1) + part
+            courseSanityCheck(prevPart)
+            return course(prevPart)
+        }
         val completeCourseCode = "$identifier $part".trim()
         courseSanityCheck(completeCourseCode)
         return course(completeCourseCode)

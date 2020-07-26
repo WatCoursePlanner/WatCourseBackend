@@ -54,6 +54,7 @@ class ConditionParserAndCheckerTests {
         )
 
         val testCases = listOf(
+            TestCase("BIOL 123A/B", "(BIOL 123A || BIOL 123B)"),
             TestCase(
                 rawRule = "Prereq: Civil Engineering.",
                 expectedCond = "[Civil Engineering]"
