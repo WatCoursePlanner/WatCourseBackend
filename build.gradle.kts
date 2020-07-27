@@ -47,6 +47,7 @@ dependencies {
         exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
     }
     testImplementation("org.assertj:assertj-core:3.16.1")
+    implementation(kotlin("script-runtime"))
 }
 
 tasks.withType<Test> {

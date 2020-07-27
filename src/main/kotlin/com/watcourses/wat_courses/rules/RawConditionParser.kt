@@ -18,16 +18,26 @@ class RawConditionParser {
     }
 
     // resolve "123" in "CS 101, 123" to course("CS 123")
-    // Make sure that each element of the parts is trimed
-    private fun resolveCourse(parts: List<String>, index: Int): Condition {
-        val part = parts[index].trim()
+    // Make sure that each element of the parts is trimmed
+     private fun resolveCourse(parts: List<String>, index: Int): Condition {
+        var part = parts[index].trim()
         if (part.contains(" ")) { // e.g. CS 101. We have "CS" already so return directly
             courseSanityCheck(part)
             return course(part)
         }
         // look backwards for identifier
-        val identifier = parts.subList(0, index).findLast { it.contains(" ") }?.substringBefore(" ")
-            ?: throw ParseFailure("Can't find a course identifier")
+        if ((part.matches("[a-zA-Z]+".toRegex())) && (part.length > 1) && part!=parts.last()) { // contains a course code; look forward for course code
+            val nextPart = parts[index + 1]
+            if (!nextPart.last().isDigit()) throw ParseFailure("Expect $nextPart to have a course code")
+            val courseCode = parts[index+1].substringAfter(" ")  // ?: throw ParseFailure("Can't find a course code")
+            part = part + " " + courseCode.trim()
+            courseSanityCheck(part)
+            return course(part)
+        }
+        //if (part.matches("\\d+".toRegex())) {
+        val prevParts = parts.subList(0, index)
+        val identifier =prevParts.findLast { it.contains(" ") }?.substringBefore(" ")
+                ?: throw ParseFailure("Can't find a course identifier")
         if (part.length == 1) { // e.g. ECE 123A/B
             var prevPart = parts[index - 1]
             if (!prevPart.last().isLetter()) throw ParseFailure("Expect $prevPart to have xxxA structure")
@@ -78,7 +88,8 @@ class RawConditionParser {
      * Example: CS 101, 123, CS 102/ECE 123, CS 233 => AND(CS101, CS123, OR(CS102, ECE123), CS233)
      * One of CS 101, 123, or 233
      */
-    private fun parseFromCourseRequirementText(text: String): Pair<Condition, Boolean> {
+    // changed private fun -> fun for testing
+    fun parseFromCourseRequirementText(text: String): Pair<Condition, Boolean> {
         var replacedText = text.replace(" OR ", "/", ignoreCase = true)
             .replace(" AND ", ",", ignoreCase = true)
             .replace("@", ",")
@@ -102,6 +113,7 @@ class RawConditionParser {
             }), true)
         }
         val andParts = replacedText.split(",").map { it.trim() }.toMutableList()
+        println(andParts)
         return Pair(Condition(ConditionType.AND, andParts.mapIndexed { i, part ->
             if (part.contains("/")) {
                 val orParts = part.split("/")
@@ -128,6 +140,8 @@ class RawConditionParser {
         val additionalMap = mapOf(
             "first year" to "1st year", "second year" to "2nd year",
             "third year" to "3rd year", "fourth year" to "4th year",
+            "first-year" to "1st year", "second-year" to "2nd year",
+            "third-year" to "3rd year", "fourth-year" to "4th year",
             "Year 1" to "1st year", "Year 2" to "2nd year",
             "Year 3" to "3rd year", "Year 4" to "4th year"
         )
@@ -135,23 +149,59 @@ class RawConditionParser {
         val result = possibleList.find { text.contains(it, ignoreCase = true) }
         if (result != null) {
             cond = cond.addOperand(label(additionalMap[result] ?: result))
-            infoNotExtracted = infoNotExtracted.replace(result, "")
+            infoNotExtracted = infoNotExtracted.replace(result, "", ignoreCase = true)
         }
 
         val abbrMap = mapOf(
-            "Eng" to "Engineering",
-            "Fin" to "Financial",
-            "Mgmt" to "Management",
             "Acc'ting" to "Accounting",
-            "AHS" to "Applied Health Science",
-            "Math" to "Mathematics",
+            "AHS" to "Applied Health Sciences",
             "Architectural" to "Architectural Engineering",
+            "BA" to "Bachelor of Arts",
+            "Biomedical" to "Biomedical Engineering",
+            "Biotechnology/Chartered Accountancy" to "Biotechnology/Chartered Professional Accountancy",
+            "BMath" to "Bachelor of Mathematics",
+            "BSc" to "Bachelor of Science",
             "Civil" to "Civil Engineering",
-            "Environmental," to "Environmental Engineering",
-            "Architectural" to "Architectural Engineering",
+            "Chemical" to "Chemical Engineering",
             "Comp & Financial" to "Computing & Financial",
             "Comp or Elect" to "Computer Engineering or Electric",
+            "Computer" to "Computer Engineering",
             "Coop" to "Co-op",
+            "Department of Recreation and Leisure Studies" to "Recreation and Leisure Studies",
+            "Digital Hdw Op" to "Digital Hardware Option",
+            "Econ" to "Economics",
+            "Economic" to "Economics",
+            "Electrical" to "Electrical Engineering",
+            "Eng" to "Engineering",
+            "Environment" to "Faculty of Environment",
+            "Environment, Resource and Sustainability" to "Environment, Resources and Sustainability",
+            "Environmental" to "Environmental Engineering",
+            "Fin" to "Financial",
+            "Geological" to "Geological Engineering",
+            "GSJ" to "Gender and Social Justice",
+            "Hon" to "Honours",
+            "HRM" to "Human Resources Management",
+            "Management" to "Management Engineering",
+            "Math" to "Mathematics",
+            "Mathematics/Chartered Accountancy" to "Mathematics/Chartered Professional Accountancy",
+            "Mathematics/Chartered Professional Accounting" to "Mathematics/Chartered Professional Accountancy",
+            "Mathematics/CPA" to "Mathematics/Chartered Professional Accountancy",
+            "Mechanical" to "Mechanical Engineering",
+            "Mechatronics" to "Mechatronics Engineering",
+            "Mgmt" to "Management Engineering",
+            "MSCI" to "Management Sciences",
+            "Nanotechnology" to "Nanotechnology Engineering",
+            "Option in Aging Studies" to "Aging Studies Option",
+            "PHARM" to "Pharmacy",
+            "Psych" to "Psychology",
+            "Rec & Business" to "Recreation and Business",
+            "Rec & Leisure Studies" to "Recreation and Leisure Studies",
+            "RI Spec" to "Research Intensive Specialization",
+            "SCI" to "Science",
+            "Software" to "Software Engineering",
+            "stdnts" to "students",
+            "Systems Design" to "Systems Design Engineering",
+            "Systems Designs Engineering" to "Systems Design Engineering",
             "&" to "and"
         )
 
@@ -172,8 +222,9 @@ class RawConditionParser {
         }
 
         val wordsToIgnore = listOf(
-            ",", ".", "/", "and", "Bachelor of", "majors", "not open to",
-            "students", "in", "only", "level", "least", "at", "or", "of", "the", "diploma"
+            ",", ".", "/", "and", "Bachelor of", "majors", "not open to", "open to", "open only to",
+            "following faculties:", "students", "in", "only", "level", "least", "at", "or", "of", "the",
+            "diploma", "(", ")", "plans", "for", "programs", "faculty"
         )
 
         for (ignoringWord in wordsToIgnore) {
@@ -220,7 +271,7 @@ class RawConditionParser {
     fun preprocess(text: String): String {
         val patterns = listOf(
             "\\(LEC \\d+\\)", // section requirement
-            "(with a grade of|Cumulative overall average of)\\s??[Aa]t least \\d+%( in)?", // grade req
+            "(with a grade of|Cumulative overall average of|with a major average of|average|cumulative major average)\\s??[Aa]t least \\d+%( in)?", // grade req
             "(taken (in or before )?|prior to)(\\s?(or\\s?)?((spring|fall|winter) 20\\d\\d|[SWF]\\d\\d),?\\s?)+", // time req
             "\\(\\s*\\)" // extra empty parenthesis
         )
