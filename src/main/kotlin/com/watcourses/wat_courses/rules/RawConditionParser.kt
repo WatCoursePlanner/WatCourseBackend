@@ -200,7 +200,7 @@ class RawConditionParser {
             "SCI" to "Science",
             "Software" to "Software Engineering",
             "stdnts" to "students",
-            "Systems Design," to "Systems Design Engineering,",
+            "Systems Design," to "Systems Design Engineering",
             "Systems Designs Engineering" to "Systems Design Engineering",
             "&" to "and"
         )
