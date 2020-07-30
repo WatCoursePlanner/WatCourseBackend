@@ -26,7 +26,7 @@ class RawConditionParser {
             return course(part)
         }
         // look backwards for identifier
-        if ((part.matches("[a-zA-Z]+".toRegex())) && (part.length > 1) && part!=parts.last()) { // contains a course code; look forward for course code
+        if ((part.all { it.isLetter() }) && (part.length > 1) && part!=parts.last()) { // contains a course code; look forward for course code
             val nextPart = parts[index + 1]
             if (!nextPart.last().isDigit()) throw ParseFailure("Expect $nextPart to have a course code")
             val courseCode = parts[index+1].substringAfter(" ")  // ?: throw ParseFailure("Can't find a course code")
@@ -113,7 +113,6 @@ class RawConditionParser {
             }), true)
         }
         val andParts = replacedText.split(",").map { it.trim() }.toMutableList()
-        println(andParts)
         return Pair(Condition(ConditionType.AND, andParts.mapIndexed { i, part ->
             if (part.contains("/")) {
                 val orParts = part.split("/")
@@ -159,13 +158,14 @@ class RawConditionParser {
             "BA" to "Bachelor of Arts",
             "Biomedical" to "Biomedical Engineering",
             "Biotechnology/Chartered Accountancy" to "Biotechnology/Chartered Professional Accountancy",
+            "Biotechnology/CPA" to "Biotechnology/Chartered Professional Accountancy",
             "BMath" to "Bachelor of Mathematics",
             "BSc" to "Bachelor of Science",
             "Civil" to "Civil Engineering",
             "Chemical" to "Chemical Engineering",
             "Comp & Financial" to "Computing & Financial",
             "Comp or Elect" to "Computer Engineering or Electric",
-            "Computer" to "Computer Engineering",
+            "Computer," to "Computer Engineering",
             "Coop" to "Co-op",
             "Department of Recreation and Leisure Studies" to "Recreation and Leisure Studies",
             "Digital Hdw Op" to "Digital Hardware Option",
@@ -175,7 +175,7 @@ class RawConditionParser {
             "Eng" to "Engineering",
             "Environment" to "Faculty of Environment",
             "Environment, Resource and Sustainability" to "Environment, Resources and Sustainability",
-            "Environmental" to "Environmental Engineering",
+            "Environmental," to "Environmental Engineering",
             "Fin" to "Financial",
             "Geological" to "Geological Engineering",
             "GSJ" to "Gender and Social Justice",
@@ -200,7 +200,7 @@ class RawConditionParser {
             "SCI" to "Science",
             "Software" to "Software Engineering",
             "stdnts" to "students",
-            "Systems Design" to "Systems Design Engineering",
+            "Systems Design," to "Systems Design Engineering,",
             "Systems Designs Engineering" to "Systems Design Engineering",
             "&" to "and"
         )
@@ -224,7 +224,7 @@ class RawConditionParser {
         val wordsToIgnore = listOf(
             ",", ".", "/", "and", "Bachelor of", "majors", "not open to", "open to", "open only to",
             "following faculties:", "students", "in", "only", "level", "least", "at", "or", "of", "the",
-            "diploma", "(", ")", "plans", "for", "programs", "faculty"
+            "diploma", "plans", "for", "programs", "faculty"
         )
 
         for (ignoringWord in wordsToIgnore) {
