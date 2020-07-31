@@ -28,13 +28,13 @@ class RawConditionParser {
         // look backwards for identifier
         if ((part.all { it.isLetter() }) && (part.length > 1) && part!=parts.last()) { // contains a course code; look forward for course code
             val nextPart = parts[index + 1]
-            if (!nextPart.last().isDigit()) throw ParseFailure("Expect $nextPart to have a course code")
-            val courseCode = parts[index+1].substringAfter(" ")  // ?: throw ParseFailure("Can't find a course code")
+            if (nextPart.all { it.isLetter() }) throw ParseFailure("Expect $nextPart to have a course code")
+            val courseCode = parts[index+1].substringAfter(" ")
             part = part + " " + courseCode.trim()
             courseSanityCheck(part)
             return course(part)
         }
-        //if (part.matches("\\d+".toRegex())) {
+
         val prevParts = parts.subList(0, index)
         val identifier =prevParts.findLast { it.contains(" ") }?.substringBefore(" ")
                 ?: throw ParseFailure("Can't find a course identifier")
@@ -92,6 +92,7 @@ class RawConditionParser {
     fun parseFromCourseRequirementText(text: String): Pair<Condition, Boolean> {
         var replacedText = text.replace(" OR ", "/", ignoreCase = true)
             .replace(" AND ", ",", ignoreCase = true)
+            .replace(" & ", ",", ignoreCase = true)
             .replace("@", ",")
             .replace("#", "/")
 
@@ -133,7 +134,7 @@ class RawConditionParser {
      *
      * Throws an exception when failed to parse
      */
-    private fun tryParseLabelRequirements(text: String): Pair<Condition, Boolean> {
+    fun tryParseLabelRequirements(text: String): Pair<Condition, Boolean> {
         var infoNotExtracted = text
         var cond = Condition(ConditionType.AND, listOf())
         val additionalMap = mapOf(
@@ -157,6 +158,7 @@ class RawConditionParser {
             "Architectural" to "Architectural Engineering",
             "BA" to "Bachelor of Arts",
             "Biomedical" to "Biomedical Engineering",
+            "Biotech/CPA" to "Biotechnology/Chartered Professional Accountancy",
             "Biotechnology/Chartered Accountancy" to "Biotechnology/Chartered Professional Accountancy",
             "Biotechnology/CPA" to "Biotechnology/Chartered Professional Accountancy",
             "BMath" to "Bachelor of Mathematics",
@@ -181,9 +183,17 @@ class RawConditionParser {
             "GSJ" to "Gender and Social Justice",
             "Hon" to "Honours",
             "HRM" to "Human Resources Management",
-            "Management" to "Management Engineering",
+            "Management," to "Management Engineering",
             "Math" to "Mathematics",
+            "Math/Accounting" to "Mathematics/Chartered Professional Accountancy",
+            "Math/Chartered Professional Accountancy" to "Mathematics/Chartered Professional Accountancy",
+            "Math/CPA" to "Mathematics/Chartered Professional Accountancy",
+            "Math/FARM" to "Mathematics/Financial Analysis and Risk Management",
+            "Math/Financial Analysis and Risk Management" to "Mathematics/Financial Analysis and Risk Management",
+            "Math/ITM" to "Mathematics/Information Technology Management",
+            "Math/Phys" to "Mathematical Physics",
             "Mathematics/Chartered Accountancy" to "Mathematics/Chartered Professional Accountancy",
+            "Mathematics Chartered Accountancy" to "Mathematics/Chartered Professional Accountancy",
             "Mathematics/Chartered Professional Accounting" to "Mathematics/Chartered Professional Accountancy",
             "Mathematics/CPA" to "Mathematics/Chartered Professional Accountancy",
             "Mechanical" to "Mechanical Engineering",
@@ -196,6 +206,7 @@ class RawConditionParser {
             "Psych" to "Psychology",
             "Rec & Business" to "Recreation and Business",
             "Rec & Leisure Studies" to "Recreation and Leisure Studies",
+            "Recreation and Leisure Students" to "Recreation and Leisure Studies",
             "RI Spec" to "Research Intensive Specialization",
             "SCI" to "Science",
             "Software" to "Software Engineering",
@@ -208,6 +219,7 @@ class RawConditionParser {
         for (it in abbrMap) {
             infoNotExtracted = infoNotExtracted.replace(it.key + ",", it.value + ",", ignoreCase = true)
                 .replace(it.key + " ", it.value + " ", ignoreCase = true)
+            println(infoNotExtracted + "    " + it)
         }
 
         infoNotExtracted = infoNotExtracted.replace("Engineering Engineering", "Engineering")
@@ -271,7 +283,7 @@ class RawConditionParser {
     fun preprocess(text: String): String {
         val patterns = listOf(
             "\\(LEC \\d+\\)", // section requirement
-            "(with a grade of|Cumulative overall average of|with a major average of|average|cumulative major average)\\s??[Aa]t least \\d+%( in)?", // grade req
+            "(with a grade of|with a cumulative average of|Cumulative overall average of|with a major average of|average|cumulative major average)\\s??[Aa]t least \\d+%( in)?", // grade req
             "(taken (in or before )?|prior to)(\\s?(or\\s?)?((spring|fall|winter) 20\\d\\d|[SWF]\\d\\d),?\\s?)+", // time req
             "\\(\\s*\\)" // extra empty parenthesis
         )
