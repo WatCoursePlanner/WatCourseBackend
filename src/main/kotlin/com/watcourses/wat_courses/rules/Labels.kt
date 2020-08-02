@@ -7,7 +7,7 @@ val ALL_LABELS = listOf(
     "Aging Studies Option",
     "Applied Health Sciences",
     "Architectural Engineering",
-    "Architectural Studies",
+    "Architecture",
     "Arts",
     "Anthropology",
     "Aviation Specialization",
