@@ -129,7 +129,6 @@ val ALL_LABELS = listOf(
     "Social Development Studies",
     "Social Policy Specialization",
     "Social Work",
-    "Society, Technology and Values",
     "Society, Technology and Values Option",
     "Sociology",
     "Software Engineering",
