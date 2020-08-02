@@ -70,7 +70,6 @@ val ALL_LABELS = listOf(
     "Health Promotion",
     "Health Studies",
     "History",
-    "Honours",
     "Speech Communication",
     "Human Resources Management",
     "Hydrogeology Specialization",

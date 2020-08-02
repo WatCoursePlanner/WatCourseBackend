@@ -240,7 +240,7 @@ class RawConditionParser {
         val wordsToIgnore = listOf(
             ",", ".", "/", "and", "Bachelor of", "majors", "not open to", "open to", "open only to",
             "following faculties:", "students", "in", "only", "level", "least", "at", "or", "of", "the",
-            "diploma", "plans", "for", "programs", "faculty", "minor"
+            "diploma", "plans", "for", "programs", "faculty", "minor", "honours"
         )
 
         for (ignoringWord in wordsToIgnore) {
