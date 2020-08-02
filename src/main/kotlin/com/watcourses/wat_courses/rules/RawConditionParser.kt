@@ -19,25 +19,25 @@ class RawConditionParser {
 
     // resolve "123" in "CS 101, 123" to course("CS 123")
     // Make sure that each element of the parts is trimmed
-     private fun resolveCourse(parts: List<String>, index: Int): Condition {
+    private fun resolveCourse(parts: List<String>, index: Int): Condition {
         var part = parts[index].trim()
         if (part.contains(" ")) { // e.g. CS 101. We have "CS" already so return directly
             courseSanityCheck(part)
             return course(part)
         }
         // look backwards for identifier
-        if ((part.all { it.isLetter() }) && (part.length > 1) && part!=parts.last()) { // contains a course code; look forward for course code
+        if ((part.all { it.isLetter() }) && (part.length > 1) && part != parts.last()) { // contains a course code; look forward for course code
             val nextPart = parts[index + 1]
             if (nextPart.all { it.isLetter() }) throw ParseFailure("Expect $nextPart to have a course code")
-            val courseCode = parts[index+1].substringAfter(" ")
+            val courseCode = parts[index + 1].substringAfter(" ")
             part = part + " " + courseCode.trim()
             courseSanityCheck(part)
             return course(part)
         }
 
         val prevParts = parts.subList(0, index)
-        val identifier =prevParts.findLast { it.contains(" ") }?.substringBefore(" ")
-                ?: throw ParseFailure("Can't find a course identifier")
+        val identifier = prevParts.findLast { it.contains(" ") }?.substringBefore(" ")
+            ?: throw ParseFailure("Can't find a course identifier")
         if (part.length == 1) { // e.g. ECE 123A/B
             var prevPart = parts[index - 1]
             if (!prevPart.last().isLetter()) throw ParseFailure("Expect $prevPart to have xxxA structure")
@@ -223,7 +223,6 @@ class RawConditionParser {
         for (it in abbrMap) {
             infoNotExtracted = infoNotExtracted.replace(it.key + ",", it.value + ",", ignoreCase = true)
                 .replace(it.key + " ", it.value + " ", ignoreCase = true)
-            println(infoNotExtracted + "    " + it)
         }
 
         infoNotExtracted = infoNotExtracted.replace("Engineering Engineering", "Engineering")
