@@ -6,17 +6,15 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import com.watcourses.wat_courses.AppProperties
 import com.watcourses.wat_courses.persistence.DbUser
 import com.watcourses.wat_courses.persistence.DbUserRepo
-import com.watcourses.wat_courses.proto.GoogleLoginOrRegisterRequest
-import com.watcourses.wat_courses.proto.LoginOrRegisterResponse
-import com.watcourses.wat_courses.proto.LoginRequest
-import com.watcourses.wat_courses.proto.RegisterRequest
+import com.watcourses.wat_courses.proto.*
 import com.watcourses.wat_courses.utils.PasswordEncoder
 import com.watcourses.wat_courses.utils.SessionManager
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import java.util.*
-import javax.servlet.http.Cookie
+import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 @RestController
@@ -126,5 +124,21 @@ class UserApi(
         dbUserRepo.save(dbUser)
 
         return LoginOrRegisterResponse(success = true, userInfo = dbUser.toProto())
+    }
+
+    @PutMapping("/user/data")
+    fun putData(
+        @RequestBody request: SetUserDataRequest, httpRequest: HttpServletRequest
+    ): Boolean {
+        val user = sessionManager.getCurrentUser(httpRequest) ?: return false
+        user.data = request.data
+        dbUserRepo.save(user)
+        return true
+    }
+
+    // Use POST instead of GET to prevent json hijacking
+    @PostMapping("/user/data")
+    fun getData(httpRequest: HttpServletRequest): String {
+        return sessionManager.getCurrentUser(httpRequest)?.data ?: ""
     }
 }

@@ -36,6 +36,11 @@ class PaginationInfoResponse(
     adapter = "com.squareup.wire.ProtoAdapter#INT32"
   )
   val limit: Int? = null,
+  @field:WireField(
+    tag = 4,
+    adapter = "com.squareup.wire.ProtoAdapter#INT32"
+  )
+  val totalResults: Int? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<PaginationInfoResponse, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -51,6 +56,7 @@ class PaginationInfoResponse(
         && totalPages == other.totalPages
         && currentPage == other.currentPage
         && limit == other.limit
+        && totalResults == other.totalResults
   }
 
   override fun hashCode(): Int {
@@ -60,6 +66,7 @@ class PaginationInfoResponse(
       result = result * 37 + totalPages.hashCode()
       result = result * 37 + currentPage.hashCode()
       result = result * 37 + limit.hashCode()
+      result = result * 37 + totalResults.hashCode()
       super.hashCode = result
     }
     return result
@@ -70,6 +77,7 @@ class PaginationInfoResponse(
     if (totalPages != null) result += """totalPages=$totalPages"""
     if (currentPage != null) result += """currentPage=$currentPage"""
     if (limit != null) result += """limit=$limit"""
+    if (totalResults != null) result += """totalResults=$totalResults"""
     return result.joinToString(prefix = "PaginationInfoResponse{", separator = ", ", postfix = "}")
   }
 
@@ -77,8 +85,10 @@ class PaginationInfoResponse(
     totalPages: Int? = this.totalPages,
     currentPage: Int? = this.currentPage,
     limit: Int? = this.limit,
+    totalResults: Int? = this.totalResults,
     unknownFields: ByteString = this.unknownFields
-  ): PaginationInfoResponse = PaginationInfoResponse(totalPages, currentPage, limit, unknownFields)
+  ): PaginationInfoResponse = PaginationInfoResponse(totalPages, currentPage, limit, totalResults,
+      unknownFields)
 
   companion object {
     @JvmField
@@ -92,12 +102,14 @@ class PaginationInfoResponse(
         ProtoAdapter.INT32.encodedSizeWithTag(1, value.totalPages) +
         ProtoAdapter.INT32.encodedSizeWithTag(2, value.currentPage) +
         ProtoAdapter.INT32.encodedSizeWithTag(3, value.limit) +
+        ProtoAdapter.INT32.encodedSizeWithTag(4, value.totalResults) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: PaginationInfoResponse) {
         ProtoAdapter.INT32.encodeWithTag(writer, 1, value.totalPages)
         ProtoAdapter.INT32.encodeWithTag(writer, 2, value.currentPage)
         ProtoAdapter.INT32.encodeWithTag(writer, 3, value.limit)
+        ProtoAdapter.INT32.encodeWithTag(writer, 4, value.totalResults)
         writer.writeBytes(value.unknownFields)
       }
 
@@ -105,11 +117,13 @@ class PaginationInfoResponse(
         var totalPages: Int? = null
         var currentPage: Int? = null
         var limit: Int? = null
+        var totalResults: Int? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> totalPages = ProtoAdapter.INT32.decode(reader)
             2 -> currentPage = ProtoAdapter.INT32.decode(reader)
             3 -> limit = ProtoAdapter.INT32.decode(reader)
+            4 -> totalResults = ProtoAdapter.INT32.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
@@ -117,6 +131,7 @@ class PaginationInfoResponse(
           totalPages = totalPages,
           currentPage = currentPage,
           limit = limit,
+          totalResults = totalResults,
           unknownFields = unknownFields
         )
       }

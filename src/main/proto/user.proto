@@ -31,3 +31,7 @@ message LoginRequest {
 message GoogleLoginOrRegisterRequest {
   optional string token = 1;
 }
+
+message SetUserDataRequest {
+  optional string data = 1;
+}

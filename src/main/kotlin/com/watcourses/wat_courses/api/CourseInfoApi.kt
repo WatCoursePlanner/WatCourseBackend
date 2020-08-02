@@ -23,20 +23,21 @@ class CourseInfoApi(val dbCourseRepo: DbCourseRepo, val courseListLoader: Course
     }
 
     @PostMapping("/course/search")
-    fun searchCourse(@RequestBody searchCourseRequest: SearchCourseRequest): SearchCourseResponse {
+    fun searchCourse(@RequestBody request: SearchCourseRequest): SearchCourseResponse {
         val result = dbCourseRepo.findAll(
             PageRequest.of(
-                searchCourseRequest.pagination?.zeroBasedPage ?: 0,
-                searchCourseRequest.pagination?.limit ?: 30
+                request.pagination?.zeroBasedPage ?: 0,
+                request.pagination?.limit ?: 30
             )
         )
         return SearchCourseResponse(
             pagination = PaginationInfoResponse(
                 totalPages = result.totalPages,
                 limit = result.size,
-                currentPage = result.number
+                currentPage = result.number,
+                totalResults = result.totalElements.toInt()
             ),
-            results = result.content.map { it.toProto() }
+            results = result.content.map { it.toProto(includeConditions = !(request.basicInfoOnly ?: false)) }
         )
     }
 
