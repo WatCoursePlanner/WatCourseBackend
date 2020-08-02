@@ -22,6 +22,7 @@ class SessionManager(private val dbUserRepo: DbUserRepo) {
         dbUser.sessionId = generateSessionId()
         val cookie = Cookie("session", dbUser.sessionId)
         cookie.isHttpOnly = true
+        cookie.path = "/"
         cookie.secure = true
         cookie.maxAge = 60 * 60 * 24 * 30 // 30 days
         response.addCookie(cookie)
