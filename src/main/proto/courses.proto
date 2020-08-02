@@ -43,10 +43,25 @@ message PaginationInfoResponse {
   optional int32 totalPages = 1;
   optional int32 currentPage = 2;
   optional int32 limit = 3;
+  optional int32 totalResults = 4;
+}
+
+message Sort {
+  enum SortBy {
+    TITLE = 1;
+    CODE = 2;
+  }
+  enum Order {
+    ASC = 1;
+    DESC = 2;
+  }
+  optional SortBy sortBy = 1;
+  optional Order order = 2;
 }
 
 message SearchCourseRequest {
   optional PaginationInfoRequest pagination = 1;
+  optional bool basicInfoOnly = 2; // if true, do not return requisite info
 }
 
 message SearchCourseResponse {

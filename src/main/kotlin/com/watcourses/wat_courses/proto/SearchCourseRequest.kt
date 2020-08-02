@@ -26,6 +26,14 @@ class SearchCourseRequest(
     adapter = "com.watcourses.wat_courses.proto.PaginationInfoRequest#ADAPTER"
   )
   val pagination: PaginationInfoRequest? = null,
+  /**
+   * if true, do not return requisite info
+   */
+  @field:WireField(
+    tag = 2,
+    adapter = "com.squareup.wire.ProtoAdapter#BOOL"
+  )
+  val basicInfoOnly: Boolean? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<SearchCourseRequest, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -39,6 +47,7 @@ class SearchCourseRequest(
     if (other !is SearchCourseRequest) return false
     return unknownFields == other.unknownFields
         && pagination == other.pagination
+        && basicInfoOnly == other.basicInfoOnly
   }
 
   override fun hashCode(): Int {
@@ -46,6 +55,7 @@ class SearchCourseRequest(
     if (result == 0) {
       result = unknownFields.hashCode()
       result = result * 37 + pagination.hashCode()
+      result = result * 37 + basicInfoOnly.hashCode()
       super.hashCode = result
     }
     return result
@@ -54,11 +64,15 @@ class SearchCourseRequest(
   override fun toString(): String {
     val result = mutableListOf<String>()
     if (pagination != null) result += """pagination=$pagination"""
+    if (basicInfoOnly != null) result += """basicInfoOnly=$basicInfoOnly"""
     return result.joinToString(prefix = "SearchCourseRequest{", separator = ", ", postfix = "}")
   }
 
-  fun copy(pagination: PaginationInfoRequest? = this.pagination, unknownFields: ByteString =
-      this.unknownFields): SearchCourseRequest = SearchCourseRequest(pagination, unknownFields)
+  fun copy(
+    pagination: PaginationInfoRequest? = this.pagination,
+    basicInfoOnly: Boolean? = this.basicInfoOnly,
+    unknownFields: ByteString = this.unknownFields
+  ): SearchCourseRequest = SearchCourseRequest(pagination, basicInfoOnly, unknownFields)
 
   companion object {
     @JvmField
@@ -69,23 +83,28 @@ class SearchCourseRequest(
     ) {
       override fun encodedSize(value: SearchCourseRequest): Int = 
         PaginationInfoRequest.ADAPTER.encodedSizeWithTag(1, value.pagination) +
+        ProtoAdapter.BOOL.encodedSizeWithTag(2, value.basicInfoOnly) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: SearchCourseRequest) {
         PaginationInfoRequest.ADAPTER.encodeWithTag(writer, 1, value.pagination)
+        ProtoAdapter.BOOL.encodeWithTag(writer, 2, value.basicInfoOnly)
         writer.writeBytes(value.unknownFields)
       }
 
       override fun decode(reader: ProtoReader): SearchCourseRequest {
         var pagination: PaginationInfoRequest? = null
+        var basicInfoOnly: Boolean? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> pagination = PaginationInfoRequest.ADAPTER.decode(reader)
+            2 -> basicInfoOnly = ProtoAdapter.BOOL.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
         return SearchCourseRequest(
           pagination = pagination,
+          basicInfoOnly = basicInfoOnly,
           unknownFields = unknownFields
         )
       }

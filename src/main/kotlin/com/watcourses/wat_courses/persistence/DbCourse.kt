@@ -58,16 +58,16 @@ data class DbCourse(
     @Id @GeneratedValue
     var id: Long? = null
 ) {
-    fun toProto(): CourseInfo {
+    fun toProto(includeConditions: Boolean = true): CourseInfo {
         return CourseInfo(
             name = name,
             code = code,
             description = description,
             offeringTerms = offeringTerms ?: listOf(),
             id = courseId,
-            preRequisite = preRequisite?.toProto(),
-            coRequisite = coRequisite?.toProto(),
-            antiRequisite = antiRequisite?.toProto(),
+            preRequisite = if (includeConditions) preRequisite?.toProto() else null,
+            coRequisite = if (includeConditions) coRequisite?.toProto() else null,
+            antiRequisite = if (includeConditions) antiRequisite?.toProto() else null,
             liked = liked,
             useful = useful,
             easy = easy,

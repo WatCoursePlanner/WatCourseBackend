@@ -33,6 +33,9 @@ data class DbUser(
     @Column
     var pictureUrl: String? = null,
 
+    @Column
+    var data: String? = null,
+
     @Id @GeneratedValue
     var id: Long? = null
 ) {
