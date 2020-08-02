@@ -179,7 +179,7 @@ class RawConditionParser {
             "Environment and Resource" to "Environment, Resources and Sustainability",
             "Environment, Resource and Sustainability" to "Environment, Resources and Sustainability",
             "Environmental," to "Environmental Engineering",
-            "Ergonomics and Injury Prevention students" to "Ergonomics and Injury Prevention Minor",
+            "Ergonomics and Injury Prevention" to "Ergonomics and Injury Prevention Minor",
             "Fin" to "Financial",
             "Geological" to "Geological Engineering",
             "Global Business," to "Global Business and Digital Arts",
@@ -240,7 +240,7 @@ class RawConditionParser {
         val wordsToIgnore = listOf(
             ",", ".", "/", "and", "Bachelor of", "majors", "not open to", "open to", "open only to",
             "following faculties:", "students", "in", "only", "level", "least", "at", "or", "of", "the",
-            "diploma", "plans", "for", "programs", "faculty"
+            "diploma", "plans", "for", "programs", "faculty", "minor"
         )
 
         for (ignoringWord in wordsToIgnore) {
