@@ -103,9 +103,13 @@ class ScrapingCourseService(
         var successCount = 0
         for (rule in rulesToReparse) {
             val newRule = DbRule.parse(rule.rawRule!!) { rawConditionParser.parse(it) }
-            if (rule.parseFailureBecause != newRule.parseFailureBecause || rule.cond != newRule.cond) {
+            if (rule.parseFailureBecause != newRule.parseFailureBecause ||
+                rule.cond != newRule.cond ||
+                rule.fullyResolved != newRule.fullyResolved
+            ) {
                 rule.parseFailureBecause = newRule.parseFailureBecause
                 rule.cond = newRule.cond
+                rule.fullyResolved = newRule.fullyResolved
                 if (!dryRun) dbRuleRepo.save(rule)
             }
             if (rule.cond != null) {
