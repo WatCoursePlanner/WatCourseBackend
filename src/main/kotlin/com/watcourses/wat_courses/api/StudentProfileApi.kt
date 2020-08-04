@@ -50,8 +50,8 @@ class StudentProfileApi(
 
     @PostMapping("/profile/find_slots")
     fun findSlots(@RequestBody request: FindSlotRequest): FindSlotResponse {
-        val profile = request.profile!!
         val course = request.courseCode!!
+        val profile = removeCourseFromSchedule(request.profile!!, course)
 
         // Check for each term
         val results = profile.schedule!!.terms.mapIndexed { i, term ->
@@ -74,6 +74,16 @@ class StudentProfileApi(
             // subtract commonResults
             CheckResults(issues = it.value.issues.filterNot { commonResults.contains(it) })
         })
+    }
+
+    private fun removeCourseFromSchedule(raw: StudentProfile, courseCode: String): StudentProfile {
+        return raw.copy(
+            schedule = raw.schedule!!.copy(
+                terms = raw.schedule.terms.map {
+                    it.copy(courseCodes = it.courseCodes.filterNot { code -> code == courseCode })
+                }
+            )
+        )
     }
 
     private fun mergeSchedule(imported: Schedule, template: Schedule): Schedule {
