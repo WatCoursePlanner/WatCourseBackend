@@ -37,6 +37,11 @@ class RuleInfo(
     adapter = "com.squareup.wire.ProtoAdapter#BOOL"
   )
   val fullyResolved: Boolean? = null,
+  @field:WireField(
+    tag = 4,
+    adapter = "com.squareup.wire.ProtoAdapter#STRING"
+  )
+  val json: String? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<RuleInfo, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -52,6 +57,7 @@ class RuleInfo(
         && rawString == other.rawString
         && logicString == other.logicString
         && fullyResolved == other.fullyResolved
+        && json == other.json
   }
 
   override fun hashCode(): Int {
@@ -61,6 +67,7 @@ class RuleInfo(
       result = result * 37 + rawString.hashCode()
       result = result * 37 + logicString.hashCode()
       result = result * 37 + fullyResolved.hashCode()
+      result = result * 37 + json.hashCode()
       super.hashCode = result
     }
     return result
@@ -71,6 +78,7 @@ class RuleInfo(
     if (rawString != null) result += """rawString=${sanitize(rawString)}"""
     if (logicString != null) result += """logicString=${sanitize(logicString)}"""
     if (fullyResolved != null) result += """fullyResolved=$fullyResolved"""
+    if (json != null) result += """json=${sanitize(json)}"""
     return result.joinToString(prefix = "RuleInfo{", separator = ", ", postfix = "}")
   }
 
@@ -78,8 +86,9 @@ class RuleInfo(
     rawString: String? = this.rawString,
     logicString: String? = this.logicString,
     fullyResolved: Boolean? = this.fullyResolved,
+    json: String? = this.json,
     unknownFields: ByteString = this.unknownFields
-  ): RuleInfo = RuleInfo(rawString, logicString, fullyResolved, unknownFields)
+  ): RuleInfo = RuleInfo(rawString, logicString, fullyResolved, json, unknownFields)
 
   companion object {
     @JvmField
@@ -92,12 +101,14 @@ class RuleInfo(
         ProtoAdapter.STRING.encodedSizeWithTag(1, value.rawString) +
         ProtoAdapter.STRING.encodedSizeWithTag(2, value.logicString) +
         ProtoAdapter.BOOL.encodedSizeWithTag(3, value.fullyResolved) +
+        ProtoAdapter.STRING.encodedSizeWithTag(4, value.json) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: RuleInfo) {
         ProtoAdapter.STRING.encodeWithTag(writer, 1, value.rawString)
         ProtoAdapter.STRING.encodeWithTag(writer, 2, value.logicString)
         ProtoAdapter.BOOL.encodeWithTag(writer, 3, value.fullyResolved)
+        ProtoAdapter.STRING.encodeWithTag(writer, 4, value.json)
         writer.writeBytes(value.unknownFields)
       }
 
@@ -105,11 +116,13 @@ class RuleInfo(
         var rawString: String? = null
         var logicString: String? = null
         var fullyResolved: Boolean? = null
+        var json: String? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> rawString = ProtoAdapter.STRING.decode(reader)
             2 -> logicString = ProtoAdapter.STRING.decode(reader)
             3 -> fullyResolved = ProtoAdapter.BOOL.decode(reader)
+            4 -> json = ProtoAdapter.STRING.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
@@ -117,6 +130,7 @@ class RuleInfo(
           rawString = rawString,
           logicString = logicString,
           fullyResolved = fullyResolved,
+          json = json,
           unknownFields = unknownFields
         )
       }

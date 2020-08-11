@@ -1,5 +1,6 @@
 package com.watcourses.wat_courses.persistence
 
+import com.google.gson.Gson
 import com.vladmihalcea.hibernate.type.json.JsonStringType
 import com.watcourses.wat_courses.proto.RuleInfo
 import com.watcourses.wat_courses.rules.Condition
@@ -49,6 +50,11 @@ data class DbRule(
     }
 
     fun toProto(): RuleInfo {
-        return RuleInfo(rawString = rawRule, logicString = cond.toString(), fullyResolved = fullyResolved)
+        return RuleInfo(
+            rawString = rawRule,
+            logicString = cond.toString(),
+            fullyResolved = fullyResolved,
+            json = Gson().toJson(cond)
+        )
     }
 }

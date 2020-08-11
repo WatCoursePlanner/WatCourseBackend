@@ -10,6 +10,7 @@ message RuleInfo {
   optional string rawString = 1;
   optional string logicString = 2;
   optional bool fullyResolved = 3;
+  optional string json = 4;
 }
 
 message CourseInfo {
@@ -100,6 +101,7 @@ message StudentProfile {
   optional Schedule schedule = 1;
   repeated string labels = 2;
   repeated string degrees = 3;
+  repeated string shortList = 4;
 }
 
 message CreateStudentProfileRequest {
