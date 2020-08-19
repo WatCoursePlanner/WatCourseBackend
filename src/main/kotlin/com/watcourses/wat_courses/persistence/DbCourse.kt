@@ -58,7 +58,7 @@ data class DbCourse(
     @Id @GeneratedValue
     var id: Long? = null
 ) {
-    fun toProto(basicInfoOnly: Boolean = true): CourseInfo {
+    fun toProto(basicInfoOnly: Boolean = false): CourseInfo {
         val basicInfo = CourseInfo(
             name = name,
             code = code,
