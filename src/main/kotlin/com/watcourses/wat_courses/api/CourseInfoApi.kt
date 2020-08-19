@@ -37,7 +37,7 @@ class CourseInfoApi(val dbCourseRepo: DbCourseRepo, val courseListLoader: Course
                 currentPage = result.number,
                 totalResults = result.totalElements.toInt()
             ),
-            results = result.content.map { it.toProto(basicInfoOnly = !(request.basicInfoOnly ?: false)) }
+            results = result.content.map { it.toProto(basicInfoOnly = request.basicInfoOnly ?: false) }
         )
     }
 
