@@ -1,8 +1,16 @@
 package com.watcourses.wat_courses.rules
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.watcourses.wat_courses.proto.ConditionType
 import com.watcourses.wat_courses.utils.unionFlatten
 
+@JsonAutoDetect(
+    fieldVisibility = JsonAutoDetect.Visibility.ANY,
+    getterVisibility = JsonAutoDetect.Visibility.NONE,
+    setterVisibility = JsonAutoDetect.Visibility.NONE
+)
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Condition(val type: ConditionType, val operands: List<Condition>, val data: String? = null) {
     // Get the set of courses involved in the condition
     fun getRelatedCourses(): Set<String> {
