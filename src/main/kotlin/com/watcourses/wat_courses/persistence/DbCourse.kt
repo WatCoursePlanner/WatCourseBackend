@@ -58,19 +58,23 @@ data class DbCourse(
     @Id @GeneratedValue
     var id: Long? = null
 ) {
-    fun toProto(includeConditions: Boolean = true): CourseInfo {
-        return CourseInfo(
+    fun toProto(basicInfoOnly: Boolean = true): CourseInfo {
+        val basicInfo = CourseInfo(
             name = name,
             code = code,
-            description = description,
-            offeringTerms = offeringTerms ?: listOf(),
             id = courseId,
-            preRequisite = if (includeConditions) preRequisite?.toProto() else null,
-            coRequisite = if (includeConditions) coRequisite?.toProto() else null,
-            antiRequisite = if (includeConditions) antiRequisite?.toProto() else null,
             liked = liked,
             useful = useful,
-            easy = easy,
+            easy = easy
+        )
+        if (basicInfoOnly) return basicInfo
+
+        return basicInfo.copy(
+            description = description,
+            offeringTerms = offeringTerms ?: listOf(),
+            preRequisite = preRequisite?.toProto(),
+            coRequisite = coRequisite?.toProto(),
+            antiRequisite = antiRequisite?.toProto(),
             commentsCount = commentCount,
             ratingsCount = filledCount
         )

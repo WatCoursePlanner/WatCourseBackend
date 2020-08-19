@@ -318,9 +318,9 @@ class RawConditionParser {
             conditions.add(parsedCondition)
         }
 
-        if (conditions.size == 1) return Pair(conditions.single(), conditionFullyResolved)
+        if (conditions.size == 1) return Pair(conditions.single().minify(), conditionFullyResolved)
 
-        return Pair(Condition(ConditionType.AND, conditions), conditionFullyResolved)
+        return Pair(Condition(ConditionType.AND, conditions).minify(), conditionFullyResolved)
     }
 
     companion object {

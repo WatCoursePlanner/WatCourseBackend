@@ -54,7 +54,7 @@ class ConditionParserAndCheckerTests {
         )
 
         val testCases = listOf(
-            TestCase("BIOL 123A/B", "(BIOL 123A || BIOL 123B)"),
+            TestCase("BIOL 123A/B", "BIOL 123A || BIOL 123B"),
             TestCase(
                 rawRule = "Prereq: Civil Engineering.",
                 expectedCond = "[Civil Engineering]"
@@ -71,11 +71,11 @@ class ConditionParserAndCheckerTests {
             ),
             TestCase(
                 rawRule = "Prereq: (MATH 225 or 235 or 245) and (STAT 221 or 231 or 241).",
-                expectedCond = "((MATH 225 || MATH 235 || MATH 245)) && ((STAT 221 || STAT 231 || STAT 241))"
+                expectedCond = "(MATH 225 || MATH 235 || MATH 245) && (STAT 221 || STAT 231 || STAT 241)"
             ),
             TestCase(
                 rawRule = "Prereq: (CS 245 or SE 212), (one of CS 241, 246, 247), (one of STAT 206, 230, 240);",
-                expectedCond = "((CS 245 || SE 212)) && (CS 241 || CS 246 || CS 247) && (STAT 206 || STAT 230 || STAT 240)"
+                expectedCond = "(CS 245 || SE 212) && (CS 241 || CS 246 || CS 247) && (STAT 206 || STAT 230 || STAT 240)"
             ),
             TestCase(
                 rawRule = "Prereq: Level at least 3A; One of HUMSC 101, 102, 201, 301",
@@ -172,9 +172,29 @@ class ConditionParserAndCheckerTests {
     }
 
     @Test
+    fun `condition minify`() {
+        assertThat(
+            ConditionParser.parseToEnd(
+                "CS 123 && [1A] && ([2A]) && (CS 233 || (ECE 123 || (MATH 123)))"
+            ).minify().toString()
+        ).isEqualTo("CS 123 && [1A] && [2A] && (CS 233 || ECE 123 || MATH 123)")
+
+        assertThat(
+            ConditionParser.parseToEnd(
+                "(CS 233 || (ECE 123 || (MATH 123 && CS 123 && ([1A] || [1B]))))"
+            ).minify().toString()
+        ).isEqualTo("CS 233 || ECE 123 || (MATH 123 && CS 123 && ([1A] || [1B]))")
+
+        assertThat(
+            or(and(course("CS 123")), and(course("CS 233"))).minify().toString()
+        ).isEqualTo("CS 123 || CS 233")
+    }
+
+    @Test
     fun `get related courses works`() {
         val cond = ConditionParser.parseToEnd("!(MATH 233 || (<list1:1>&&true)) && <list2:2> or <list3:3>")
         assertThat(cond.getRelatedCourses()).containsExactlyInAnyOrder("MATH 233")
         assertThat(cond.getRelatedCourseLists()).containsExactlyInAnyOrder("list1", "list2", "list3")
     }
 }
+

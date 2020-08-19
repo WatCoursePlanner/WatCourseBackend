@@ -33,6 +33,18 @@ data class Condition(val type: ConditionType, val operands: List<Condition>, val
     fun addOperand(operand: Condition) =
         Condition(type = type, operands = operands + operand, data = data)
 
+    fun minify(): Condition {
+        if (type != ConditionType.AND && type != ConditionType.OR) return this
+        var minifiedOperands = operands.map { it.minify() }
+        val operandsWithSameType = minifiedOperands.filter { it.type == type }
+        minifiedOperands = minifiedOperands.filterNot { it.type == type }.toMutableList().apply {
+            addAll(operandsWithSameType.map { it.operands.map { operand -> operand.minify() } }.flatten())
+            return@apply
+        }
+        if (minifiedOperands.size == 1) return minifiedOperands.single()
+        return this.copy(operands = minifiedOperands)
+    }
+
     private fun toStringInternal(): String {
         val bracketIfComplex = { c: String -> if (c.contains("&&") || c.contains("||")) "($c)" else c }
         return when (type) {
