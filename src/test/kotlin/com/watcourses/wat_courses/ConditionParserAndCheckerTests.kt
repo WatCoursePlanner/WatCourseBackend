@@ -172,9 +172,25 @@ class ConditionParserAndCheckerTests {
     }
 
     @Test
+    fun `condition minify`() {
+        assertThat(
+            ConditionParser.parseToEnd(
+                "CS 123 && [1A] && ([2A]) && (CS 233 || (ECE 123 || (MATH 123)))"
+            ).minify().toString()
+        ).isEqualTo("CS 123 && [1A] && [2A] && (CS 233 || ECE 123 || MATH 123)")
+
+        assertThat(
+            ConditionParser.parseToEnd(
+                "(CS 233 || (ECE 123 || (MATH 123 && CS 123 && ([1A] || [1B]))))"
+            ).minify().toString()
+        ).isEqualTo("CS 233 || ECE 123 || (MATH 123 && CS 123 && ([1A] || [1B]))")
+    }
+
+    @Test
     fun `get related courses works`() {
         val cond = ConditionParser.parseToEnd("!(MATH 233 || (<list1:1>&&true)) && <list2:2> or <list3:3>")
         assertThat(cond.getRelatedCourses()).containsExactlyInAnyOrder("MATH 233")
         assertThat(cond.getRelatedCourseLists()).containsExactlyInAnyOrder("list1", "list2", "list3")
     }
 }
+

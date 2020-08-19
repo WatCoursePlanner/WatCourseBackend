@@ -320,7 +320,7 @@ class RawConditionParser {
 
         if (conditions.size == 1) return Pair(conditions.single(), conditionFullyResolved)
 
-        return Pair(Condition(ConditionType.AND, conditions), conditionFullyResolved)
+        return Pair(Condition(ConditionType.AND, conditions).minify(), conditionFullyResolved)
     }
 
     companion object {
