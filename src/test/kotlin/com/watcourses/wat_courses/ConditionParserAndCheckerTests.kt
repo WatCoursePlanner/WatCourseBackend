@@ -184,6 +184,10 @@ class ConditionParserAndCheckerTests {
                 "(CS 233 || (ECE 123 || (MATH 123 && CS 123 && ([1A] || [1B]))))"
             ).minify().toString()
         ).isEqualTo("CS 233 || ECE 123 || (MATH 123 && CS 123 && ([1A] || [1B]))")
+
+        assertThat(
+            or(and(course("CS 123")), and(course("CS 233"))).minify().toString()
+        ).isEqualTo("CS 123 || CS 233")
     }
 
     @Test
