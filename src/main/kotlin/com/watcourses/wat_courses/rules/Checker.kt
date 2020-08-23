@@ -4,6 +4,7 @@ import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.persistence.DbRule
 import com.watcourses.wat_courses.proto.CheckResults
 import com.watcourses.wat_courses.proto.ConditionType
+import com.watcourses.wat_courses.proto.CourseInfo
 import com.watcourses.wat_courses.proto.StudentProfile
 import com.watcourses.wat_courses.utils.getDegreeLabels
 import com.watcourses.wat_courses.utils.getLabels
@@ -15,8 +16,9 @@ class Checker(
     private val courseListLoader: CourseListLoader,
     private val degreeRequirementLoader: DegreeRequirementLoader
 ) {
+    // check and populate the `met` field
     fun checkCondition(condition: Condition, studentState: StudentState): Boolean {
-        return when (condition.type) {
+        condition.met = when (condition.type) {
             ConditionType.TRUE -> true
             ConditionType.FALSE -> false
             ConditionType.AND -> if (condition.operands.isEmpty()) true else condition.operands.map {
@@ -35,6 +37,7 @@ class Checker(
                 } >= countStr.toLong()
             }
         }
+        return condition.met!!
     }
 
     fun Condition.check(state: StudentState) = checkCondition(this, state)
@@ -65,6 +68,7 @@ class Checker(
         val issues = mutableListOf<CheckResults.Issue>()
         val degrees = profile.degrees.map { degreeRequirementLoader.getDegreeRequirement(it)!! }
         val degreeLabels = profile.getDegreeLabels(degrees)
+        val checkedCourses = mutableListOf<CourseInfo>()
 
         // Check all individual courses
         val coursesTaken = mutableSetOf<String>()
@@ -100,6 +104,7 @@ class Checker(
                     )
                 }
                 coursesTaken.addAll(term.courseCodes)
+                checkedCourses.add(dbCourse.toProto())
             }
         }
         // Check degree requirements
@@ -140,6 +145,6 @@ class Checker(
                 }
             }
         }
-        return CheckResults(issues = issues)
+        return CheckResults(issues = issues, checkedCourses = checkedCourses)
     }
 }

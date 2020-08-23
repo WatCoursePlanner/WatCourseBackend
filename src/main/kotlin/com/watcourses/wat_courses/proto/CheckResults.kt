@@ -33,6 +33,12 @@ class CheckResults(
     label = WireField.Label.REPEATED
   )
   val issues: List<Issue> = emptyList(),
+  @field:WireField(
+    tag = 2,
+    adapter = "com.watcourses.wat_courses.proto.CourseInfo#ADAPTER",
+    label = WireField.Label.REPEATED
+  )
+  val checkedCourses: List<CourseInfo> = emptyList(),
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<CheckResults, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -46,6 +52,7 @@ class CheckResults(
     if (other !is CheckResults) return false
     return unknownFields == other.unknownFields
         && issues == other.issues
+        && checkedCourses == other.checkedCourses
   }
 
   override fun hashCode(): Int {
@@ -53,6 +60,7 @@ class CheckResults(
     if (result == 0) {
       result = unknownFields.hashCode()
       result = result * 37 + issues.hashCode()
+      result = result * 37 + checkedCourses.hashCode()
       super.hashCode = result
     }
     return result
@@ -61,11 +69,15 @@ class CheckResults(
   override fun toString(): String {
     val result = mutableListOf<String>()
     if (issues.isNotEmpty()) result += """issues=$issues"""
+    if (checkedCourses.isNotEmpty()) result += """checkedCourses=$checkedCourses"""
     return result.joinToString(prefix = "CheckResults{", separator = ", ", postfix = "}")
   }
 
-  fun copy(issues: List<Issue> = this.issues, unknownFields: ByteString = this.unknownFields):
-      CheckResults = CheckResults(issues, unknownFields)
+  fun copy(
+    issues: List<Issue> = this.issues,
+    checkedCourses: List<CourseInfo> = this.checkedCourses,
+    unknownFields: ByteString = this.unknownFields
+  ): CheckResults = CheckResults(issues, checkedCourses, unknownFields)
 
   companion object {
     @JvmField
@@ -76,29 +88,35 @@ class CheckResults(
     ) {
       override fun encodedSize(value: CheckResults): Int = 
         Issue.ADAPTER.asRepeated().encodedSizeWithTag(1, value.issues) +
+        CourseInfo.ADAPTER.asRepeated().encodedSizeWithTag(2, value.checkedCourses) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: CheckResults) {
         Issue.ADAPTER.asRepeated().encodeWithTag(writer, 1, value.issues)
+        CourseInfo.ADAPTER.asRepeated().encodeWithTag(writer, 2, value.checkedCourses)
         writer.writeBytes(value.unknownFields)
       }
 
       override fun decode(reader: ProtoReader): CheckResults {
         val issues = mutableListOf<Issue>()
+        val checkedCourses = mutableListOf<CourseInfo>()
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> issues.add(Issue.ADAPTER.decode(reader))
+            2 -> checkedCourses.add(CourseInfo.ADAPTER.decode(reader))
             else -> reader.readUnknownField(tag)
           }
         }
         return CheckResults(
           issues = issues,
+          checkedCourses = checkedCourses,
           unknownFields = unknownFields
         )
       }
 
       override fun redact(value: CheckResults): CheckResults = value.copy(
         issues = value.issues.redactElements(Issue.ADAPTER),
+        checkedCourses = value.checkedCourses.redactElements(CourseInfo.ADAPTER),
         unknownFields = ByteString.EMPTY
       )
     }

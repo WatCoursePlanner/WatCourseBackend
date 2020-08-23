@@ -127,6 +127,7 @@ message CheckResults {
     repeated string relatedCourseList = 6; // course list in the cond.
   }
   repeated Issue issues = 1;
+  repeated CourseInfo checkedCourses = 2;
 }
 
 message FindSlotRequest{

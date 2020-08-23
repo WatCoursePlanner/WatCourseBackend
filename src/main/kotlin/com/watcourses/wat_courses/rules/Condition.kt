@@ -11,7 +11,12 @@ import com.watcourses.wat_courses.utils.unionFlatten
     setterVisibility = JsonAutoDetect.Visibility.NONE
 )
 @JsonIgnoreProperties(ignoreUnknown = true)
-data class Condition(val type: ConditionType, val operands: List<Condition>, val data: String? = null) {
+data class Condition(
+    val type: ConditionType,
+    val operands: List<Condition>,
+    val data: String? = null,
+    var met: Boolean? = false
+) {
     // Get the set of courses involved in the condition
     fun getRelatedCourses(): Set<String> {
         return (if (type == ConditionType.HAS_COURSE) setOf(data!!) else setOf()) +
