@@ -5,6 +5,7 @@ import com.watcourses.wat_courses.proto.CourseInfo
 import com.watcourses.wat_courses.proto.Term
 import org.hibernate.annotations.Type
 import org.hibernate.annotations.TypeDef
+import java.math.RoundingMode
 import javax.persistence.*
 
 @Entity(name = "course")
@@ -58,14 +59,18 @@ data class DbCourse(
     @Id @GeneratedValue
     var id: Long? = null
 ) {
+    private fun Double.round(precision: Int) = this.toBigDecimal().setScale(precision, RoundingMode.HALF_UP).toDouble()
+
     fun toProto(basicInfoOnly: Boolean = false): CourseInfo {
         val basicInfo = CourseInfo(
             name = name,
             code = code,
             id = courseId,
-            liked = liked,
-            useful = useful,
-            easy = easy
+            liked = liked?.round(3),
+            useful = useful?.round(3),
+            easy = easy?.round(3),
+            commentsCount = commentCount,
+            ratingsCount = filledCount
         )
         if (basicInfoOnly) return basicInfo
 
@@ -74,9 +79,7 @@ data class DbCourse(
             offeringTerms = offeringTerms ?: listOf(),
             preRequisite = preRequisite?.toProto(),
             coRequisite = coRequisite?.toProto(),
-            antiRequisite = antiRequisite?.toProto(),
-            commentsCount = commentCount,
-            ratingsCount = filledCount
+            antiRequisite = antiRequisite?.toProto()
         )
     }
 }
