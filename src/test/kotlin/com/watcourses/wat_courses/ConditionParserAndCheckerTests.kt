@@ -166,9 +166,16 @@ class ConditionParserAndCheckerTests {
         assertThat(
             ConditionParser.parseToEnd("CS 123 && !(MATH 233 || [label2]) && [label] or CS 101 and [1A]").toString()
         ).isEqualTo("(CS 123 && !(MATH 233 || [label2]) && [label]) || (CS 101 && [1A])")
+
         assertThat(
             ConditionParser.parseToEnd("!CS 123 && <list:2> || <ATE_CS:3>").toString()
         ).isEqualTo("(!CS 123 && <list:2>) || <ATE_CS:3>")
+
+        assertThat(
+            ConditionParser.parseToEnd(
+                "[Computer Science] || [Mathematics] || [Data Science]"
+            ).minify().toString()
+        ).isEqualTo("[Computer Science] || [Mathematics] || [Data Science]")
     }
 
     @Test

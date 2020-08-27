@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 class RawConditionParser {
     class ParseFailure(reason: String) : Exception(reason)
 
-    private fun courseSanityCheck(course: String) {
+    fun courseSanityCheck(course: String) {
         val courseParts = course.split(" ")
         if (courseParts.size != 2
             || courseParts[0].length > 6

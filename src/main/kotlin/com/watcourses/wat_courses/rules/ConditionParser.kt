@@ -19,7 +19,7 @@ object ConditionParser : Grammar<Condition>() {
     val and by regexToken("(&&|and)")
     val or by regexToken("(\\|\\||or)")
     val courseCode by regexToken("[A-Z]+ [0-9A-Z]+")
-    val id by regexToken("([a-zA-Z]\\w*|[1-4][A-B])")
+    val id by regexToken("([a-zA-Z][\\w\\s]*|[1-4][A-B])")
     val positiveNumber by regexToken("\\d+")
     val lpar by literalToken("(")
     val rpar by literalToken(")")
