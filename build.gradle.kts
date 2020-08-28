@@ -32,6 +32,8 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.springframework.session:spring-session-core")
     implementation("org.springframework.security:spring-security-crypto")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("com.squareup.wire:wire-runtime:3.2.2")
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("org.jsoup:jsoup:1.13.1")

@@ -1,15 +1,20 @@
 package com.watcourses.wat_courses.api
 
+import com.watcourses.wat_courses.persistence.DbCourse
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.*
 import com.watcourses.wat_courses.rules.CourseListLoader
-import org.springframework.data.domain.PageRequest
+import com.watcourses.wat_courses.search.SearchManager
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 
 @RestController
-class CourseInfoApi(val dbCourseRepo: DbCourseRepo, val courseListLoader: CourseListLoader) {
+class CourseInfoApi(
+    private val dbCourseRepo: DbCourseRepo,
+    private val courseListLoader: CourseListLoader,
+    private val searchManager: SearchManager
+) {
     @GetMapping("/course/{code}")
     fun getCourse(@PathVariable code: String): CourseInfo {
         return dbCourseRepo.findByCode(code)?.toProto() ?: throw ResponseStatusException(
@@ -24,20 +29,10 @@ class CourseInfoApi(val dbCourseRepo: DbCourseRepo, val courseListLoader: Course
 
     @PostMapping("/course/search")
     fun searchCourse(@RequestBody request: SearchCourseRequest): SearchCourseResponse {
-        val result = dbCourseRepo.findAll(
-            PageRequest.of(
-                request.pagination?.zeroBasedPage ?: 0,
-                request.pagination?.limit ?: 30
-            )
-        )
+        val (paginatedResults, paginationInfo) = searchManager.search(request)
         return SearchCourseResponse(
-            pagination = PaginationInfoResponse(
-                totalPages = result.totalPages,
-                limit = result.size,
-                currentPage = result.number,
-                totalResults = result.totalElements.toInt()
-            ),
-            results = result.content.map { it.toProto(basicInfoOnly = request.basicInfoOnly ?: false) }
+            pagination = paginationInfo,
+            results = paginatedResults.map { DbCourse.toBasicInfoProto(it) }
         )
     }
 

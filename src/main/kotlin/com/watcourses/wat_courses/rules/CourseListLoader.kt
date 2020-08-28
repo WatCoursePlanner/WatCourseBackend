@@ -2,7 +2,6 @@ package com.watcourses.wat_courses.rules
 
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.CourseList
-import com.watcourses.wat_courses.scraping.ScrapingCourseService
 import com.watcourses.wat_courses.utils.ClassPathResourceReader
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -74,8 +73,10 @@ class CourseListLoader(private val dbCourseRepo: DbCourseRepo, private val resou
     fun getList(listName: String) =
         (courseList[listName] ?: throw RuntimeException("List $listName does not exist"))
 
-    fun listContainsCourse(listName: String, courseName: String) =
-        getList(listName).courses.contains(courseName)
+    fun getListOrNull(listName: String) = courseList[listName]
+
+    fun listContainsCourse(listName: String, courseCode: String) =
+        getList(listName).courses.contains(courseCode)
 
     fun matchCourseWildcard(wildcardCourseCode: String, courseCode: String): Boolean {
         if (wildcardCourseCode.contains("*") && wildcardCourseCode.last() != '*') {

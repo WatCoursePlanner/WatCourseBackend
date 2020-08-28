@@ -8,6 +8,7 @@ import com.squareup.wire.ProtoAdapter
 import com.squareup.wire.ProtoReader
 import com.squareup.wire.ProtoWriter
 import com.squareup.wire.WireField
+import com.squareup.wire.internal.sanitize
 import kotlin.Any
 import kotlin.AssertionError
 import kotlin.Boolean
@@ -34,6 +35,16 @@ class SearchCourseRequest(
     adapter = "com.squareup.wire.ProtoAdapter#BOOL"
   )
   val basicInfoOnly: Boolean? = null,
+  @field:WireField(
+    tag = 3,
+    adapter = "com.squareup.wire.ProtoAdapter#STRING"
+  )
+  val searchQuery: String? = null,
+  @field:WireField(
+    tag = 4,
+    adapter = "com.watcourses.wat_courses.proto.Sort#ADAPTER"
+  )
+  val sort: Sort? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<SearchCourseRequest, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -48,6 +59,8 @@ class SearchCourseRequest(
     return unknownFields == other.unknownFields
         && pagination == other.pagination
         && basicInfoOnly == other.basicInfoOnly
+        && searchQuery == other.searchQuery
+        && sort == other.sort
   }
 
   override fun hashCode(): Int {
@@ -56,6 +69,8 @@ class SearchCourseRequest(
       result = unknownFields.hashCode()
       result = result * 37 + pagination.hashCode()
       result = result * 37 + basicInfoOnly.hashCode()
+      result = result * 37 + searchQuery.hashCode()
+      result = result * 37 + sort.hashCode()
       super.hashCode = result
     }
     return result
@@ -65,14 +80,19 @@ class SearchCourseRequest(
     val result = mutableListOf<String>()
     if (pagination != null) result += """pagination=$pagination"""
     if (basicInfoOnly != null) result += """basicInfoOnly=$basicInfoOnly"""
+    if (searchQuery != null) result += """searchQuery=${sanitize(searchQuery)}"""
+    if (sort != null) result += """sort=$sort"""
     return result.joinToString(prefix = "SearchCourseRequest{", separator = ", ", postfix = "}")
   }
 
   fun copy(
     pagination: PaginationInfoRequest? = this.pagination,
     basicInfoOnly: Boolean? = this.basicInfoOnly,
+    searchQuery: String? = this.searchQuery,
+    sort: Sort? = this.sort,
     unknownFields: ByteString = this.unknownFields
-  ): SearchCourseRequest = SearchCourseRequest(pagination, basicInfoOnly, unknownFields)
+  ): SearchCourseRequest = SearchCourseRequest(pagination, basicInfoOnly, searchQuery, sort,
+      unknownFields)
 
   companion object {
     @JvmField
@@ -84,33 +104,44 @@ class SearchCourseRequest(
       override fun encodedSize(value: SearchCourseRequest): Int = 
         PaginationInfoRequest.ADAPTER.encodedSizeWithTag(1, value.pagination) +
         ProtoAdapter.BOOL.encodedSizeWithTag(2, value.basicInfoOnly) +
+        ProtoAdapter.STRING.encodedSizeWithTag(3, value.searchQuery) +
+        Sort.ADAPTER.encodedSizeWithTag(4, value.sort) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: SearchCourseRequest) {
         PaginationInfoRequest.ADAPTER.encodeWithTag(writer, 1, value.pagination)
         ProtoAdapter.BOOL.encodeWithTag(writer, 2, value.basicInfoOnly)
+        ProtoAdapter.STRING.encodeWithTag(writer, 3, value.searchQuery)
+        Sort.ADAPTER.encodeWithTag(writer, 4, value.sort)
         writer.writeBytes(value.unknownFields)
       }
 
       override fun decode(reader: ProtoReader): SearchCourseRequest {
         var pagination: PaginationInfoRequest? = null
         var basicInfoOnly: Boolean? = null
+        var searchQuery: String? = null
+        var sort: Sort? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> pagination = PaginationInfoRequest.ADAPTER.decode(reader)
             2 -> basicInfoOnly = ProtoAdapter.BOOL.decode(reader)
+            3 -> searchQuery = ProtoAdapter.STRING.decode(reader)
+            4 -> sort = Sort.ADAPTER.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
         return SearchCourseRequest(
           pagination = pagination,
           basicInfoOnly = basicInfoOnly,
+          searchQuery = searchQuery,
+          sort = sort,
           unknownFields = unknownFields
         )
       }
 
       override fun redact(value: SearchCourseRequest): SearchCourseRequest = value.copy(
         pagination = value.pagination?.let(PaginationInfoRequest.ADAPTER::redact),
+        sort = value.sort?.let(Sort.ADAPTER::redact),
         unknownFields = ByteString.EMPTY
       )
     }

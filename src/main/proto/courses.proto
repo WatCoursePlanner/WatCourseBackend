@@ -63,6 +63,8 @@ message Sort {
 message SearchCourseRequest {
   optional PaginationInfoRequest pagination = 1;
   optional bool basicInfoOnly = 2; // if true, do not return requisite info
+  optional string searchQuery = 3;
+  optional Sort sort = 4;
 }
 
 message SearchCourseResponse {

@@ -29,13 +29,13 @@ data class DbCourse(
     @Column(columnDefinition = "json") @Type(type = "json")
     var offeringTerms: List<Term>?,
 
-    @OneToOne @JoinColumn
+    @OneToOne(fetch = FetchType.EAGER) @JoinColumn
     var preRequisite: DbRule?,
 
-    @OneToOne @JoinColumn
+    @OneToOne(fetch = FetchType.EAGER) @JoinColumn
     var coRequisite: DbRule?,
 
-    @OneToOne @JoinColumn
+    @OneToOne(fetch = FetchType.EAGER) @JoinColumn
     var antiRequisite: DbRule?,
 
     @Column
@@ -81,5 +81,20 @@ data class DbCourse(
             coRequisite = coRequisite?.toProto(),
             antiRequisite = antiRequisite?.toProto()
         )
+    }
+
+    companion object {
+        fun toBasicInfoProto(proto: CourseInfo): CourseInfo {
+            return CourseInfo(
+                name = proto.name,
+                code = proto.code,
+                id = proto.id,
+                liked = proto.liked,
+                useful = proto.useful,
+                easy = proto.easy,
+                commentsCount = proto.commentsCount,
+                ratingsCount = proto.ratingsCount
+            )
+        }
     }
 }
