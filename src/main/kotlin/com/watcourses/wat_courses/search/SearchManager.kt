@@ -1,23 +1,25 @@
 package com.watcourses.wat_courses.search
 
 import com.watcourses.wat_courses.proto.*
-import com.watcourses.wat_courses.rules.CourseListLoader
+import com.watcourses.wat_courses.search.filters.SearchFilter
 import com.watcourses.wat_courses.utils.CachedData
 import org.springframework.stereotype.Component
 
 @Component
-class SearchManager(private val cachedData: CachedData, private val courseLists: CourseListLoader) {
-    private fun shouldMatchCourse(course: CourseInfo, query: String): Boolean {
-        if (courseLists.getListOrNull(query)?.courses?.contains(course.code!!) == true) return true
-        return course.name!!.contains(query, ignoreCase = true) ||
-                course.description!!.contains(query, ignoreCase = true) ||
-                course.code!!.contains(query, ignoreCase = true)
-    }
-
+class SearchManager(
+    private val cachedData: CachedData,
+    private val filters: List<SearchFilter>
+) {
     private fun filterResults(courses: List<CourseInfo>, query: String?): List<CourseInfo> {
         if (query.isNullOrBlank()) return courses
         val queryParts = query.split(" ").map { it.trim() }
-        return courses.filter { course -> queryParts.all { part -> shouldMatchCourse(course, part) } }
+        return courses.filter { course ->
+            queryParts.all { part -> // a course is considered matched if all queries are matched
+                filters.any { filter -> // a course is considered matched if any filter matches it
+                    filter.match(course, part)
+                }
+            }
+        }
     }
 
     private fun pagination(results: List<CourseInfo>, pagination: PaginationInfoRequest?)
