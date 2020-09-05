@@ -61,8 +61,6 @@ class ApiScheduleService(
         null
     }
 
-    // Extract course info from a course schedule.
-    // e.g. http://www.adm.uwaterloo.ca/cgi-bin/cgiwrap/infocour/salook.pl?level=under&sess=1205&subject=EMLS&cournum=129R
     fun scrapeSchedulePage(courseCode: String, termId: String, inputStream: InputStream): DbCourseSchedule {
         val res = jsonParser.fromJson<CourseScheduleResponse>(
             InputStreamReader(inputStream),
