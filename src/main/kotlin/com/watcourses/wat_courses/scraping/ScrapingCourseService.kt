@@ -74,24 +74,24 @@ class ScrapingCourseService(
 
     // Extract course info from a course page. e.g. http://www.ucalendar.uwaterloo.ca/2021/COURSE/course-CS.html
     fun scrapeCoursePage(doc: Document): List<DbCourse> {
-        return doc.select("center> table > tbody").map { courseElement ->
-            val texts = courseElement.select("tr > td").filterNot { it.text().isEmpty() }
-            val basicInfo = texts.filterNot { it.children().firstOrNull()?.tagName() == "i" }.map { it.text() }
-            val noteInfo = texts.filter { it.children().firstOrNull()?.tagName() == "i" }.map { it.text().trim() }
-            val codeAndCredit = basicInfo[0].split(" ")
+        return doc.select("center > div").map { courseElement ->
+            val texts = courseElement.select("div").filterNot { it.text().isEmpty() }
+            val basicInfo = texts.filterNot { it.children().firstOrNull()?.tagName() == "em" }.map { it.text() }
+            val noteInfo = texts.filter { it.children().firstOrNull()?.tagName() == "em" }.map { it.text().trim() }
+            val codeAndCredit = basicInfo[1].split(" ")
 
             DbCourse(
-                name = basicInfo[2],
+                name = basicInfo[3],
                 code = codeAndCredit.subList(0, 2).joinToString(" "),
-                offeringTerms = extractTermInfoFromDescription(basicInfo[3]),
-                description = basicInfo[3],
+                offeringTerms = extractTermInfoFromDescription(basicInfo[4]),
+                description = basicInfo[4],
                 antiRequisite = noteInfo.find { it.startsWith("Antireq:") }
                     ?.let { DbRule.findOrParse(it, dbRuleRepo) { rawConditionParser.parse(it) } },
                 preRequisite = noteInfo.find { it.startsWith("Prereq:") }
                     ?.let { DbRule.findOrParse(it, dbRuleRepo) { rawConditionParser.parse(it) } },
                 coRequisite = noteInfo.find { it.startsWith("Coreq:") }
                     ?.let { DbRule.findOrParse(it, dbRuleRepo) { rawConditionParser.parse(it) } },
-                courseId = basicInfo[1].let { it.substring(it.lastIndexOf(" ") + 1).trim() }
+                courseId = basicInfo[2].let { it.substring(it.lastIndexOf(" ") + 1).trim() }
             )
         }
     }
