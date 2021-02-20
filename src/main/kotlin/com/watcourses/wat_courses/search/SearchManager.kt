@@ -23,8 +23,7 @@ class SearchManager(
         }
     }
 
-    private fun pagination(results: List<CourseInfo>, pagination: PaginationInfoRequest?)
-        : SearchResult {
+    private fun pagination(results: List<CourseInfo>, pagination: PaginationInfoRequest?): SearchResult {
         val page = pagination?.zeroBasedPage ?: 0
         val size = pagination?.limit ?: 30
         return SearchResult(
@@ -79,7 +78,7 @@ class SearchManager(
         return search(dbCourseRepo.findAll().map { it!!.toProto() }, request)
     }
 
-    class SearchResult (
+    class SearchResult(
         val courses: List<CourseInfo>,
         val paginationInfoResponse: PaginationInfoResponse,
     )
