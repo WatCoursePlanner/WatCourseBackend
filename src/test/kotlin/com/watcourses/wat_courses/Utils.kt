@@ -21,4 +21,18 @@ class Utils(private val dbCourseRepo: DbCourseRepo) {
                 )
             )
         }
+
+    fun createCourse(code: String, name: String) =
+        dbCourseRepo.save(
+            DbCourse(
+                name = name,
+                code = code,
+                antiRequisite = null,
+                coRequisite = null,
+                description = "",
+                offeringTerms = null,
+                preRequisite = null,
+                courseId = code
+            )
+        )
 }
