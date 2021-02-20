@@ -24,9 +24,9 @@ class SearchManagerTests {
 
     @Test
     fun `results are properly sorted`() {
-        utils.createCourse(code = "CS 1", name = "B")
-        utils.createCourse(code = "CS 2", name = "C")
-        utils.createCourse(code = "CS 3", name = "A")
+        utils.createSingleCourse(code = "CS 1", name = "B")
+        utils.createSingleCourse(code = "CS 2", name = "C")
+        utils.createSingleCourse(code = "CS 3", name = "A")
 
         // by code asc
         var request = SearchCourseRequest(

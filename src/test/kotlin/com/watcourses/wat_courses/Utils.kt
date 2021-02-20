@@ -22,7 +22,7 @@ class Utils(private val dbCourseRepo: DbCourseRepo) {
             )
         }
 
-    fun createCourse(code: String, name: String) =
+    fun createSingleCourse(code: String, name: String) =
         dbCourseRepo.save(
             DbCourse(
                 name = name,
