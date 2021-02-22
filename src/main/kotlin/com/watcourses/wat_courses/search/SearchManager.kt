@@ -1,6 +1,5 @@
 package com.watcourses.wat_courses.search
 
-import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.*
 import com.watcourses.wat_courses.search.filters.SearchFilter
 import com.watcourses.wat_courses.utils.CachedData
@@ -54,12 +53,10 @@ class SearchManager(
         return sortOrderedBy(
             list = results,
             order = sort.order,
-            selector = {
-                when (sort.sortBy) {
-                    Sort.SortBy.TITLE -> it.name
-                    Sort.SortBy.CODE -> it.code
-                    else -> it.ratingsCount
-                }
+            selector = when (sort.sortBy) {
+                Sort.SortBy.TITLE -> { it -> it.name }
+                Sort.SortBy.CODE -> { it -> it.code }
+                else -> { it -> it.ratingsCount }
             }
         )
     }
