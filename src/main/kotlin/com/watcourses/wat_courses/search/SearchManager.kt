@@ -74,10 +74,6 @@ class SearchManager(
         return search(cachedData.allCourses(), request)
     }
 
-    fun search(request: SearchCourseRequest, dbCourseRepo: DbCourseRepo): SearchResult {
-        return search(dbCourseRepo.findAll().map { it!!.toProto() }, request)
-    }
-
     class SearchResult(
         val courses: List<CourseInfo>,
         val paginationInfoResponse: PaginationInfoResponse,

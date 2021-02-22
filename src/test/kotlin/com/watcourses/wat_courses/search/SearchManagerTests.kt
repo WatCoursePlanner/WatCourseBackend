@@ -4,6 +4,7 @@ import com.watcourses.wat_courses.Utils
 import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.SearchCourseRequest
 import com.watcourses.wat_courses.proto.Sort
+import com.watcourses.wat_courses.utils.CachedData
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,13 +18,15 @@ class SearchManagerTests {
     private lateinit var searchManager: SearchManager
 
     @Autowired
-    private lateinit var dbCourseRepo: DbCourseRepo
+    private lateinit var utils: Utils
 
     @Autowired
-    private lateinit var utils: Utils
+    private lateinit var cachedData: CachedData
 
     @Test
     fun `results are properly sorted`() {
+        cachedData.invalidateAllCourses()
+
         utils.createSingleCourse(code = "CS 1", name = "B")
         utils.createSingleCourse(code = "CS 2", name = "C")
         utils.createSingleCourse(code = "CS 3", name = "A")
@@ -36,7 +39,7 @@ class SearchManagerTests {
                 order = Sort.Order.ASC,
             ),
         )
-        var paginatedResults = searchManager.search(request, dbCourseRepo).courses
+        var paginatedResults = searchManager.search(request).courses
         assertThat(paginatedResults.map { it.code }).containsExactly(
             "CS 1",
             "CS 2",
@@ -51,7 +54,7 @@ class SearchManagerTests {
                 order = Sort.Order.DESC,
             ),
         )
-        paginatedResults = searchManager.search(request, dbCourseRepo).courses
+        paginatedResults = searchManager.search(request).courses
         assertThat(paginatedResults.map { it.code }).containsExactly(
             "CS 3",
             "CS 2",
@@ -66,7 +69,7 @@ class SearchManagerTests {
                 order = Sort.Order.DESC,
             ),
         )
-        paginatedResults = searchManager.search(request, dbCourseRepo).courses
+        paginatedResults = searchManager.search(request).courses
         assertThat(paginatedResults.map { it.name }).containsExactly(
             "C",
             "B",
