@@ -29,10 +29,10 @@ class CourseInfoApi(
 
     @PostMapping("/course/search")
     fun searchCourse(@RequestBody request: SearchCourseRequest): SearchCourseResponse {
-        val (paginatedResults, paginationInfo) = searchManager.search(request)
+        val result = searchManager.search(request)
         return SearchCourseResponse(
-            pagination = paginationInfo,
-            results = paginatedResults.map { DbCourse.toBasicInfoProto(it) }
+            pagination = result.paginationInfoResponse,
+            results = result.courses.map { DbCourse.toBasicInfoProto(it) }
         )
     }
 

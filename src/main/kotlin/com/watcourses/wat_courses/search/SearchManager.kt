@@ -22,11 +22,10 @@ class SearchManager(
         }
     }
 
-    private fun pagination(results: List<CourseInfo>, pagination: PaginationInfoRequest?)
-            : Pair<List<CourseInfo>, PaginationInfoResponse> {
+    private fun pagination(results: List<CourseInfo>, pagination: PaginationInfoRequest?): SearchResult {
         val page = pagination?.zeroBasedPage ?: 0
         val size = pagination?.limit ?: 30
-        return Pair(
+        return SearchResult(
             results.drop(page * size).take(size),
             PaginationInfoResponse(
                 totalPages = (results.size + size - 1) / size,
@@ -39,13 +38,41 @@ class SearchManager(
 
     private fun defaultSort() = Sort(sortBy = Sort.SortBy.TITLE, order = Sort.Order.ASC)
 
-    fun sortResults(results: List<CourseInfo>, sort: Sort): List<CourseInfo> {
-        return results.sortedByDescending { it.ratingsCount }
+    private fun <T> sortOrderedBy(
+        list: List<T>,
+        order: Sort.Order?,
+        selector: (T) -> Comparable<*>?
+    ): List<T> {
+        return when (order ?: Sort.Order.ASC) {
+            Sort.Order.ASC -> list.sortedWith(compareBy(selector))
+            Sort.Order.DESC -> list.sortedWith(compareByDescending(selector))
+        }
     }
 
-    fun search(request: SearchCourseRequest): Pair<List<CourseInfo>, PaginationInfoResponse> {
-        val result = filterResults(cachedData.allCourses(), request.searchQuery)
+    private fun sortResults(results: List<CourseInfo>, sort: Sort): List<CourseInfo> {
+        return sortOrderedBy(
+            list = results,
+            order = sort.order,
+            selector = when (sort.sortBy) {
+                Sort.SortBy.TITLE -> { it -> it.name }
+                Sort.SortBy.CODE -> { it -> it.code }
+                else -> { it -> it.ratingsCount }
+            }
+        )
+    }
+
+    private fun search(courses: List<CourseInfo>, request: SearchCourseRequest): SearchResult {
+        val result = filterResults(courses, request.searchQuery)
         val sortedResult = sortResults(result, request.sort ?: defaultSort())
         return pagination(sortedResult, request.pagination)
     }
+
+    fun search(request: SearchCourseRequest): SearchResult {
+        return search(cachedData.allCourses(), request)
+    }
+
+    class SearchResult(
+        val courses: List<CourseInfo>,
+        val paginationInfoResponse: PaginationInfoResponse,
+    )
 }
