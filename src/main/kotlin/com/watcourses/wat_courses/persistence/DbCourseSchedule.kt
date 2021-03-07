@@ -29,10 +29,6 @@ data class DbCourseSchedule(
     @Column
     var enrolledCap: Int,
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    var owner: DbUser? = null,
-
     @Id @GeneratedValue
     var id: Long? = null
 )
