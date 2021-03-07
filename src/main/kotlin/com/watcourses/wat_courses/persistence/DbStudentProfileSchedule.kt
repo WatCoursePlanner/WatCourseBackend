@@ -9,7 +9,7 @@ import javax.persistence.*
 @Table(name = "student_profile_schedules")
 data class DbStudentProfileSchedule(
     @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn
+    @JoinColumn(name = "student_profile_id")
     var terms: MutableList<DbTermSchedule> = mutableListOf(),
 
     @Id @GeneratedValue

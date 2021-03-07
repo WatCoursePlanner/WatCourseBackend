@@ -20,8 +20,12 @@ data class DbStudentProfile(
     @Column(name = "degree")
     var degrees: MutableList<String> = mutableListOf(),
 
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "student_profile_shortlist_courses",
+        joinColumns = [JoinColumn(name = "student_profile_id")],
+        inverseJoinColumns = [JoinColumn(name = "course_id")],
+    )
     var shortListCourses: MutableList<DbCourse> = mutableListOf(),
 
     @OneToOne(fetch = FetchType.LAZY)

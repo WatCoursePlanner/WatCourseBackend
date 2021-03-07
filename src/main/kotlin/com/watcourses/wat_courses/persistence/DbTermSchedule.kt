@@ -7,8 +7,8 @@ import javax.persistence.*
 @Entity(name = "term_schedule")
 @Table(name = "term_schedules")
 data class DbTermSchedule(
-    @OneToMany(fetch = FetchType.LAZY)
-    @JoinColumn
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "term_schedule_courses")
     var courses: MutableList<DbCourse> = mutableListOf(),
 
     @Column
