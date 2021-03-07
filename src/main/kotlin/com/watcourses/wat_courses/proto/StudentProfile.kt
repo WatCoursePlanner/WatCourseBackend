@@ -46,6 +46,11 @@ class StudentProfile(
     label = WireField.Label.REPEATED
   )
   val shortList: List<String> = emptyList(),
+  @field:WireField(
+    tag = 5,
+    adapter = "com.squareup.wire.ProtoAdapter#STRING"
+  )
+  val ownerEmail: String? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<StudentProfile, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -62,6 +67,7 @@ class StudentProfile(
         && labels == other.labels
         && degrees == other.degrees
         && shortList == other.shortList
+        && ownerEmail == other.ownerEmail
   }
 
   override fun hashCode(): Int {
@@ -72,6 +78,7 @@ class StudentProfile(
       result = result * 37 + labels.hashCode()
       result = result * 37 + degrees.hashCode()
       result = result * 37 + shortList.hashCode()
+      result = result * 37 + ownerEmail.hashCode()
       super.hashCode = result
     }
     return result
@@ -83,6 +90,7 @@ class StudentProfile(
     if (labels.isNotEmpty()) result += """labels=${sanitize(labels)}"""
     if (degrees.isNotEmpty()) result += """degrees=${sanitize(degrees)}"""
     if (shortList.isNotEmpty()) result += """shortList=${sanitize(shortList)}"""
+    if (ownerEmail != null) result += """ownerEmail=${sanitize(ownerEmail)}"""
     return result.joinToString(prefix = "StudentProfile{", separator = ", ", postfix = "}")
   }
 
@@ -91,8 +99,10 @@ class StudentProfile(
     labels: List<String> = this.labels,
     degrees: List<String> = this.degrees,
     shortList: List<String> = this.shortList,
+    ownerEmail: String? = this.ownerEmail,
     unknownFields: ByteString = this.unknownFields
-  ): StudentProfile = StudentProfile(schedule, labels, degrees, shortList, unknownFields)
+  ): StudentProfile = StudentProfile(schedule, labels, degrees, shortList, ownerEmail,
+      unknownFields)
 
   companion object {
     @JvmField
@@ -106,6 +116,7 @@ class StudentProfile(
         ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(2, value.labels) +
         ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(3, value.degrees) +
         ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(4, value.shortList) +
+        ProtoAdapter.STRING.encodedSizeWithTag(5, value.ownerEmail) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: StudentProfile) {
@@ -113,6 +124,7 @@ class StudentProfile(
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 2, value.labels)
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 3, value.degrees)
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 4, value.shortList)
+        ProtoAdapter.STRING.encodeWithTag(writer, 5, value.ownerEmail)
         writer.writeBytes(value.unknownFields)
       }
 
@@ -121,12 +133,14 @@ class StudentProfile(
         val labels = mutableListOf<String>()
         val degrees = mutableListOf<String>()
         val shortList = mutableListOf<String>()
+        var ownerEmail: String? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> schedule = Schedule.ADAPTER.decode(reader)
             2 -> labels.add(ProtoAdapter.STRING.decode(reader))
             3 -> degrees.add(ProtoAdapter.STRING.decode(reader))
             4 -> shortList.add(ProtoAdapter.STRING.decode(reader))
+            5 -> ownerEmail = ProtoAdapter.STRING.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
@@ -135,6 +149,7 @@ class StudentProfile(
           labels = labels,
           degrees = degrees,
           shortList = shortList,
+          ownerEmail = ownerEmail,
           unknownFields = unknownFields
         )
       }

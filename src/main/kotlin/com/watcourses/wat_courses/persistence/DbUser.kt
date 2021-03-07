@@ -36,6 +36,7 @@ data class DbUser(
     @Column
     var data: String? = null,
 
+    // TODO make this non-nullable?
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn
     var studentProfile: DbStudentProfile? = null,
@@ -48,7 +49,8 @@ data class DbUser(
             firstName = firstName,
             lastName = lastName,
             email = email,
-            pictureUrl = pictureUrl
+            pictureUrl = pictureUrl,
+            studentProfile = studentProfile?.toProto(),
         )
     }
 }

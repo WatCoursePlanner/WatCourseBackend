@@ -11,15 +11,15 @@ data class DbTermSchedule(
     @JoinColumn
     var courses: MutableList<DbCourse> = mutableListOf(),
 
-    @Column(nullable = false)
-    var name: String,
+    @Column
+    var name: String? = null,
 
-    @Column(nullable = false)
-    var year: Int,
+    @Column
+    var year: Int? = null,
 
-    @Column(nullable = false)
+    @Column
     @Enumerated(EnumType.STRING)
-    var term: Term,
+    var term: Term? = null,
 
     @Id @GeneratedValue
     var id: Long? = null
@@ -31,5 +31,41 @@ data class DbTermSchedule(
             year = year,
             term = term
         )
+    }
+
+    companion object {
+        fun create(
+            dbTermScheduleRepo: DbTermScheduleRepo,
+            courses: MutableList<DbCourse>,
+            name: String,
+            year: Int,
+            term: Term,
+        ): DbTermSchedule {
+            val dbTermSchedule = DbTermSchedule(
+                courses = courses,
+                name = name,
+                year = year,
+                term = term,
+            )
+            dbTermScheduleRepo.save(dbTermSchedule)
+            return dbTermSchedule
+        }
+
+        fun create(
+            dbTermScheduleRepo: DbTermScheduleRepo,
+            dbCourseRepo: DbCourseRepo,
+            termSchedule: Schedule.TermSchedule,
+        ): DbTermSchedule {
+            val orderOf = termSchedule.courseCodes.mapIndexed { index, code -> code to index }.toMap()
+            val dbCourses = dbCourseRepo.findAllByCodeIn(termSchedule.courseCodes).sortedBy { orderOf[it.code] }
+            val dbTermSchedule = DbTermSchedule(
+                courses = dbCourses.toMutableList(),
+                name = termSchedule.termName,
+                year = termSchedule.year,
+                term = termSchedule.term,
+            )
+            dbTermScheduleRepo.save(dbTermSchedule)
+            return dbTermSchedule
+        }
     }
 }
