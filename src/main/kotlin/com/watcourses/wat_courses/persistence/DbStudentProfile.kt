@@ -1,6 +1,5 @@
 package com.watcourses.wat_courses.persistence
 
-import com.watcourses.wat_courses.proto.Schedule
 import com.watcourses.wat_courses.proto.StudentProfile
 import javax.persistence.*
 
@@ -14,12 +13,12 @@ data class DbStudentProfile(
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "student_profile_labels", joinColumns = [JoinColumn(name = "student_profile_id")])
     @Column(name = "degree")
-    var labels: MutableSet<String> = mutableSetOf(),
+    var labels: MutableList<String> = mutableListOf(),
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "student_profile_degrees", joinColumns = [JoinColumn(name = "student_profile_id")])
     @Column(name = "degree")
-    var degrees: MutableSet<String> = mutableSetOf(),
+    var degrees: MutableList<String> = mutableListOf(),
 
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn
@@ -53,8 +52,8 @@ data class DbStudentProfile(
         ): DbStudentProfile {
             val dbStudentProfile = DbStudentProfile(
                 schedule = schedule,
-                labels = labels.toMutableSet(),
-                degrees = degrees.toMutableSet(),
+                labels = labels,
+                degrees = degrees,
                 shortListCourses = shortList,
                 owner = owner,
             )
