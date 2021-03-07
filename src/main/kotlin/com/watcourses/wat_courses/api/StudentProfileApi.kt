@@ -1,15 +1,27 @@
 package com.watcourses.wat_courses.api
 
+import com.watcourses.wat_courses.persistence.DbCourseRepo
+import com.watcourses.wat_courses.persistence.DbStudentProfile
+import com.watcourses.wat_courses.persistence.DbStudentProfileRepo
+import com.watcourses.wat_courses.persistence.DbStudentProfileSchedule
+import com.watcourses.wat_courses.persistence.DbStudentProfileScheduleRepo
+import com.watcourses.wat_courses.persistence.DbTermScheduleRepo
 import com.watcourses.wat_courses.proto.*
 import com.watcourses.wat_courses.rules.Checker
 import com.watcourses.wat_courses.rules.DegreeRequirementLoader
 import com.watcourses.wat_courses.utils.create
 import com.watcourses.wat_courses.utils.unionFlatten
 import org.springframework.web.bind.annotation.*
+import javax.transaction.Transactional
 
+@Transactional
 @RestController
 class StudentProfileApi(
     private val degreeRequirementLoader: DegreeRequirementLoader,
+    private val dbStudentProfileScheduleRepo: DbStudentProfileScheduleRepo,
+    private val dbStudentProfileRepo: DbStudentProfileRepo,
+    private val dbTermScheduleRepo: DbTermScheduleRepo,
+    private val dbCourseRepo: DbCourseRepo,
     private val checker: Checker
 ) {
     @GetMapping("/profile/default")
@@ -33,11 +45,20 @@ class StudentProfileApi(
         val importedSchedule = request.schedule
         val mergedSchedule = importedSchedule?.let { mergeSchedule(it, defaultSchedule) } ?: defaultSchedule
 
-        return StudentProfile(
-            schedule = Schedule.create(mergedSchedule, startingYear, stream),
-            degrees = degrees,
-            labels = degreeRequirements.map { it.labels.toSet() }.unionFlatten().toList()
+        val dbStudentProfile = DbStudentProfile.create(
+            dbStudentProfileRepo = dbStudentProfileRepo,
+            schedule = DbStudentProfileSchedule.create(
+                dbStudentProfileScheduleRepo = dbStudentProfileScheduleRepo,
+                dbTermScheduleRepo = dbTermScheduleRepo,
+                dbCourseRepo = dbCourseRepo,
+                schedule = Schedule.create(mergedSchedule, startingYear, stream),
+            ),
+            degrees = degrees.toMutableList(),
+            labels = degreeRequirements.map { it.labels.toSet() }.unionFlatten().toMutableList(),
+            owner = null,
         )
+
+        return dbStudentProfile.toProto()
     }
 
     @PostMapping("/profile/check")

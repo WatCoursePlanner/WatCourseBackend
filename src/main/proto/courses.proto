@@ -104,6 +104,7 @@ message StudentProfile {
   repeated string labels = 2;
   repeated string degrees = 3;
   repeated string shortList = 4;
+  optional string ownerEmail = 5;
 }
 
 message CreateStudentProfileRequest {

@@ -42,6 +42,11 @@ class UserInfo(
     adapter = "com.squareup.wire.ProtoAdapter#STRING"
   )
   val pictureUrl: String? = null,
+  @field:WireField(
+    tag = 5,
+    adapter = "com.watcourses.wat_courses.proto.StudentProfile#ADAPTER"
+  )
+  val studentProfile: StudentProfile? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<UserInfo, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -58,6 +63,7 @@ class UserInfo(
         && lastName == other.lastName
         && email == other.email
         && pictureUrl == other.pictureUrl
+        && studentProfile == other.studentProfile
   }
 
   override fun hashCode(): Int {
@@ -68,6 +74,7 @@ class UserInfo(
       result = result * 37 + lastName.hashCode()
       result = result * 37 + email.hashCode()
       result = result * 37 + pictureUrl.hashCode()
+      result = result * 37 + studentProfile.hashCode()
       super.hashCode = result
     }
     return result
@@ -79,6 +86,7 @@ class UserInfo(
     if (lastName != null) result += """lastName=${sanitize(lastName)}"""
     if (email != null) result += """email=${sanitize(email)}"""
     if (pictureUrl != null) result += """pictureUrl=${sanitize(pictureUrl)}"""
+    if (studentProfile != null) result += """studentProfile=$studentProfile"""
     return result.joinToString(prefix = "UserInfo{", separator = ", ", postfix = "}")
   }
 
@@ -87,8 +95,9 @@ class UserInfo(
     lastName: String? = this.lastName,
     email: String? = this.email,
     pictureUrl: String? = this.pictureUrl,
+    studentProfile: StudentProfile? = this.studentProfile,
     unknownFields: ByteString = this.unknownFields
-  ): UserInfo = UserInfo(firstName, lastName, email, pictureUrl, unknownFields)
+  ): UserInfo = UserInfo(firstName, lastName, email, pictureUrl, studentProfile, unknownFields)
 
   companion object {
     @JvmField
@@ -102,6 +111,7 @@ class UserInfo(
         ProtoAdapter.STRING.encodedSizeWithTag(2, value.lastName) +
         ProtoAdapter.STRING.encodedSizeWithTag(3, value.email) +
         ProtoAdapter.STRING.encodedSizeWithTag(4, value.pictureUrl) +
+        StudentProfile.ADAPTER.encodedSizeWithTag(5, value.studentProfile) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: UserInfo) {
@@ -109,6 +119,7 @@ class UserInfo(
         ProtoAdapter.STRING.encodeWithTag(writer, 2, value.lastName)
         ProtoAdapter.STRING.encodeWithTag(writer, 3, value.email)
         ProtoAdapter.STRING.encodeWithTag(writer, 4, value.pictureUrl)
+        StudentProfile.ADAPTER.encodeWithTag(writer, 5, value.studentProfile)
         writer.writeBytes(value.unknownFields)
       }
 
@@ -117,12 +128,14 @@ class UserInfo(
         var lastName: String? = null
         var email: String? = null
         var pictureUrl: String? = null
+        var studentProfile: StudentProfile? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> firstName = ProtoAdapter.STRING.decode(reader)
             2 -> lastName = ProtoAdapter.STRING.decode(reader)
             3 -> email = ProtoAdapter.STRING.decode(reader)
             4 -> pictureUrl = ProtoAdapter.STRING.decode(reader)
+            5 -> studentProfile = StudentProfile.ADAPTER.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
@@ -131,11 +144,13 @@ class UserInfo(
           lastName = lastName,
           email = email,
           pictureUrl = pictureUrl,
+          studentProfile = studentProfile,
           unknownFields = unknownFields
         )
       }
 
       override fun redact(value: UserInfo): UserInfo = value.copy(
+        studentProfile = value.studentProfile?.let(StudentProfile.ADAPTER::redact),
         unknownFields = ByteString.EMPTY
       )
     }
