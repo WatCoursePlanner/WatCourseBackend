@@ -12,7 +12,7 @@ data class DbStudentProfile(
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "student_profile_labels", joinColumns = [JoinColumn(name = "student_profile_id")])
-    @Column(name = "degree")
+    @Column(name = "label")
     var labels: MutableList<String> = mutableListOf(),
 
     @ElementCollection(fetch = FetchType.LAZY)
