@@ -1,5 +1,7 @@
 package com.watcourses.wat_courses.proto;
 
+import "user.proto";
+
 enum Term {
   SPRING = 0;
   WINTER = 1;
@@ -104,6 +106,7 @@ message StudentProfile {
   repeated string labels = 2;
   repeated string degrees = 3;
   repeated string shortList = 4;
+  optional UserInfo owner = 5;
 }
 
 message CreateStudentProfileRequest {

@@ -36,6 +36,10 @@ data class DbUser(
     @Column
     var data: String? = null,
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn
+    var studentProfile: DbStudentProfile? = null,
+
     @Id @GeneratedValue
     var id: Long? = null
 ) {
