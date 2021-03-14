@@ -100,6 +100,7 @@ class StudentProfileApi(
 
     @PostMapping("/profile/create-or-update")
     fun createOrUpdateStudentProfile(@RequestBody studentProfile: StudentProfile): StudentProfile {
+        // TODO check session for permission
         val owner = dbUserRepo.findByEmail(
             studentProfile.ownerEmail ?: throw ResponseStatusException(
                 HttpStatus.NOT_FOUND, "No owner provided"
