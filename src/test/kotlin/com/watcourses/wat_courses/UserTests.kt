@@ -37,7 +37,7 @@ class UserTests {
             assertThat(lastName).isEqualTo("last")
             assertThat(email).isEqualTo("test@example.com")
         }
-        assertThat(resp.cookies[0].name).isEqualTo("session")
+        assertThat(resp.cookies[0].name).isEqualTo("watcourses_session")
         val sessionValue = resp.cookies[0].value
         assertThat(sessionValue).isNotEmpty()
 
@@ -87,7 +87,7 @@ class UserTests {
             assertThat(lastName).isEqualTo("last")
             assertThat(email).isEqualTo("test@example.com")
         }
-        val newSessionId = resp2.cookies.single { it.name == "session" }.value
+        val newSessionId = resp2.cookies.single { it.name == "watcourses_session" }.value
         assertThat(newSessionId).isNotEmpty()
         assertThat(newSessionId).isNotEqualTo(sessionValue)
     }
