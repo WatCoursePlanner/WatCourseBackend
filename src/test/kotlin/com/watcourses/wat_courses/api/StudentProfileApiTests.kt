@@ -4,6 +4,7 @@ import com.watcourses.wat_courses.Utils
 import com.watcourses.wat_courses.persistence.DbStudentProfileRepo
 import com.watcourses.wat_courses.persistence.DbUserRepo
 import com.watcourses.wat_courses.proto.CoopStream
+import com.watcourses.wat_courses.proto.CreateDefaultStudentProfileRequest
 import com.watcourses.wat_courses.proto.CreateStudentProfileRequest
 import com.watcourses.wat_courses.proto.Schedule
 import com.watcourses.wat_courses.proto.StudentProfile
@@ -44,6 +45,25 @@ class StudentProfileApiTests {
         )
         assertThat(studentProfile).isEqualTo(SAMPLE_PROFILE)
         assertThat(dbStudentProfileRepo.findAll().single()!!.toProto()).isEqualTo(SAMPLE_PROFILE)
+    }
+
+    @Test
+    fun `create default student profile`() {
+        utils.createCourses(SAMPLE_PROFILE.allCourseCodes())
+        val ownerEmail = "a@b.com"
+        utils.createUserWithEmail(ownerEmail)
+        val profileWithOwnerEmail = SAMPLE_PROFILE.copy(ownerEmail = ownerEmail)
+        val studentProfile = studentProfileApi.createDefaultStudentProfile(
+            CreateDefaultStudentProfileRequest(
+                degrees = listOf("Software Engineering"),
+                startingYear = 2019,
+                coopStream = CoopStream.STREAM_8,
+                ownerEmail = ownerEmail,
+            )
+        )
+        assertThat(studentProfile).isEqualTo(profileWithOwnerEmail)
+        assertThat(dbStudentProfileRepo.findAll().single()!!.toProto()).isEqualTo(profileWithOwnerEmail)
+        assertThat(dbUserRepo.findByEmail(ownerEmail)!!.studentProfile!!.toProto()).isEqualTo(profileWithOwnerEmail)
     }
 
     @Test

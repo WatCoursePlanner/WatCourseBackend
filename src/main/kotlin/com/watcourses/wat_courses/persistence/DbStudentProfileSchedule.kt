@@ -31,18 +31,15 @@ data class DbStudentProfileSchedule(
             existingDbStudentProfileSchedule: DbStudentProfileSchedule?,
         ): DbStudentProfileSchedule {
             val dbStudentProfileSchedule = existingDbStudentProfileSchedule ?: DbStudentProfileSchedule()
-            val newTerms = mutableListOf<DbTermSchedule>()
-            for (termSchedule in schedule.terms) {
-                newTerms.add(
-                    DbTermSchedule.createOrUpdate(
-                        dbTermScheduleRepo = dbTermScheduleRepo,
-                        dbCourseRepo = dbCourseRepo,
-                        termSchedule = termSchedule,
-                        existingDbTermSchedule = dbStudentProfileSchedule.terms
-                            .singleOrNull { it.name == termSchedule.termName },
-                    )
+            val newTerms = schedule.terms.map { termSchedule ->
+                DbTermSchedule.createOrUpdate(
+                    dbTermScheduleRepo = dbTermScheduleRepo,
+                    dbCourseRepo = dbCourseRepo,
+                    termSchedule = termSchedule,
+                    existingDbTermSchedule = dbStudentProfileSchedule.terms
+                        .singleOrNull { it.name == termSchedule.termName },
                 )
-            }
+            }.toMutableList()
 
             val newTermNames = newTerms.map { it.name }.toSet()
             dbStudentProfileSchedule.terms

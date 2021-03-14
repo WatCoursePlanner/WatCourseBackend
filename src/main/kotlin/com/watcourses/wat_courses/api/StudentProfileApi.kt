@@ -68,9 +68,13 @@ class StudentProfileApi(
     }
 
     fun createDefaultStudentProfile(@RequestBody request: CreateDefaultStudentProfileRequest): StudentProfile {
-        val owner = dbUserRepo.findByEmail(request.ownerEmail!!) ?: throw ResponseStatusException(
-            HttpStatus.NOT_FOUND, "User with email ${request.ownerEmail} is not found"
-        )
+        // TODO check session for permission
+        val ownerEmail = request.ownerEmail ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No owner provided")
+        val owner = dbUserRepo.findByEmail(ownerEmail)
+            ?: throw ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User with email ${request.ownerEmail} is not found"
+            )
         val degrees = request.degrees
         val degreeRequirements = degrees.map { degreeRequirementLoader.getDegreeRequirement(it)!! }
         val startingYear = request.startingYear!!
@@ -94,20 +98,21 @@ class StudentProfileApi(
             labels = degreeRequirements.map { it.labels.toSet() }.unionFlatten().toMutableList(),
             owner = owner,
         )
-
+        owner.studentProfile = dbStudentProfile
+        dbUserRepo.save(owner)
         return dbStudentProfile.toProto()
     }
 
     @PostMapping("/profile/create-or-update")
     fun createOrUpdateStudentProfile(@RequestBody studentProfile: StudentProfile): StudentProfile {
         // TODO check session for permission
-        val owner = dbUserRepo.findByEmail(
-            studentProfile.ownerEmail ?: throw ResponseStatusException(
-                HttpStatus.NOT_FOUND, "No owner provided"
+        val ownerEmail = studentProfile.ownerEmail
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No owner provided")
+        val owner = dbUserRepo.findByEmail(ownerEmail)
+            ?: throw ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "User with email ${studentProfile.ownerEmail} is not found"
             )
-        ) ?: throw ResponseStatusException(
-            HttpStatus.NOT_FOUND, "User with email ${studentProfile.ownerEmail} is not found"
-        )
         val dbStudentProfile = DbStudentProfile.createOrUpdate(
             dbStudentProfileScheduleRepo = dbStudentProfileScheduleRepo,
             dbTermScheduleRepo = dbTermScheduleRepo,
