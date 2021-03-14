@@ -2,6 +2,7 @@ package com.watcourses.wat_courses.persistence
 
 import com.watcourses.wat_courses.proto.Schedule
 import com.watcourses.wat_courses.proto.Term
+import org.springframework.data.repository.findByIdOrNull
 import javax.persistence.*
 
 @Entity(name = "term_schedule")
@@ -51,21 +52,22 @@ data class DbTermSchedule(
             return dbTermSchedule
         }
 
-        fun create(
+        fun createOrUpdate(
             dbTermScheduleRepo: DbTermScheduleRepo,
             dbCourseRepo: DbCourseRepo,
             termSchedule: Schedule.TermSchedule,
+            existingDbTermSchedule: DbTermSchedule?,
         ): DbTermSchedule {
             val orderOf = termSchedule.courseCodes.mapIndexed { index, code -> code to index }.toMap()
             val dbCourses = dbCourseRepo.findAllByCodeIn(termSchedule.courseCodes).sortedBy { orderOf[it.code] }
-            val dbTermSchedule = DbTermSchedule(
-                courses = dbCourses.toMutableList(),
-                name = termSchedule.termName,
-                year = termSchedule.year,
-                term = termSchedule.term,
-            )
-            dbTermScheduleRepo.save(dbTermSchedule)
-            return dbTermSchedule
+            val dbTermSchedule = existingDbTermSchedule ?: DbTermSchedule()
+
+            dbTermSchedule.courses = dbCourses.toMutableList()
+            dbTermSchedule.name = termSchedule.termName
+            dbTermSchedule.year = termSchedule.year
+            dbTermSchedule.term = termSchedule.term
+
+            return dbTermScheduleRepo.save(dbTermSchedule)
         }
     }
 }
