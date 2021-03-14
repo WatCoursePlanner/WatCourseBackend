@@ -25,6 +25,7 @@ class WatCoursesApplication(private val redisProperties: RedisProperties) {
                 registry.addMapping("/**")
                     .allowedOrigins("http://localhost:3000", "https://watcourses.com")
                     .allowedMethods("*")
+                    .allowCredentials(true)
             }
         }
     }

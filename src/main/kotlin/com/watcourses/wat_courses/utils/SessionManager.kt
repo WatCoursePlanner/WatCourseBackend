@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 private const val LENGTH = 20
+private const val SESSION_COOKIE_NAME = "watcourses_session"
 
 @Component
 class SessionManager(private val dbUserRepo: DbUserRepo) {
@@ -20,7 +21,7 @@ class SessionManager(private val dbUserRepo: DbUserRepo) {
 
     fun generateAndSendSessionId(response: HttpServletResponse, dbUser: DbUser) {
         dbUser.sessionId = generateSessionId()
-        val cookie = Cookie("session", dbUser.sessionId)
+        val cookie = Cookie(SESSION_COOKIE_NAME, dbUser.sessionId)
         cookie.isHttpOnly = true
         cookie.path = "/"
         cookie.secure = true
@@ -29,7 +30,7 @@ class SessionManager(private val dbUserRepo: DbUserRepo) {
     }
 
     fun getSessionId(request: HttpServletRequest): String? {
-        return request.cookies?.find { it.name == "session" }?.value
+        return request.cookies?.findLast { it.name == SESSION_COOKIE_NAME }?.value
     }
 
     fun getCurrentUser(request: HttpServletRequest): DbUser? {
