@@ -9,10 +9,12 @@ import com.watcourses.wat_courses.persistence.DbUserRepo
 import com.watcourses.wat_courses.proto.*
 import com.watcourses.wat_courses.utils.PasswordEncoder
 import com.watcourses.wat_courses.utils.SessionManager
+import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -74,7 +76,7 @@ class UserApi(
             firstName = firstName,
             lastName = lastName,
             password = passwordEncoder.hash(password),
-            sessionId = ""
+            sessionId = "",
         )
 
         sessionManager.generateAndSendSessionId(response, dbUser)
@@ -140,5 +142,10 @@ class UserApi(
     @PostMapping("/user/data")
     fun getData(httpRequest: HttpServletRequest): String {
         return sessionManager.getCurrentUser(httpRequest)?.data ?: ""
+    }
+
+    @PostMapping("/user/get")
+    fun getUser(httpRequest: HttpServletRequest): GetUserResponse {
+        return GetUserResponse(user = sessionManager.getCurrentUser(httpRequest)?.toProto())
     }
 }

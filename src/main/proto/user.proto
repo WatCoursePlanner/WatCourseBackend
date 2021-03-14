@@ -38,3 +38,7 @@ message GoogleLoginOrRegisterRequest {
 message SetUserDataRequest {
   optional string data = 1;
 }
+
+message GetUserResponse {
+  optional UserInfo user = 1;
+}
