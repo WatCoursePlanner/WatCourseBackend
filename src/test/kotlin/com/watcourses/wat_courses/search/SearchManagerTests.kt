@@ -1,7 +1,5 @@
 package com.watcourses.wat_courses.search
 
-import com.watcourses.wat_courses.Utils
-import com.watcourses.wat_courses.persistence.DbCourseRepo
 import com.watcourses.wat_courses.proto.CourseInfo
 import com.watcourses.wat_courses.proto.SearchCourseRequest
 import com.watcourses.wat_courses.proto.Sort
@@ -11,16 +9,15 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class SearchManagerTests {
     @Autowired
     private lateinit var searchManager: SearchManager
-
-    @Autowired
-    private lateinit var utils: Utils
 
     @Autowired
     private lateinit var cachedData: CachedData
