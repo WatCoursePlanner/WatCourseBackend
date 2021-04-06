@@ -51,7 +51,7 @@ message Sort {
   enum SortBy {
     TITLE = 1;
     CODE = 2;
-    LIKE = 3;
+    LIKED = 3;
     EASY = 4;
     USEFUL = 5;
     RATINGS_COUNT = 6;

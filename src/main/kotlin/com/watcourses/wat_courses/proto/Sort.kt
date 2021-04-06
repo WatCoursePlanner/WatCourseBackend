@@ -130,7 +130,7 @@ class Sort(
 
     CODE(2),
 
-    LIKE(3),
+    LIKED(3),
 
     EASY(4),
 
@@ -150,7 +150,7 @@ class Sort(
       fun fromValue(value: Int): SortBy? = when (value) {
         1 -> TITLE
         2 -> CODE
-        3 -> LIKE
+        3 -> LIKED
         4 -> EASY
         5 -> USEFUL
         6 -> RATINGS_COUNT

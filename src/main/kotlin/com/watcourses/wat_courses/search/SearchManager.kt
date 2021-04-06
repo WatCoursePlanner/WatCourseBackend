@@ -56,10 +56,10 @@ class SearchManager(
             selector = when (sort.sortBy) {
                 Sort.SortBy.TITLE -> { it -> it.name }
                 Sort.SortBy.CODE -> { it -> it.code }
-                Sort.SortBy.LIKE -> { it -> it.like }
+                Sort.SortBy.LIKED -> { it -> it.liked }
                 Sort.SortBy.EASY -> { it -> it.easy }
                 Sort.SortBy.USEFUL -> { it -> it.useful }
-                Sort.SortBy.RATING -> { it -> it.useful }
+                Sort.SortBy.RATINGS_COUNT -> { it -> it.ratingsCount }
                 else -> { it -> it.ratingsCount }
             }
         )

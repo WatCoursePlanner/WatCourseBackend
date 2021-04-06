@@ -8,6 +8,7 @@ import com.watcourses.wat_courses.rules.CourseListLoader
 import com.watcourses.wat_courses.rules.DegreeRequirementLoader
 import com.watcourses.wat_courses.rules.TermResolver
 import com.watcourses.wat_courses.utils.ClassPathResourceReader
+import com.watcourses.wat_courses.utils.CourseBuilderProvider
 import com.watcourses.wat_courses.utils.build
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
