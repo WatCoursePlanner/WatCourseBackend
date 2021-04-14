@@ -8,6 +8,7 @@ import com.watcourses.wat_courses.rules.CourseListLoader
 import com.watcourses.wat_courses.rules.DegreeRequirementLoader
 import com.watcourses.wat_courses.rules.TermResolver
 import com.watcourses.wat_courses.utils.ClassPathResourceReader
+import com.watcourses.wat_courses.utils.CourseBuilderProvider
 import com.watcourses.wat_courses.utils.build
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -18,10 +19,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 
 @SpringBootTest
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class CheckerTests {
     @Autowired
     private lateinit var checker: Checker
@@ -50,7 +53,6 @@ class CheckerTests {
             PathMatchingResourcePatternResolver(this.javaClass.classLoader).getResources("degrees/*")
         )
 
-        dbCourseRepo.deleteAll()
         utils.createCourse("CS 442", "AE 101", "ANTH 100", "ECON 221", "ECON 101", "PSYCH 420", "ECE 409")
 
         courseListLoader.loadLists()

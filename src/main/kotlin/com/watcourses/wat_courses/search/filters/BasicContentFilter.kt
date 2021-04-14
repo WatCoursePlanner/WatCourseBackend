@@ -6,8 +6,12 @@ import org.springframework.stereotype.Component
 @Component
 class BasicContentFilter : SearchFilter {
     override fun match(course: CourseInfo, query: String): Boolean {
-        return course.name!!.contains(query, ignoreCase = true) ||
-                course.description!!.contains(query, ignoreCase = true) ||
-                course.code!!.contains(query, ignoreCase = true)
+        return matchString(course.name!!, query) ||
+            matchString(course.description!!, query) ||
+            matchString(course.code!!, query)
+    }
+
+    private fun matchString(content: String, query: String): Boolean {
+        return content.contains(query, ignoreCase = true)
     }
 }
