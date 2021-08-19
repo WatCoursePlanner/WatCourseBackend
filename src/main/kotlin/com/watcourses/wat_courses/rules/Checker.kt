@@ -145,6 +145,13 @@ class Checker(
                 }
             }
         }
+        // Details for shortlist courses
+        for (courseCode in profile.shortList) {
+            val dbCourse = dbCourseRepo.findByCode(courseCode)
+            if (dbCourse != null) {
+                checkedCourses.add(dbCourse.toProto())
+            }
+        }
         return CheckResults(issues = issues, checkedCourses = checkedCourses)
     }
 }
