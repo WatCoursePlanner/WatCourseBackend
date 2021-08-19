@@ -119,7 +119,6 @@ message CreateDefaultStudentProfileRequest {
   optional int32 startingYear = 2;
   optional CoopStream coopStream = 3; // not used for now.
   optional Schedule schedule = 4;
-  optional string ownerEmail = 5;
 }
 
 message CheckResults {

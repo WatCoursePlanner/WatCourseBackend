@@ -29,9 +29,9 @@ data class DbStudentProfile(
     )
     var shortListCourses: MutableList<DbCourse> = mutableListOf(),
 
-    // TODO make this non-nullable
     @Column
-    var ownerEmail: String? = null,
+    @OneToOne(fetch = FetchType.LAZY)
+    var owner: DbUser,
 
     @Id @GeneratedValue
     var id: Long? = null
@@ -42,7 +42,7 @@ data class DbStudentProfile(
             labels = labels.toList(),
             degrees = degrees.toList(),
             shortList = shortListCourses.map { it.code },
-            ownerEmail = ownerEmail,
+            ownerEmail = owner.email,
         )
     }
 
@@ -53,14 +53,14 @@ data class DbStudentProfile(
             labels: MutableList<String>,
             degrees: MutableList<String>,
             shortList: MutableList<DbCourse> = mutableListOf(),
-            owner: DbUser?,
+            owner: DbUser,
         ): DbStudentProfile {
             val dbStudentProfile = DbStudentProfile(
                 schedule = schedule,
                 labels = labels,
                 degrees = degrees,
                 shortListCourses = shortList,
-                ownerEmail = owner?.email,
+                owner = owner,
             )
             dbStudentProfileRepo.save(dbStudentProfile)
             return dbStudentProfile
@@ -102,7 +102,7 @@ data class DbStudentProfile(
             existingDbStudentProfile.labels = labels
             existingDbStudentProfile.degrees = degrees
             existingDbStudentProfile.shortListCourses = shortList
-            existingDbStudentProfile.ownerEmail = owner.email
+            existingDbStudentProfile.owner = owner
 
             return dbStudentProfileRepo.save(existingDbStudentProfile)
         }

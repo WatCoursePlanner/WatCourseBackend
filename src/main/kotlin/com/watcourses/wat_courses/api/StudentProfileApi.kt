@@ -10,11 +10,13 @@ import com.watcourses.wat_courses.persistence.DbUserRepo
 import com.watcourses.wat_courses.proto.*
 import com.watcourses.wat_courses.rules.Checker
 import com.watcourses.wat_courses.rules.DegreeRequirementLoader
+import com.watcourses.wat_courses.utils.SessionManager
 import com.watcourses.wat_courses.utils.create
 import com.watcourses.wat_courses.utils.unionFlatten
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import javax.servlet.http.HttpServletRequest
 import javax.transaction.Transactional
 
 @Transactional
@@ -27,6 +29,7 @@ class StudentProfileApi(
     private val dbCourseRepo: DbCourseRepo,
     private val dbUserRepo: DbUserRepo,
     private val checker: Checker,
+    private val sessionManager: SessionManager,
 ) {
     @GetMapping("/profile/default")
     fun getDefaultStudentProfile(program: String): StudentProfile {
@@ -38,43 +41,13 @@ class StudentProfileApi(
         )
     }
 
-    @Deprecated(message = "Student profiles created without owner can never be referenced in the DB")
     @PostMapping("/profile/create")
-    fun createStudentProfile(@RequestBody request: CreateStudentProfileRequest): StudentProfile {
-        val degrees = request.degrees
-        val degreeRequirements = degrees.map { degreeRequirementLoader.getDegreeRequirement(it)!! }
-        val startingYear = request.startingYear!!
-        val stream = request.coopStream!!
-        val defaultSchedule = degreeRequirements.single { it.defaultSchedule?.terms?.isNotEmpty() == true }
-            .defaultSchedule!!
-        val importedSchedule = request.schedule
-        val mergedSchedule = importedSchedule?.let { mergeSchedule(it, defaultSchedule) } ?: defaultSchedule
-
-        val dbStudentProfile = DbStudentProfile.create(
-            dbStudentProfileRepo = dbStudentProfileRepo,
-            schedule = DbStudentProfileSchedule.createOrUpdate(
-                dbStudentProfileScheduleRepo = dbStudentProfileScheduleRepo,
-                dbTermScheduleRepo = dbTermScheduleRepo,
-                dbCourseRepo = dbCourseRepo,
-                schedule = Schedule.create(mergedSchedule, startingYear, stream),
-                existingDbStudentProfileSchedule = null,
-            ),
-            degrees = degrees.toMutableList(),
-            labels = degreeRequirements.map { it.labels.toSet() }.unionFlatten().toMutableList(),
-            owner = null,
-        )
-
-        return dbStudentProfile.toProto()
-    }
-
-    fun createDefaultStudentProfile(@RequestBody request: CreateDefaultStudentProfileRequest): StudentProfile {
-        // TODO check session for permission
-        val ownerEmail = request.ownerEmail ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No owner provided")
-        val owner = dbUserRepo.findByEmail(ownerEmail)
-            ?: throw ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "User with email ${request.ownerEmail} is not found"
-            )
+    fun createDefaultStudentProfile(
+        @RequestBody request: CreateDefaultStudentProfileRequest,
+        httpRequest: HttpServletRequest
+    ): StudentProfile {
+        val owner = sessionManager.getCurrentUser(httpRequest)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Not logged in")
         val degrees = request.degrees
         val degreeRequirements = degrees.map { degreeRequirementLoader.getDegreeRequirement(it)!! }
         val startingYear = request.startingYear!!
@@ -104,15 +77,13 @@ class StudentProfileApi(
     }
 
     @PostMapping("/profile/create-or-update")
-    fun createOrUpdateStudentProfile(@RequestBody studentProfile: StudentProfile): StudentProfile {
-        // TODO check session for permission
-        val ownerEmail = studentProfile.ownerEmail
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No owner provided")
-        val owner = dbUserRepo.findByEmail(ownerEmail)
-            ?: throw ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "User with email ${studentProfile.ownerEmail} is not found"
-            )
+    fun createOrUpdateStudentProfile(
+        @RequestBody studentProfile: StudentProfile,
+        httpRequest: HttpServletRequest
+    ): StudentProfile {
+        val owner = sessionManager.getCurrentUser(httpRequest)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Not logged in")
+
         val dbStudentProfile = DbStudentProfile.createOrUpdate(
             dbStudentProfileScheduleRepo = dbStudentProfileScheduleRepo,
             dbTermScheduleRepo = dbTermScheduleRepo,

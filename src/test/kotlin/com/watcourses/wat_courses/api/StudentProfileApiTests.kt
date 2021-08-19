@@ -107,7 +107,7 @@ class StudentProfileApiTests {
                         termName = "5B", year = 5839, term = Term.FALL
                     ),
                     Schedule.TermSchedule(
-                        courseCodes = listOf("SE 201",  "CS 241", "ECE 222", "CHE 102", "SE 999", "STAT 206"),
+                        courseCodes = listOf("SE 201", "CS 241", "ECE 222", "CHE 102", "SE 999", "STAT 206"),
                         termName = "2A", year = 2333, term = Term.FALL
                     ),
                     Schedule.TermSchedule(
@@ -144,7 +144,15 @@ class StudentProfileApiTests {
                         termName = "2A", year = 2020, term = Term.SPRING
                     ),
                     Schedule.TermSchedule(
-                        courseCodes = listOf("SE 202", "CS 240", "CS 247", "CS 348", "ECE 192", "MATH 239", "WKRPT 200"),
+                        courseCodes = listOf(
+                            "SE 202",
+                            "CS 240",
+                            "CS 247",
+                            "CS 348",
+                            "ECE 192",
+                            "MATH 239",
+                            "WKRPT 200"
+                        ),
                         termName = "2B", year = 2020, term = Term.FALL
                     ),
                     Schedule.TermSchedule(
@@ -170,6 +178,7 @@ class StudentProfileApiTests {
             shortList = listOf(),
             ownerEmail = null,
         )
+
         private fun StudentProfile.allCourseCodes() = schedule!!.terms.flatMap { it.courseCodes }.plus(shortList)
     }
 }

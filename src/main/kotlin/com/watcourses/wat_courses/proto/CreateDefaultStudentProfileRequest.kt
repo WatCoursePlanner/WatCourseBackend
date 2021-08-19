@@ -47,11 +47,6 @@ class CreateDefaultStudentProfileRequest(
     adapter = "com.watcourses.wat_courses.proto.Schedule#ADAPTER"
   )
   val schedule: Schedule? = null,
-  @field:WireField(
-    tag = 5,
-    adapter = "com.squareup.wire.ProtoAdapter#STRING"
-  )
-  val ownerEmail: String? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<CreateDefaultStudentProfileRequest, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -68,7 +63,6 @@ class CreateDefaultStudentProfileRequest(
         && startingYear == other.startingYear
         && coopStream == other.coopStream
         && schedule == other.schedule
-        && ownerEmail == other.ownerEmail
   }
 
   override fun hashCode(): Int {
@@ -79,7 +73,6 @@ class CreateDefaultStudentProfileRequest(
       result = result * 37 + startingYear.hashCode()
       result = result * 37 + coopStream.hashCode()
       result = result * 37 + schedule.hashCode()
-      result = result * 37 + ownerEmail.hashCode()
       super.hashCode = result
     }
     return result
@@ -91,7 +84,6 @@ class CreateDefaultStudentProfileRequest(
     if (startingYear != null) result += """startingYear=$startingYear"""
     if (coopStream != null) result += """coopStream=$coopStream"""
     if (schedule != null) result += """schedule=$schedule"""
-    if (ownerEmail != null) result += """ownerEmail=${sanitize(ownerEmail)}"""
     return result.joinToString(prefix = "CreateDefaultStudentProfileRequest{", separator = ", ",
         postfix = "}")
   }
@@ -101,10 +93,9 @@ class CreateDefaultStudentProfileRequest(
     startingYear: Int? = this.startingYear,
     coopStream: CoopStream? = this.coopStream,
     schedule: Schedule? = this.schedule,
-    ownerEmail: String? = this.ownerEmail,
     unknownFields: ByteString = this.unknownFields
   ): CreateDefaultStudentProfileRequest = CreateDefaultStudentProfileRequest(degrees, startingYear,
-      coopStream, schedule, ownerEmail, unknownFields)
+      coopStream, schedule, unknownFields)
 
   companion object {
     @JvmField
@@ -119,7 +110,6 @@ class CreateDefaultStudentProfileRequest(
         ProtoAdapter.INT32.encodedSizeWithTag(2, value.startingYear) +
         CoopStream.ADAPTER.encodedSizeWithTag(3, value.coopStream) +
         Schedule.ADAPTER.encodedSizeWithTag(4, value.schedule) +
-        ProtoAdapter.STRING.encodedSizeWithTag(5, value.ownerEmail) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: CreateDefaultStudentProfileRequest) {
@@ -127,7 +117,6 @@ class CreateDefaultStudentProfileRequest(
         ProtoAdapter.INT32.encodeWithTag(writer, 2, value.startingYear)
         CoopStream.ADAPTER.encodeWithTag(writer, 3, value.coopStream)
         Schedule.ADAPTER.encodeWithTag(writer, 4, value.schedule)
-        ProtoAdapter.STRING.encodeWithTag(writer, 5, value.ownerEmail)
         writer.writeBytes(value.unknownFields)
       }
 
@@ -136,7 +125,6 @@ class CreateDefaultStudentProfileRequest(
         var startingYear: Int? = null
         var coopStream: CoopStream? = null
         var schedule: Schedule? = null
-        var ownerEmail: String? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> degrees.add(ProtoAdapter.STRING.decode(reader))
@@ -147,7 +135,6 @@ class CreateDefaultStudentProfileRequest(
               reader.addUnknownField(tag, FieldEncoding.VARINT, e.value.toLong())
             }
             4 -> schedule = Schedule.ADAPTER.decode(reader)
-            5 -> ownerEmail = ProtoAdapter.STRING.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
@@ -156,7 +143,6 @@ class CreateDefaultStudentProfileRequest(
           startingYear = startingYear,
           coopStream = coopStream,
           schedule = schedule,
-          ownerEmail = ownerEmail,
           unknownFields = unknownFields
         )
       }
