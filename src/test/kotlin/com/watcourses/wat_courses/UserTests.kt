@@ -7,12 +7,15 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.mock.web.MockHttpServletRequest
 import org.springframework.mock.web.MockHttpServletResponse
+import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ActiveProfiles
 
 
 @SpringBootTest
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class UserTests {
     @Autowired
     private lateinit var userApi: UserApi
@@ -37,7 +40,7 @@ class UserTests {
             assertThat(lastName).isEqualTo("last")
             assertThat(email).isEqualTo("test@example.com")
         }
-        assertThat(resp.cookies[0].name).isEqualTo("session")
+        assertThat(resp.cookies[0].name).isEqualTo("watcourses_session")
         val sessionValue = resp.cookies[0].value
         assertThat(sessionValue).isNotEmpty()
 
@@ -87,8 +90,40 @@ class UserTests {
             assertThat(lastName).isEqualTo("last")
             assertThat(email).isEqualTo("test@example.com")
         }
-        val newSessionId = resp2.cookies.single { it.name == "session" }.value
+        val newSessionId = resp2.cookies.single { it.name == "watcourses_session" }.value
         assertThat(newSessionId).isNotEmpty()
         assertThat(newSessionId).isNotEqualTo(sessionValue)
+    }
+
+    @Test
+    fun `can logout`() {
+        val resp = MockHttpServletResponse()
+        assertThat(userApi.register(RegisterRequest(), resp).success).isEqualTo(false)
+        assertThat(resp.cookies.size).isEqualTo(0)
+        val result =
+            userApi.register(
+                RegisterRequest(
+                    firstName = "first",
+                    lastName = "last",
+                    email = "test@example.com",
+                    password = "very_secure_password"
+                ), resp
+            )
+        assertThat(result.success).isEqualTo(true)
+        with(result.userInfo!!) {
+            assertThat(firstName).isEqualTo("first")
+            assertThat(lastName).isEqualTo("last")
+            assertThat(email).isEqualTo("test@example.com")
+        }
+        assertThat(resp.cookies[0].name).isEqualTo("watcourses_session")
+        val sessionValue = resp.cookies[0].value
+        assertThat(sessionValue).isNotEmpty
+
+        val request = MockHttpServletRequest()
+        request.setCookies(resp.cookies[0])
+        assertThat(userApi.getUser(request).user!!.email).isEqualTo("test@example.com")
+        assertThat(userApi.logout(request)).isTrue
+        assertThat(userApi.getUser(request).user).isNull()
+        assertThat(userApi.logout(request)).isFalse
     }
 }
