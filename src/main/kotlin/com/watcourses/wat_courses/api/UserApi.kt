@@ -6,15 +6,14 @@ import com.google.api.client.json.jackson2.JacksonFactory
 import com.watcourses.wat_courses.AppProperties
 import com.watcourses.wat_courses.persistence.DbUser
 import com.watcourses.wat_courses.persistence.DbUserRepo
+import com.watcourses.wat_courses.persistence.DbUserSessionRepo
 import com.watcourses.wat_courses.proto.*
 import com.watcourses.wat_courses.utils.PasswordEncoder
 import com.watcourses.wat_courses.utils.SessionManager
-import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.server.ResponseStatusException
 import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
@@ -22,6 +21,7 @@ import javax.servlet.http.HttpServletResponse
 @RestController
 class UserApi(
     val dbUserRepo: DbUserRepo,
+    val dbUserSessionRepo: DbUserSessionRepo,
     val passwordEncoder: PasswordEncoder,
     val sessionManager: SessionManager,
     val appProperties: AppProperties
@@ -41,7 +41,6 @@ class UserApi(
 
         if (dbUser?.password != null && passwordEncoder.compare(dbUser.password!!, password)) {
             sessionManager.generateAndSendSessionId(response, dbUser)
-            dbUserRepo.save(dbUser)
             return LoginOrRegisterResponse(success = true, userInfo = dbUser.toProto())
         }
 
@@ -76,11 +75,10 @@ class UserApi(
             firstName = firstName,
             lastName = lastName,
             password = passwordEncoder.hash(password),
-            sessionId = "",
         )
 
-        sessionManager.generateAndSendSessionId(response, dbUser)
         dbUserRepo.save(dbUser)
+        sessionManager.generateAndSendSessionId(response, dbUser)
 
         return LoginOrRegisterResponse(success = true, userInfo = dbUser.toProto())
     }
@@ -117,13 +115,12 @@ class UserApi(
                 firstName = payload["given_name"] as String,
                 lastName = payload["family_name"] as String,
                 password = null,
-                sessionId = "",
                 googleId = userId,
                 pictureUrl = payload["picture"] as String?
             )
         }
-        sessionManager.generateAndSendSessionId(response, dbUser)
         dbUserRepo.save(dbUser)
+        sessionManager.generateAndSendSessionId(response, dbUser)
 
         return LoginOrRegisterResponse(success = true, userInfo = dbUser.toProto())
     }
@@ -147,5 +144,12 @@ class UserApi(
     @PostMapping("/user/get")
     fun getUser(httpRequest: HttpServletRequest): GetUserResponse {
         return GetUserResponse(user = sessionManager.getCurrentUser(httpRequest)?.toProto())
+    }
+
+    @PostMapping("/user/logout")
+    fun logout(httpRequest: HttpServletRequest): Boolean {
+        val dbUserSession = sessionManager.getCurrentSession(httpRequest) ?: return false
+        dbUserSessionRepo.delete(dbUserSession)
+        return true
     }
 }

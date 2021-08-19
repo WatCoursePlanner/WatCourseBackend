@@ -7,7 +7,6 @@ import javax.persistence.*
 @Table(
     name = "users", indexes = [
         Index(name = "idx_email", columnList = "email", unique = true),
-        Index(name = "idx_session", columnList = "sessionId", unique = true),
         Index(name = "idx_google_id", columnList = "googleId", unique = true)
     ]
 )
@@ -23,9 +22,6 @@ data class DbUser(
 
     @Column
     var password: String?,
-
-    @Column(nullable = false)
-    var sessionId: String,
 
     @Column
     var googleId: String? = null,
