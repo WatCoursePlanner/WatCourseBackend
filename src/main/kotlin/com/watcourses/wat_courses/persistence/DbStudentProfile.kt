@@ -1,6 +1,7 @@
 package com.watcourses.wat_courses.persistence
 
 import com.watcourses.wat_courses.proto.StudentProfile
+import org.springframework.data.repository.findByIdOrNull
 import javax.persistence.*
 
 @Entity(name = "student_profile")
@@ -28,9 +29,9 @@ data class DbStudentProfile(
     )
     var shortListCourses: MutableList<DbCourse> = mutableListOf(),
 
+    @Column
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn
-    var owner: DbUser? = null,
+    var owner: DbUser,
 
     @Id @GeneratedValue
     var id: Long? = null
@@ -41,7 +42,7 @@ data class DbStudentProfile(
             labels = labels.toList(),
             degrees = degrees.toList(),
             shortList = shortListCourses.map { it.code },
-            ownerEmail = owner?.email,
+            ownerEmail = owner.email,
         )
     }
 
@@ -52,7 +53,7 @@ data class DbStudentProfile(
             labels: MutableList<String>,
             degrees: MutableList<String>,
             shortList: MutableList<DbCourse> = mutableListOf(),
-            owner: DbUser?,
+            owner: DbUser,
         ): DbStudentProfile {
             val dbStudentProfile = DbStudentProfile(
                 schedule = schedule,
@@ -63,6 +64,47 @@ data class DbStudentProfile(
             )
             dbStudentProfileRepo.save(dbStudentProfile)
             return dbStudentProfile
+        }
+
+        fun createOrUpdate(
+            dbStudentProfileScheduleRepo: DbStudentProfileScheduleRepo,
+            dbTermScheduleRepo: DbTermScheduleRepo,
+            dbStudentProfileRepo: DbStudentProfileRepo,
+            dbCourseRepo: DbCourseRepo,
+            studentProfile: StudentProfile,
+            owner: DbUser,
+        ): DbStudentProfile {
+            val existingDbStudentProfile = owner.studentProfile
+
+            val dbSchedule = DbStudentProfileSchedule.createOrUpdate(
+                dbStudentProfileScheduleRepo = dbStudentProfileScheduleRepo,
+                dbTermScheduleRepo = dbTermScheduleRepo,
+                dbCourseRepo = dbCourseRepo,
+                schedule = studentProfile.schedule!!,
+                existingDbStudentProfileSchedule = existingDbStudentProfile?.schedule,
+            )
+            val labels = studentProfile.labels.toMutableList()
+            val degrees = studentProfile.degrees.toMutableList()
+            val shortList = studentProfile.shortList.mapNotNull { dbCourseRepo.findByCode(it) }.toMutableList()
+
+            if (existingDbStudentProfile == null) {
+                return create(
+                    dbStudentProfileRepo = dbStudentProfileRepo,
+                    schedule = dbSchedule,
+                    labels = labels,
+                    degrees = degrees,
+                    shortList = shortList,
+                    owner = owner,
+                )
+            }
+
+            existingDbStudentProfile.schedule = dbSchedule
+            existingDbStudentProfile.labels = labels
+            existingDbStudentProfile.degrees = degrees
+            existingDbStudentProfile.shortListCourses = shortList
+            existingDbStudentProfile.owner = owner
+
+            return dbStudentProfileRepo.save(existingDbStudentProfile)
         }
     }
 }

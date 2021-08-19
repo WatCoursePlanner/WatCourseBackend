@@ -118,6 +118,13 @@ message CreateStudentProfileRequest {
   optional Schedule schedule = 4;
 }
 
+message CreateDefaultStudentProfileRequest {
+  repeated string degrees = 1;
+  optional int32 startingYear = 2;
+  optional CoopStream coopStream = 3; // not used for now.
+  optional Schedule schedule = 4;
+}
+
 message CheckResults {
   message Issue {
     enum Type {

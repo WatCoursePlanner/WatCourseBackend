@@ -3,6 +3,7 @@ package com.watcourses.wat_courses.persistence
 import com.watcourses.wat_courses.proto.Schedule
 import com.watcourses.wat_courses.proto.Term
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import javax.persistence.*
 
 @Entity(name = "student_profile_schedule")
@@ -22,34 +23,31 @@ data class DbStudentProfileSchedule(
     }
 
     companion object {
-        fun create(
-            dbStudentProfileScheduleRepo: DbStudentProfileScheduleRepo,
-            terms: MutableList<DbTermSchedule>,
-        ): DbStudentProfileSchedule {
-            val dbStudentProfileSchedule = DbStudentProfileSchedule(
-                terms = terms,
-            )
-            dbStudentProfileScheduleRepo.save(dbStudentProfileSchedule)
-            return dbStudentProfileSchedule
-        }
-
-        fun create(
+        fun createOrUpdate(
             dbStudentProfileScheduleRepo: DbStudentProfileScheduleRepo,
             dbTermScheduleRepo: DbTermScheduleRepo,
             dbCourseRepo: DbCourseRepo,
             schedule: Schedule,
+            existingDbStudentProfileSchedule: DbStudentProfileSchedule?,
         ): DbStudentProfileSchedule {
-            val dbStudentProfileSchedule = DbStudentProfileSchedule(
-                terms = schedule.terms.map {
-                    DbTermSchedule.create(
-                        dbTermScheduleRepo = dbTermScheduleRepo,
-                        dbCourseRepo = dbCourseRepo,
-                        termSchedule = it,
-                    )
-                }.toMutableList(),
-            )
-            dbStudentProfileScheduleRepo.save(dbStudentProfileSchedule)
-            return dbStudentProfileSchedule
+            val dbStudentProfileSchedule = existingDbStudentProfileSchedule ?: DbStudentProfileSchedule()
+            val newTerms = schedule.terms.map { termSchedule ->
+                DbTermSchedule.createOrUpdate(
+                    dbTermScheduleRepo = dbTermScheduleRepo,
+                    dbCourseRepo = dbCourseRepo,
+                    termSchedule = termSchedule,
+                    existingDbTermSchedule = dbStudentProfileSchedule.terms
+                        .singleOrNull { it.name == termSchedule.termName },
+                )
+            }.toMutableList()
+
+            val newTermNames = newTerms.map { it.name }.toSet()
+            dbStudentProfileSchedule.terms
+                .filter { it.name !in newTermNames }
+                .forEach { dbTermScheduleRepo.delete(it) }
+
+            dbStudentProfileSchedule.terms = newTerms
+            return dbStudentProfileScheduleRepo.save(dbStudentProfileSchedule)
         }
     }
 }
