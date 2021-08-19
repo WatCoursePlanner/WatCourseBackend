@@ -18,7 +18,7 @@ class EventApi(
     fun event(@RequestBody request: EventRequest, httpRequest: HttpServletRequest) {
         val identifier = sessionManager.getCurrentUser(httpRequest)?.id?.toString()
             ?: httpRequest.session.id
-            ?: sessionManager.generateGuestSessionId()
+            ?: sessionManager.generateGuestSessionToken()
 
         dbEventRepo.save(
             DbEvent(
