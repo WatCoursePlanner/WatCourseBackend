@@ -9,11 +9,15 @@ import com.watcourses.wat_courses.proto.CreateStudentProfileRequest
 import com.watcourses.wat_courses.proto.Schedule
 import com.watcourses.wat_courses.proto.StudentProfile
 import com.watcourses.wat_courses.proto.Term
+import com.watcourses.wat_courses.utils.UserSessionFactory
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.mockito.BDDMockito
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver
 import org.springframework.test.context.ActiveProfiles
 import javax.transaction.Transactional
 
@@ -21,9 +25,6 @@ import javax.transaction.Transactional
 @SpringBootTest
 @ActiveProfiles("test")
 class StudentProfileApiTests {
-    @Autowired
-    private lateinit var studentProfileApi: StudentProfileApi
-
     @Autowired
     private lateinit var dbStudentProfileRepo: DbStudentProfileRepo
 
@@ -33,11 +34,19 @@ class StudentProfileApiTests {
     @Autowired
     private lateinit var utils: Utils
 
+    @Autowired
+    private lateinit var userSessionFactory: UserSessionFactory
+
+    @BeforeEach
+    fun setup() {
+        utils.createCourse(*SAMPLE_PROFILE.allCourseCodes().toTypedArray())
+    }
+
     @Test
-    fun `create student profile`() {
-        utils.createCourses(SAMPLE_PROFILE.allCourseCodes())
-        val studentProfile = studentProfileApi.createStudentProfile(
-            CreateStudentProfileRequest(
+    fun `guest create student profile`() {
+        val guest = userSessionFactory.guest()
+        val studentProfile = guest.createDefaultStudentProfile(
+            CreateDefaultStudentProfileRequest(
                 degrees = listOf("Software Engineering"),
                 startingYear = 2019,
                 coopStream = CoopStream.STREAM_8,
@@ -48,19 +57,18 @@ class StudentProfileApiTests {
     }
 
     @Test
-    fun `create default student profile`() {
-        utils.createCourses(SAMPLE_PROFILE.allCourseCodes())
+    fun `registered user can create default student profile`() {
         val ownerEmail = "a@b.com"
-        utils.createUserWithEmail(ownerEmail)
-        val profileWithOwnerEmail = SAMPLE_PROFILE.copy(ownerEmail = ownerEmail)
-        val studentProfile = studentProfileApi.createDefaultStudentProfile(
+        val user = userSessionFactory.register(email = ownerEmail)
+        val studentProfile = user.createDefaultStudentProfile(
             CreateDefaultStudentProfileRequest(
                 degrees = listOf("Software Engineering"),
                 startingYear = 2019,
-                coopStream = CoopStream.STREAM_8,
-                ownerEmail = ownerEmail,
+                coopStream = CoopStream.STREAM_8
             )
         )
+
+        val profileWithOwnerEmail = SAMPLE_PROFILE.copy(ownerEmail = ownerEmail)
         assertThat(studentProfile).isEqualTo(profileWithOwnerEmail)
         assertThat(dbStudentProfileRepo.findAll().single()!!.toProto()).isEqualTo(profileWithOwnerEmail)
         assertThat(dbUserRepo.findByEmail(ownerEmail)!!.studentProfile!!.toProto()).isEqualTo(profileWithOwnerEmail)
@@ -68,17 +76,10 @@ class StudentProfileApiTests {
 
     @Test
     fun `create or update student profile`() {
-        utils.createCourses(SAMPLE_PROFILE.allCourseCodes())
-        assertThatThrownBy { studentProfileApi.createOrUpdateStudentProfile(SAMPLE_PROFILE) }
-            .hasMessageContaining("No owner provided")
-
         val ownerEmail = "a@b.com"
         val profileWithOwnerEmail = SAMPLE_PROFILE.copy(ownerEmail = ownerEmail)
-        assertThatThrownBy { studentProfileApi.createOrUpdateStudentProfile(profileWithOwnerEmail) }
-            .hasMessageContaining("User with email $ownerEmail is not found")
-
-        utils.createUserWithEmail(ownerEmail)
-        var studentProfile = studentProfileApi.createOrUpdateStudentProfile(profileWithOwnerEmail)
+        val user = userSessionFactory.register(email = ownerEmail)
+        var studentProfile = user.createOrUpdateStudentProfile(profileWithOwnerEmail)
         assertThat(studentProfile).isEqualTo(profileWithOwnerEmail)
         assertThat(dbStudentProfileRepo.findAll().single()!!.toProto()).isEqualTo(profileWithOwnerEmail)
         assertThat(dbUserRepo.findByEmail(ownerEmail)!!.studentProfile!!.toProto()).isEqualTo(profileWithOwnerEmail)
@@ -120,8 +121,8 @@ class StudentProfileApiTests {
             degrees = listOf("Bug Engineering"),
             shortList = listOf("CS 2077", "SCI 238"),
         )
-        utils.createCourses(updatedProfile.allCourseCodes())
-        studentProfile = studentProfileApi.createOrUpdateStudentProfile(updatedProfile)
+        utils.createCourse(*updatedProfile.allCourseCodes().toTypedArray())
+        studentProfile = user.createOrUpdateStudentProfile(updatedProfile)
         assertThat(studentProfile).isEqualTo(updatedProfile)
         assertThat(dbStudentProfileRepo.findAll().single()!!.toProto()).isEqualTo(updatedProfile)
         assertThat(dbUserRepo.findByEmail(ownerEmail)!!.studentProfile!!.toProto()).isEqualTo(updatedProfile)

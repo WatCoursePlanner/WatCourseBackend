@@ -6,6 +6,7 @@ import com.watcourses.wat_courses.persistence.DbEventRepo
 import com.watcourses.wat_courses.persistence.DbUserRepo
 import com.watcourses.wat_courses.proto.EventRequest
 import com.watcourses.wat_courses.proto.RegisterRequest
+import com.watcourses.wat_courses.utils.UserSessionFactory
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -32,22 +33,17 @@ class EventTests {
     @Autowired
     private lateinit var dbUserRepo: DbUserRepo
 
-    private fun requestFromResponse(resp: MockHttpServletResponse): MockHttpServletRequest {
-        val req = MockHttpServletRequest()
-        req.setCookies(*resp.cookies)
-        return req
-    }
+    @Autowired
+    private lateinit var userSessionFactory: UserSessionFactory
+
 
     @Test
     fun `logged in user has user id as identifier`() {
-        val resp = MockHttpServletResponse()
-        userApi.register(
-            RegisterRequest(firstName = "first", lastName = "last", email = "1@a.com", password = "1"), resp
-        )
+        val user = userSessionFactory.register()
         val identifier = dbUserRepo.findAll().single()!!.id.toString()
 
-        eventApi.event(EventRequest(type = "type", subject = "ECE 123", data = "123"), requestFromResponse(resp))
-        eventApi.event(EventRequest(type = "type2", subject = "ECE 124", data = "124"), requestFromResponse(resp))
+        user.event(EventRequest(type = "type", subject = "ECE 123", data = "123"))
+        user.event(EventRequest(type = "type2", subject = "ECE 124", data = "124"))
 
         val events = dbEventRepo.findAll()
         assertThat(events).hasSize(2)

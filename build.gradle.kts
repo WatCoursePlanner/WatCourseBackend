@@ -38,7 +38,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.6")
     implementation("org.jsoup:jsoup:1.13.1")
     implementation("com.vladmihalcea:hibernate-types-52:2.9.12")
-    implementation("com.github.h0tk3y.betterParse:better-parse:0.4.0")
+    implementation("com.github.h0tk3y.betterParse:better-parse:0.4.2")
     implementation("org.tomlj:tomlj:1.0.0")
     implementation("com.google.apis:google-api-services-oauth2:v2-rev20200213-1.30.10")
     implementation("org.bouncycastle:bcprov-jdk15on:1.66")

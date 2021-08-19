@@ -3,6 +3,7 @@ package com.watcourses.wat_courses
 import com.watcourses.wat_courses.api.UserApi
 import com.watcourses.wat_courses.proto.LoginRequest
 import com.watcourses.wat_courses.proto.RegisterRequest
+import com.watcourses.wat_courses.utils.UserSessionFactory
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
