@@ -29,8 +29,8 @@ data class DbStudentProfile(
     )
     var shortListCourses: MutableList<DbCourse> = mutableListOf(),
 
-    @Column
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn
     var owner: DbUser,
 
     @Id @GeneratedValue

@@ -16,6 +16,7 @@ import com.watcourses.wat_courses.utils.unionFlatten
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
+import java.util.*
 import javax.servlet.http.HttpServletRequest
 import javax.transaction.Transactional
 
@@ -31,11 +32,14 @@ class StudentProfileApi(
     private val checker: Checker,
     private val sessionManager: SessionManager,
 ) {
-    @GetMapping("/profile/default")
-    fun getDefaultStudentProfile(program: String): StudentProfile {
-        val degreeRequirement = degreeRequirementLoader.getDegreeRequirement(program)!!
+    @GetMapping("/profile/default/{program}")
+    fun getDefaultStudentProfile(@PathVariable program: String): StudentProfile {
+        val degreeRequirement = degreeRequirementLoader.getDegreeRequirement(program)
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Program not found")
+        val schedule = degreeRequirement.defaultSchedule
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Default schedule unavailable for program")
         return StudentProfile(
-            schedule = degreeRequirement.defaultSchedule,
+            schedule = Schedule.create(schedule, Calendar.getInstance().get(Calendar.YEAR), CoopStream.NO_COOP),
             degrees = listOf(program),
             labels = degreeRequirement.labels.toList()
         )

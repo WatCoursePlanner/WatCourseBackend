@@ -6,6 +6,8 @@ import com.watcourses.wat_courses.proto.Sort
 import com.watcourses.wat_courses.utils.CachedData
 import com.watcourses.wat_courses.utils.CourseBuilderProvider
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
@@ -25,10 +27,14 @@ class SearchManagerTests {
     @Autowired
     private lateinit var courseBuilderProvider: CourseBuilderProvider
 
+    @BeforeEach
+    @AfterEach
+    fun `invalidate cache`() {
+        cachedData.invalidateAllCourses()
+    }
+
     @Test
     fun `results are properly sorted`() {
-        cachedData.invalidateAllCourses()
-
         courseBuilderProvider.get().code("CS 1").name("B").liked(0.5).build()
         courseBuilderProvider.get().code("CS 2").name("C").liked(0.8).build()
         courseBuilderProvider.get().code("CS 3").name("A").liked(null).build()
@@ -52,8 +58,6 @@ class SearchManagerTests {
 
     @Test
     fun `basic content filter`() {
-        cachedData.invalidateAllCourses()
-
         courseBuilderProvider.get().code("CS 1").name("1A1").description("d 1").build()
         courseBuilderProvider.get().code("CS 2").name("0B0").description("d 12").build()
         courseBuilderProvider.get().code("CS 3").name("0D0").description("d 21").build()
