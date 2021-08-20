@@ -2,6 +2,7 @@ package com.watcourses.wat_courses.persistence
 
 import com.watcourses.wat_courses.proto.StudentProfile
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Component
 import javax.persistence.*
 
 @Entity(name = "student_profile")
@@ -46,9 +47,14 @@ data class DbStudentProfile(
         )
     }
 
-    companion object {
+    @Component
+    class Factory(
+        private val dbStudentProfileRepo: DbStudentProfileRepo,
+        private val dbCourseRepo: DbCourseRepo,
+        private val dbStudentProfileScheduleFactory: DbStudentProfileSchedule.Factory,
+        private val dbUserRepo: DbUserRepo,
+    ) {
         fun create(
-            dbStudentProfileRepo: DbStudentProfileRepo,
             schedule: DbStudentProfileSchedule,
             labels: List<String>,
             degrees: List<String>,
@@ -63,23 +69,18 @@ data class DbStudentProfile(
                 owner = owner,
             )
             dbStudentProfileRepo.save(dbStudentProfile)
+            owner.studentProfile = dbStudentProfile
+            dbUserRepo.save(owner)
             return dbStudentProfile
         }
 
         fun createOrUpdate(
-            dbStudentProfileScheduleRepo: DbStudentProfileScheduleRepo,
-            dbTermScheduleRepo: DbTermScheduleRepo,
-            dbStudentProfileRepo: DbStudentProfileRepo,
-            dbCourseRepo: DbCourseRepo,
             studentProfile: StudentProfile,
             owner: DbUser,
         ): DbStudentProfile {
             val existingDbStudentProfile = owner.studentProfile
 
-            val dbSchedule = DbStudentProfileSchedule.createOrUpdate(
-                dbStudentProfileScheduleRepo = dbStudentProfileScheduleRepo,
-                dbTermScheduleRepo = dbTermScheduleRepo,
-                dbCourseRepo = dbCourseRepo,
+            val dbSchedule = dbStudentProfileScheduleFactory.createOrUpdate(
                 schedule = studentProfile.schedule!!,
                 existingDbStudentProfileSchedule = existingDbStudentProfile?.schedule,
             )
@@ -89,7 +90,6 @@ data class DbStudentProfile(
 
             if (existingDbStudentProfile == null) {
                 return create(
-                    dbStudentProfileRepo = dbStudentProfileRepo,
                     schedule = dbSchedule,
                     labels = labels,
                     degrees = degrees,
@@ -103,6 +103,9 @@ data class DbStudentProfile(
             existingDbStudentProfile.degrees = degrees
             existingDbStudentProfile.shortListCourses = shortList
             existingDbStudentProfile.owner = owner
+
+            owner.studentProfile = existingDbStudentProfile
+            dbUserRepo.save(owner)
 
             return dbStudentProfileRepo.save(existingDbStudentProfile)
         }

@@ -3,6 +3,7 @@ package com.watcourses.wat_courses.persistence
 import com.watcourses.wat_courses.proto.Schedule
 import com.watcourses.wat_courses.proto.Term
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Component
 import javax.persistence.*
 
 @Entity(name = "term_schedule")
@@ -34,9 +35,12 @@ data class DbTermSchedule(
         )
     }
 
-    companion object {
+    @Component
+    class Factory(
+        private val dbTermScheduleRepo: DbTermScheduleRepo,
+        private val dbCourseRepo: DbCourseRepo
+    ) {
         fun create(
-            dbTermScheduleRepo: DbTermScheduleRepo,
             courses: MutableList<DbCourse>,
             name: String,
             year: Int,
@@ -53,8 +57,6 @@ data class DbTermSchedule(
         }
 
         fun createOrUpdate(
-            dbTermScheduleRepo: DbTermScheduleRepo,
-            dbCourseRepo: DbCourseRepo,
             termSchedule: Schedule.TermSchedule,
             existingDbTermSchedule: DbTermSchedule?,
         ): DbTermSchedule {

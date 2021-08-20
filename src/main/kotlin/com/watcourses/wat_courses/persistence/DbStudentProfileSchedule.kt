@@ -4,6 +4,7 @@ import com.watcourses.wat_courses.proto.Schedule
 import com.watcourses.wat_courses.proto.Term
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Component
 import javax.persistence.*
 
 @Entity(name = "student_profile_schedule")
@@ -22,19 +23,19 @@ data class DbStudentProfileSchedule(
         )
     }
 
-    companion object {
+    @Component
+    class Factory(
+        private val dbStudentProfileScheduleRepo: DbStudentProfileScheduleRepo,
+        private val dbTermScheduleRepo: DbTermScheduleRepo,
+        private val dbTermScheduleFactory: DbTermSchedule.Factory
+    ) {
         fun createOrUpdate(
-            dbStudentProfileScheduleRepo: DbStudentProfileScheduleRepo,
-            dbTermScheduleRepo: DbTermScheduleRepo,
-            dbCourseRepo: DbCourseRepo,
             schedule: Schedule,
             existingDbStudentProfileSchedule: DbStudentProfileSchedule?,
         ): DbStudentProfileSchedule {
             val dbStudentProfileSchedule = existingDbStudentProfileSchedule ?: DbStudentProfileSchedule()
             val newTerms = schedule.terms.map { termSchedule ->
-                DbTermSchedule.createOrUpdate(
-                    dbTermScheduleRepo = dbTermScheduleRepo,
-                    dbCourseRepo = dbCourseRepo,
+                dbTermScheduleFactory.createOrUpdate(
                     termSchedule = termSchedule,
                     existingDbTermSchedule = dbStudentProfileSchedule.terms
                         .singleOrNull { it.name == termSchedule.termName },

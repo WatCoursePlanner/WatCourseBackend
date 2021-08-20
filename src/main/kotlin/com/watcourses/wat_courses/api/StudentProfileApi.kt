@@ -24,13 +24,9 @@ import javax.transaction.Transactional
 @RestController
 class StudentProfileApi(
     private val degreeRequirementLoader: DegreeRequirementLoader,
-    private val dbStudentProfileScheduleRepo: DbStudentProfileScheduleRepo,
-    private val dbStudentProfileRepo: DbStudentProfileRepo,
-    private val dbTermScheduleRepo: DbTermScheduleRepo,
-    private val dbCourseRepo: DbCourseRepo,
-    private val dbUserRepo: DbUserRepo,
     private val checker: Checker,
     private val sessionManager: SessionManager,
+    private val dbStudentProfileFactory: DbStudentProfile.Factory,
 ) {
     @GetMapping("/profile/default/{program}")
     fun getDefaultStudentProfile(@PathVariable program: String): StudentProfile {
@@ -61,17 +57,7 @@ class StudentProfileApi(
         // do not create db entity for guest users
         val owner = sessionManager.getCurrentUser(httpRequest) ?: return profile
 
-        val dbStudentProfile = DbStudentProfile.createOrUpdate(
-            dbStudentProfileRepo = dbStudentProfileRepo,
-            dbStudentProfileScheduleRepo = dbStudentProfileScheduleRepo,
-            dbTermScheduleRepo = dbTermScheduleRepo,
-            dbCourseRepo = dbCourseRepo,
-            studentProfile = profile,
-            owner = owner,
-        )
-        owner.studentProfile = dbStudentProfile
-        dbUserRepo.save(owner)
-        return dbStudentProfile.toProto()
+        return dbStudentProfileFactory.createOrUpdate(profile, owner).toProto()
     }
 
     @PostMapping("/profile/create-or-update")
@@ -82,17 +68,7 @@ class StudentProfileApi(
         val owner = sessionManager.getCurrentUser(httpRequest)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Not logged in")
 
-        val dbStudentProfile = DbStudentProfile.createOrUpdate(
-            dbStudentProfileScheduleRepo = dbStudentProfileScheduleRepo,
-            dbTermScheduleRepo = dbTermScheduleRepo,
-            dbStudentProfileRepo = dbStudentProfileRepo,
-            dbCourseRepo = dbCourseRepo,
-            studentProfile = studentProfile,
-            owner = owner,
-        )
-        owner.studentProfile = dbStudentProfile
-        dbUserRepo.save(owner)
-        return dbStudentProfile.toProto()
+        return dbStudentProfileFactory.createOrUpdate(studentProfile, owner).toProto()
     }
 
     @PostMapping("/profile/check")
