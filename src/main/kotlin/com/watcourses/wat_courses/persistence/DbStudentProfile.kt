@@ -50,16 +50,16 @@ data class DbStudentProfile(
         fun create(
             dbStudentProfileRepo: DbStudentProfileRepo,
             schedule: DbStudentProfileSchedule,
-            labels: MutableList<String>,
-            degrees: MutableList<String>,
-            shortList: MutableList<DbCourse> = mutableListOf(),
+            labels: List<String>,
+            degrees: List<String>,
+            shortList: List<DbCourse> = listOf(),
             owner: DbUser,
         ): DbStudentProfile {
             val dbStudentProfile = DbStudentProfile(
                 schedule = schedule,
-                labels = labels,
-                degrees = degrees,
-                shortListCourses = shortList,
+                labels = labels.toMutableList(),
+                degrees = degrees.toMutableList(),
+                shortListCourses = shortList.toMutableList(),
                 owner = owner,
             )
             dbStudentProfileRepo.save(dbStudentProfile)

@@ -53,7 +53,7 @@ class StudentProfileApiTests {
             )
         )
         assertThat(studentProfile).isEqualTo(SAMPLE_PROFILE)
-        assertThat(dbStudentProfileRepo.findAll().single()!!.toProto()).isEqualTo(SAMPLE_PROFILE)
+        assertThat(dbStudentProfileRepo.findAll()).isEmpty()
     }
 
     @Test
@@ -121,7 +121,10 @@ class StudentProfileApiTests {
             degrees = listOf("Bug Engineering"),
             shortList = listOf("CS 2077", "SCI 238"),
         )
-        utils.createCourse(*updatedProfile.allCourseCodes().toTypedArray())
+        utils.createCourse(
+            *(updatedProfile.allCourseCodes().toSet() - SAMPLE_PROFILE.allCourseCodes().toSet())
+                .toTypedArray()
+        )
         studentProfile = user.createOrUpdateStudentProfile(updatedProfile)
         assertThat(studentProfile).isEqualTo(updatedProfile)
         assertThat(dbStudentProfileRepo.findAll().single()!!.toProto()).isEqualTo(updatedProfile)

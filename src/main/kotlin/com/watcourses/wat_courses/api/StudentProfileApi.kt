@@ -50,29 +50,23 @@ class StudentProfileApi(
         @RequestBody request: CreateDefaultStudentProfileRequest,
         httpRequest: HttpServletRequest
     ): StudentProfile {
-        val owner = sessionManager.getCurrentUser(httpRequest)
-            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "Not logged in")
         val degrees = request.degrees
         val degreeRequirements = degrees.map { degreeRequirementLoader.getDegreeRequirement(it)!! }
-        val startingYear = request.startingYear!!
-        val stream = request.coopStream!!
         val defaultSchedule = degreeRequirements
             .single { it.defaultSchedule?.terms?.isNotEmpty() == true }
             .defaultSchedule!!
-        val importedSchedule = request.schedule
-        val mergedSchedule = importedSchedule?.let { mergeSchedule(it, defaultSchedule) } ?: defaultSchedule
+        val schedule = Schedule.create(defaultSchedule, request.startingYear!!, request.coopStream!!)
+        val labels = degreeRequirements.map { it.labels.toSet() }.unionFlatten().toMutableList()
+        val profile = StudentProfile(schedule = schedule, labels = labels, degrees = degrees)
+        // do not create db entity for guest users
+        val owner = sessionManager.getCurrentUser(httpRequest) ?: return profile
 
-        val dbStudentProfile = DbStudentProfile.create(
+        val dbStudentProfile = DbStudentProfile.createOrUpdate(
             dbStudentProfileRepo = dbStudentProfileRepo,
-            schedule = DbStudentProfileSchedule.createOrUpdate(
-                dbStudentProfileScheduleRepo = dbStudentProfileScheduleRepo,
-                dbTermScheduleRepo = dbTermScheduleRepo,
-                dbCourseRepo = dbCourseRepo,
-                schedule = Schedule.create(mergedSchedule, startingYear, stream),
-                existingDbStudentProfileSchedule = null,
-            ),
-            degrees = degrees.toMutableList(),
-            labels = degreeRequirements.map { it.labels.toSet() }.unionFlatten().toMutableList(),
+            dbStudentProfileScheduleRepo = dbStudentProfileScheduleRepo,
+            dbTermScheduleRepo = dbTermScheduleRepo,
+            dbCourseRepo = dbCourseRepo,
+            studentProfile = profile,
             owner = owner,
         )
         owner.studentProfile = dbStudentProfile
@@ -142,11 +136,5 @@ class StudentProfileApi(
                 }
             )
         )
-    }
-
-    private fun mergeSchedule(imported: Schedule, template: Schedule): Schedule {
-        return Schedule(terms = template.terms.map { templateTerm ->
-            imported.terms.find { it.termName == templateTerm.termName } ?: templateTerm
-        })
     }
 }

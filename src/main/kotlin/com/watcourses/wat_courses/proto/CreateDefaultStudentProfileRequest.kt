@@ -42,11 +42,6 @@ class CreateDefaultStudentProfileRequest(
     adapter = "com.watcourses.wat_courses.proto.CoopStream#ADAPTER"
   )
   val coopStream: CoopStream? = null,
-  @field:WireField(
-    tag = 4,
-    adapter = "com.watcourses.wat_courses.proto.Schedule#ADAPTER"
-  )
-  val schedule: Schedule? = null,
   unknownFields: ByteString = ByteString.EMPTY
 ) : Message<CreateDefaultStudentProfileRequest, Nothing>(ADAPTER, unknownFields) {
   @Deprecated(
@@ -62,7 +57,6 @@ class CreateDefaultStudentProfileRequest(
         && degrees == other.degrees
         && startingYear == other.startingYear
         && coopStream == other.coopStream
-        && schedule == other.schedule
   }
 
   override fun hashCode(): Int {
@@ -72,7 +66,6 @@ class CreateDefaultStudentProfileRequest(
       result = result * 37 + degrees.hashCode()
       result = result * 37 + startingYear.hashCode()
       result = result * 37 + coopStream.hashCode()
-      result = result * 37 + schedule.hashCode()
       super.hashCode = result
     }
     return result
@@ -83,7 +76,6 @@ class CreateDefaultStudentProfileRequest(
     if (degrees.isNotEmpty()) result += """degrees=${sanitize(degrees)}"""
     if (startingYear != null) result += """startingYear=$startingYear"""
     if (coopStream != null) result += """coopStream=$coopStream"""
-    if (schedule != null) result += """schedule=$schedule"""
     return result.joinToString(prefix = "CreateDefaultStudentProfileRequest{", separator = ", ",
         postfix = "}")
   }
@@ -92,10 +84,9 @@ class CreateDefaultStudentProfileRequest(
     degrees: List<String> = this.degrees,
     startingYear: Int? = this.startingYear,
     coopStream: CoopStream? = this.coopStream,
-    schedule: Schedule? = this.schedule,
     unknownFields: ByteString = this.unknownFields
   ): CreateDefaultStudentProfileRequest = CreateDefaultStudentProfileRequest(degrees, startingYear,
-      coopStream, schedule, unknownFields)
+      coopStream, unknownFields)
 
   companion object {
     @JvmField
@@ -109,14 +100,12 @@ class CreateDefaultStudentProfileRequest(
         ProtoAdapter.STRING.asRepeated().encodedSizeWithTag(1, value.degrees) +
         ProtoAdapter.INT32.encodedSizeWithTag(2, value.startingYear) +
         CoopStream.ADAPTER.encodedSizeWithTag(3, value.coopStream) +
-        Schedule.ADAPTER.encodedSizeWithTag(4, value.schedule) +
         value.unknownFields.size
 
       override fun encode(writer: ProtoWriter, value: CreateDefaultStudentProfileRequest) {
         ProtoAdapter.STRING.asRepeated().encodeWithTag(writer, 1, value.degrees)
         ProtoAdapter.INT32.encodeWithTag(writer, 2, value.startingYear)
         CoopStream.ADAPTER.encodeWithTag(writer, 3, value.coopStream)
-        Schedule.ADAPTER.encodeWithTag(writer, 4, value.schedule)
         writer.writeBytes(value.unknownFields)
       }
 
@@ -124,7 +113,6 @@ class CreateDefaultStudentProfileRequest(
         val degrees = mutableListOf<String>()
         var startingYear: Int? = null
         var coopStream: CoopStream? = null
-        var schedule: Schedule? = null
         val unknownFields = reader.forEachTag { tag ->
           when (tag) {
             1 -> degrees.add(ProtoAdapter.STRING.decode(reader))
@@ -134,7 +122,6 @@ class CreateDefaultStudentProfileRequest(
             } catch (e: ProtoAdapter.EnumConstantNotFoundException) {
               reader.addUnknownField(tag, FieldEncoding.VARINT, e.value.toLong())
             }
-            4 -> schedule = Schedule.ADAPTER.decode(reader)
             else -> reader.readUnknownField(tag)
           }
         }
@@ -142,14 +129,12 @@ class CreateDefaultStudentProfileRequest(
           degrees = degrees,
           startingYear = startingYear,
           coopStream = coopStream,
-          schedule = schedule,
           unknownFields = unknownFields
         )
       }
 
       override fun redact(value: CreateDefaultStudentProfileRequest):
           CreateDefaultStudentProfileRequest = value.copy(
-        schedule = value.schedule?.let(Schedule.ADAPTER::redact),
         unknownFields = ByteString.EMPTY
       )
     }
